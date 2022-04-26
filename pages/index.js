@@ -47,7 +47,7 @@ export default function Home() {
       </div>
 
       {/* Our projects component */ }
-      <div className="projects flex flex-col text-center m-10">
+      <div id="projects" className="projects flex flex-col text-center m-10">
         <h5 className="text-5xl tracking-tight">Our Projects</h5>
         <h6 className="text-gray-400 text-3xl font-light py-3">We enjoy collaborating, experimenting, and shipping products using blockchain technology. Below is a collecton of projects we have worked on. Do you have an idea that would like to see brought to life? Let`s chat!</h6>
         <div className="project-list flex flex-col md:flex-row justify-around w-full mt-10 text-left">
@@ -82,13 +82,13 @@ export default function Home() {
       </div>
 
       {/* About us */ }
-      <div className="p-5 m-10">
+      <div id="about" className="p-5 m-10">
         <h5 className="text-5xl font-light py-5">About us</h5>
         <p>Started in 2016 as a meetup group on Long Island, Long Island Blockchain has grown to not only foster a growing community of passionate builders in our region but has had the opportunity to work with may great clients in the space. We focus primarily on educational resources and product development, getting your team up to speed with the ever changing Web3 space.</p>
       </div>
 
       {/* Our services component */ }
-      <div className="projects flex flex-col text-center m-10">
+      <div id="services" className="projects flex flex-col text-center m-10">
         <h5 className="text-5xl tracking-tight">Services</h5>
         <h6 className="text-gray-400 text-3xl font-light py-3">Whether you are just starting to figure out what this Web3 thing is, or you have a clear plan that needs to be executed, we have you covered.</h6>
         <div className="project-list flex flex-col md:flex-row justify-around w-full mt-10 text-left">
