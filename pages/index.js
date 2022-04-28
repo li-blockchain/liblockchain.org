@@ -20,7 +20,7 @@ export default function Home() {
       <div className="navigation flex items-center bg-transparent px-10 py-2">
         <div className="navigation-wrap flex justify-between items-center grow shrink relative">
           <Link href="/" className="relative float-left no-underline">
-            <img className="w-36 lg:w-40" src="/libc-logo.png"/>
+            <img alt="Long Island Blockchain Logo" className="w-36 lg:w-40" src="/libc-logo.png"/>
           </Link>
           <div className="hidden lg:block absolute flex items-center justify-center inset-0 menu">
             <nav role="navigation" className="flex justify-center items-center uppercase">
@@ -72,7 +72,7 @@ export default function Home() {
           <div className="project w-full p-3 mb-20">
             <a href="https://niftyunderground.app" target="_blank" rel="noreferrer">
               <div className="relative overflow-hidden w-full card-wrapper">
-                <img src="/nft.png" className="absolute w-full h-full inset-0 object-cover object-center"/>
+                <img src="/nft.png" alt="NFT Platforms" className="absolute w-full h-full inset-0 object-cover object-center"/>
               </div>
               <h4 className="text-4xl tracking-tight font-bold py-4">Nifty Underground</h4>
               <p>In collaboration with world renowned artists, we created an NFT minting platform for multiple networks. We are the first to bring a music NFT platform to the Polygon platform</p>
@@ -81,7 +81,7 @@ export default function Home() {
           <div className="project w-full p-3 mb-20">
             <a href="https://createcoin.surge.sh/" target="_blank" rel="noreferrer">
               <div className="relative overflow-hidden w-full card-wrapper">
-                <img src="/coin.png" className="absolute w-full h-full inset-0 object-cover object-center"/>
+                <img src="/coin.png" alt="Create your own token" className="absolute w-full h-full inset-0 object-cover object-center"/>
               </div>
               <h4 className="text-4xl tracking-tight font-bold py-4">Create your own token</h4>
               <p>With a single click create your own ERC-20 token on Ethereum or BSC.</p>
@@ -90,7 +90,7 @@ export default function Home() {
           <div className="project w-full p-3 mb-20">
             <a href="https://assetrouter.com" target="_blank" rel="noreferrer">
               <div className="relative overflow-hidden w-full card-wrapper">
-                  <img src="/route.jpg" className="absolute w-full h-full inset-0 object-cover object-center"/>
+                  <img src="/route.jpg" alt="Route funds between collaborators" className="absolute w-full h-full inset-0 object-cover object-center"/>
                 </div>
                 <h4 className="text-4xl tracking-tight font-bold py-4">Asset Router</h4>
                 <p>Providing simple to use smart contract wallets to facilitate simple payment splitting between collaborators</p>
@@ -113,7 +113,7 @@ export default function Home() {
           <div className="project w-full p-3 mb-20">
             <a href="#" target="_blank">
               <div className="relative overflow-hidden w-full card-wrapper">
-                <img src="/train.jpg" className="absolute w-full h-full inset-0 object-cover object-center"/>
+                <img src="/train.jpg" alt="Blockchain training services" className="absolute w-full h-full inset-0 object-cover object-center"/>
               </div>
               <h4 className="text-4xl tracking-tight font-bold py-4">Training</h4>
               <p>Whether you need a top level overview of the landscape or low level knowledge for a specific challenge. Our training services will have you convered.</p>
@@ -122,7 +122,7 @@ export default function Home() {
           <div className="project w-full p-3 mb-20">
             <a href="#" target="_blank">
               <div className="relative overflow-hidden w-full card-wrapper">
-                <img src="/create.jpg" className="absolute w-full h-full inset-0 object-cover object-center"/>
+                <img src="/create.jpg" alt="Blockchain development services" className="absolute w-full h-full inset-0 object-cover object-center"/>
               </div>
               <h4 className="text-4xl tracking-tight font-bold py-4">Development</h4>
               <p>Do you require a team of experienced developers to create and bring your ideas to life?</p>
@@ -131,7 +131,7 @@ export default function Home() {
           <div className="project w-full p-3 mb-20">
             <a href="#" target="_blank">
               <div className="relative overflow-hidden w-full card-wrapper">
-                  <img src="/consult.jpg" className="absolute w-full h-full inset-0 object-cover object-center"/>
+                  <img src="/consult.jpg" alt="Blockchain consulting services" className="absolute w-full h-full inset-0 object-cover object-center"/>
                 </div>
                 <h4 className="text-4xl tracking-tight font-bold py-4">Consulting</h4>
                 <p>Does your team require a knowledgeable resource to help strategize your product vision and guide you on best practices?</p>
@@ -153,7 +153,7 @@ export default function Home() {
           rel="noopener noreferrer"
         >
           <span className={styles.logo}>
-            <img className="w-40" src="/libc-logo.png" alt="LIBC Logo"/>
+            <img className="w-40" alt="Long Island Blockchain Logo" src="/libc-logo.png"/>
           </span>
         </a>
       </footer>
