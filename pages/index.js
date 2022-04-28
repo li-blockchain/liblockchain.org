@@ -20,9 +20,9 @@ export default function Home() {
       <div className="navigation flex items-center bg-transparent px-10 py-2">
         <div className="navigation-wrap flex justify-between items-center grow shrink relative">
           <Link href="/" className="relative float-left no-underline">
-            <img className="w-36 md:w-40" src="/libc-logo.png"/>
+            <img className="w-36 lg:w-40" src="/libc-logo.png"/>
           </Link>
-          <div className="hidden md:block absolute flex items-center justify-center inset-0 menu">
+          <div className="hidden lg:block absolute flex items-center justify-center inset-0 menu">
             <nav role="navigation" className="flex justify-center items-center uppercase">
               <a href="#about" className="relative no-underline p-9">About</a>
               <a href="#projects" className="relative no-underline p-9">Projects</a>
@@ -30,9 +30,9 @@ export default function Home() {
               <a href="https://www.youtube.com/c/LongIslandBlockchain" className="relative no-underline p-9">Learn</a>
             </nav>
           </div>
-          <ContractForm class="invisible md:visible"></ContractForm>
+          <ContractForm class="invisible lg:visible"></ContractForm>
         </div>
-        <div className="md:invisible">
+        <div className="lg:invisible">
           <Hamburger toggled={isOpen} toggle={setOpen} size={30} />
         </div>
       </div>
@@ -54,13 +54,13 @@ export default function Home() {
       {/* Hero Component */}
       <div className="hero flex flex-col items-center justify-center h-auto bg-[url('/sky.jpg')] bg-cover mx-auto py-16">
         <div className="flex flex-col items-center justify-center w-1/2">
-        <h1 className="text-4xl lg:text-6xl text-white text-center tracking-tight font-extrabold lg:m-5 md:m-2 sm:m-0 sm:pt-10">
+        <h1 className="text-4xl lg:text-6xl text-white text-center tracking-tight font-extrabold lg:m-5 lg:m-2 sm:m-0 sm:pt-10">
           Your Web3 Development & Education Resource
         </h1>
-        <h2 className="lg:text-xl md:text-md sm:text-md tracking-tight text-gray-300 text-center">
+        <h2 className="lg:text-xl lg:text-md sm:text-md tracking-tight text-gray-300 text-center">
           Since 2016, Long Island Blockchain has been teaching and building the fundamentals of decentralized technology. Are you ready to bring your Web3 project to life?
         </h2>
-        <ContractForm class="block md:hidden p-9"></ContractForm>
+        <ContractForm class="block lg:hidden p-9"></ContractForm>
         </div>
       </div>
 
@@ -68,7 +68,7 @@ export default function Home() {
       <div id="projects" className="projects flex flex-col text-center m-10">
         <h5 className="text-5xl tracking-tight">Our Projects</h5>
         <h6 className="text-gray-400 text-3xl font-light py-3">We enjoy collaborating, experimenting, and shipping products using blockchain technology. Below is a collecton of projects we have worked on. Do you have an idea that would like to see brought to life? Let`s chat!</h6>
-        <div className="project-list flex flex-col md:flex-row justify-around w-full mt-10 text-left">
+        <div className="project-list flex flex-col lg:flex-row justify-around w-full mt-10 text-left">
           <div className="project w-full p-3 mb-20">
             <a href="https://niftyunderground.app" target="_blank" rel="noreferrer">
               <div className="relative overflow-hidden w-full card-wrapper">
@@ -109,7 +109,7 @@ export default function Home() {
       <div id="services" className="projects flex flex-col text-center m-10">
         <h5 className="text-5xl tracking-tight">Services</h5>
         <h6 className="text-gray-400 text-3xl font-light py-3">Whether you are just starting to figure out what this Web3 thing is, or you have a clear plan that needs to be executed, we have you covered.</h6>
-        <div className="project-list flex flex-col md:flex-row justify-around w-full mt-10 text-left">
+        <div className="project-list flex flex-col lg:flex-row justify-around w-full mt-10 text-left">
           <div className="project w-full p-3 mb-20">
             <a href="#" target="_blank">
               <div className="relative overflow-hidden w-full card-wrapper">
