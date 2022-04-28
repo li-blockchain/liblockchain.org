@@ -116,7 +116,7 @@ export default function Home() {
                 <img src="/train.jpg" alt="Blockchain training services" className="absolute w-full h-full inset-0 object-cover object-center"/>
               </div>
               <h4 className="text-4xl tracking-tight font-bold py-4">Training</h4>
-              <p>Whether you need a top level overview of the landscape or low level knowledge for a specific challenge. Our training services will have you convered.</p>
+              <p>Whether you need a top level overview of the landscape or low level knowledge for a specific challenge. Our training services will have you covered.</p>
             </a>
           </div>
           <div className="project w-full p-3 mb-20">
