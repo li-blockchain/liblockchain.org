@@ -5,9 +5,9 @@ import Head from 'next/head'
 function MyApp({ Component, pageProps }) {
   return (
   <>
-    <Script strategy="lazyOnload" src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`} />
+    <Script strategy="lazyOnload" id="gtags" src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS}`} />
 
-<Script strategy="lazyOnload">
+<Script id="ganaltyics" strategy="lazyOnload">
     {`
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
