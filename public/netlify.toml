@@ -1,6 +1,0 @@
-[[redirects]]
-    from = "https://liblockchain.org"
-    to = "https://liblockchain.xyz"
-    status = 301
-    force = true
-    query = { path = ":path"}
