@@ -65,48 +65,53 @@ export default function Home() {
       </div>
 
       {/* Our projects component */ }
-      <div id="projects" className="projects flex flex-col text-center m-10">
-        <h5 className="text-5xl tracking-tight">Our Projects</h5>
-        <h6 className="text-gray-400 text-3xl font-light py-3">We enjoy collaborating, experimenting, and shipping products using blockchain technology. Below is a collecton of projects we have worked on. Do you have an idea that would like to see brought to life? Let`s chat!</h6>
-        <div className="project-list flex flex-col lg:flex-row justify-around w-full mt-10 text-left">
-          <div className="project w-full p-3 mb-20">
-            <a href="https://niftyunderground.app" target="_blank" rel="noreferrer">
-              <div className="relative overflow-hidden w-full card-wrapper">
-                <img src="/nft.png" alt="NFT Platforms" className="absolute w-full h-full inset-0 object-cover object-center"/>
-              </div>
-              <h4 className="text-4xl tracking-tight font-bold py-4">Nifty Underground</h4>
-              <p>In collaboration with world renowned artists, we created an NFT minting platform for multiple networks. We are the first to bring a music NFT platform to the Polygon platform</p>
-            </a>
-          </div>
-          <div className="project w-full p-3 mb-20">
-            <a href="https://createcoin.surge.sh/" target="_blank" rel="noreferrer">
-              <div className="relative overflow-hidden w-full card-wrapper">
-                <img src="/coin.png" alt="Create your own token" className="absolute w-full h-full inset-0 object-cover object-center"/>
-              </div>
-              <h4 className="text-4xl tracking-tight font-bold py-4">Create your own token</h4>
-              <p>With a single click create your own ERC-20 token on Ethereum or BSC.</p>
-            </a>
-          </div>
-          <div className="project w-full p-3 mb-20">
-            <a href="https://assetrouter.com" target="_blank" rel="noreferrer">
-              <div className="relative overflow-hidden w-full card-wrapper">
-                  <img src="/route.jpg" alt="Route funds between collaborators" className="absolute w-full h-full inset-0 object-cover object-center"/>
+      <div class="flex flex-col items-center justify-center text-center">
+        <div id="projects" className="projects flex flex-col text-center m-10 max-w-7xl">
+          <h5 className="text-5xl tracking-tight">Our Projects</h5>
+          <h6 className="text-gray-400 text-3xl font-light py-3">We enjoy collaborating, experimenting, and shipping products using blockchain technology. Below is a collecton of projects we have worked on. Do you have an idea that would like to see brought to life? Let`s chat!</h6>
+          <div className="project-list flex flex-col lg:flex-row justify-around w-full mt-10 text-left">
+            <div className="project w-full p-3 mb-20">
+              <a href="https://niftyunderground.app" target="_blank" rel="noreferrer">
+                <div className="relative overflow-hidden w-full card-wrapper">
+                  <img src="/nft.png" alt="NFT Platforms" className="absolute w-full h-full inset-0 object-cover object-center"/>
                 </div>
-                <h4 className="text-4xl tracking-tight font-bold py-4">Asset Router</h4>
-                <p>Providing simple to use smart contract wallets to facilitate simple payment splitting between collaborators</p>
-            </a>
+                <h4 className="text-4xl tracking-tight font-bold py-4">Nifty Underground</h4>
+                <p>In collaboration with world renowned artists, we created an NFT minting platform for multiple networks. We are the first to bring a music NFT platform to the Polygon platform</p>
+              </a>
+            </div>
+            <div className="project w-full p-3 mb-20">
+              <a href="https://createcoin.surge.sh/" target="_blank" rel="noreferrer">
+                <div className="relative overflow-hidden w-full card-wrapper">
+                  <img src="/coin.png" alt="Create your own token" className="absolute w-full h-full inset-0 object-cover object-center"/>
+                </div>
+                <h4 className="text-4xl tracking-tight font-bold py-4">Create your own token</h4>
+                <p>With a single click create your own ERC-20 token on Ethereum or BSC.</p>
+              </a>
+            </div>
+            <div className="project w-full p-3 mb-20">
+              <a href="https://assetrouter.com" target="_blank" rel="noreferrer">
+                <div className="relative overflow-hidden w-full card-wrapper">
+                    <img src="/route.jpg" alt="Route funds between collaborators" className="absolute w-full h-full inset-0 object-cover object-center"/>
+                  </div>
+                  <h4 className="text-4xl tracking-tight font-bold py-4">Asset Router</h4>
+                  <p>Providing simple to use smart contract wallets to facilitate simple payment splitting between collaborators</p>
+              </a>
+            </div>
           </div>
         </div>
       </div>
 
       {/* About us */ }
-      <div id="about" className="p-5 m-10">
-        <h5 className="text-5xl font-light py-5">About us</h5>
-        <p>Started in 2016 as a meetup group on Long Island, Long Island Blockchain has grown to not only foster a growing community of passionate builders in our region but has had the opportunity to work with may great clients in the space. We focus primarily on educational resources and product development, getting your team up to speed with the ever changing Web3 space.</p>
+      <div class="flex flex-col items-center justify-center text-center">
+        <div id="about" className="p-5 m-10 max-w-7xl">
+          <h5 className="text-5xl font-light py-5">About us</h5>
+          <p>Started in 2016 as a meetup group on Long Island, Long Island Blockchain has grown to not only foster a growing community of passionate builders in our region but has had the opportunity to work with may great clients in the space. We focus primarily on educational resources and product development, getting your team up to speed with the ever changing Web3 space.</p>
+        </div>
       </div>
 
       {/* Our services component */ }
-      <div id="services" className="projects flex flex-col text-center m-10">
+      <div class="flex flex-col items-center justify-center text-center">
+      <div id="services" className="projects flex flex-col text-center m-10 max-w-7xl">
         <h5 className="text-5xl tracking-tight">Services</h5>
         <h6 className="text-gray-400 text-3xl font-light py-3">Whether you are just starting to figure out what this Web3 thing is, or you have a clear plan that needs to be executed, we have you covered.</h6>
         <div className="project-list flex flex-col lg:flex-row justify-around w-full mt-10 text-left">
@@ -139,7 +144,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-
+      </div>
       {/* Contact us */ }
       <div className="projects flex flex-col text-center m-10">
       <h5 className="text-5xl tracking-tight mb-10">Ready to connect?</h5>
