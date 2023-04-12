@@ -4,6 +4,7 @@ import styles from '../styles/Home.module.css'
 import ContractForm from '../components/ContactForm'
 import Link from 'next/link'
 import { useState } from 'react'
+import Navigation from '../components/Navigation'
 
 export default function Home() {
   // Mobile menu state.
@@ -16,40 +17,7 @@ export default function Home() {
         <meta name="description" content="Blockchain developers, consultants, and educators. #BUIDL" />
       </Head>
 
-      {/* Navigation Component */}
-      <div className="navigation flex items-center bg-transparent px-10 py-2">
-        <div className="navigation-wrap flex justify-between items-center grow shrink relative">
-          <Link href="/" className="relative float-left no-underline">
-            <img alt="Long Island Blockchain Logo" className="w-36 lg:w-40" src="/libc-logo.png"/>
-          </Link>
-          <div className="hidden lg:block absolute flex items-center justify-center inset-0 menu">
-            <nav role="navigation" className="flex justify-center items-center uppercase">
-              <a href="#about" className="relative no-underline p-9">About</a>
-              <a href="#projects" className="relative no-underline p-9">Projects</a>
-              <a href="#services" className="relative no-underline p-9">Services</a>
-              <a href="https://www.youtube.com/c/LongIslandBlockchain" className="relative no-underline p-9">Learn</a>
-            </nav>
-          </div>
-          <ContractForm class="invisible lg:visible"></ContractForm>
-        </div>
-        <div className="lg:invisible">
-          <Hamburger toggled={isOpen} toggle={setOpen} size={30} />
-        </div>
-      </div>
-
-      {/* Mobile menu */}
-      {isOpen && (        
-        <>
-          <div className="p-10">
-                <nav role="navigation" className="flex flex-col justify-center items-center uppercase">
-                  <a href="#about" className="relative no-underline p-9">About</a>
-                  <a href="#projects" className="relative no-underline p-9">Projects</a>
-                  <a href="#services" className="relative no-underline p-9">Services</a>
-                  <a href="https://www.youtube.com/c/LongIslandBlockchain" className="relative no-underline p-9">Learn</a>
-                </nav> 
-          </div>
-        </>
-      )}
+      <Navigation></Navigation>
 
       {/* Hero Component */}
       <div className="hero flex flex-col items-center justify-center h-auto bg-[url('/sky.jpg')] bg-cover mx-auto py-16">
