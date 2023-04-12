@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Long Island Blockchain - Your trusted Blockchain builders</title>
+        <title>Long Island Blockchain - Your trusted Ethereum staking consultants</title>
         <meta name="description" content="Blockchain developers, consultants, and educators. #BUIDL" />
       </Head>
 
