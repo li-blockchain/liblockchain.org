@@ -29,7 +29,7 @@ export default function Home() {
         <h2 className="lg:text-xl drop-shadow-md lg:text-md sm:text-md tracking-tight text-gray-300 text-center">
           With extensive experience helping folks take advantage of the Ethereum proof-of-stake protocol, we can help you get started and starting earning rewards!
         </h2>
-        <ContractForm class="block p-9" cta></ContractForm>
+        <ContractForm additionalClasses="block p-10" cta></ContractForm>
         </div>
       </div>
 
@@ -46,7 +46,7 @@ export default function Home() {
 
       {/* Contact us */ }
       <div className="projects flex flex-col text-center m-10">
-      <h5 className="text-5xl tracking-tight mb-10">Let's connect</h5>
+      <h5 className="text-5xl tracking-tight mb-10">Let&apos;s connect</h5>
         <ContractForm></ContractForm>
       </div>
      

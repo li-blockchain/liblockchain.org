@@ -1,4 +1,5 @@
 import Hamburger from "hamburger-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import ContractForm from "./ContactForm";
@@ -25,7 +26,7 @@ export default function Navigation() {
             <a href="https://www.youtube.com/c/LongIslandBlockchain" className="relative no-underline p-9">Learn</a>
             </nav>
         </div>
-        <ContractForm class="invisible lg:visible"></ContractForm>
+        <ContractForm additionalClasses="invisible lg:visible"></ContractForm>
         </div>
         <div className="lg:invisible">
         <Hamburger toggled={isOpen} toggle={setOpen} size={30} />

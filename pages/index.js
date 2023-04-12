@@ -28,12 +28,12 @@ export default function Home() {
         <h2 className="lg:text-xl lg:text-md sm:text-md tracking-tight text-gray-300 text-center">
           Since 2016, Long Island Blockchain has been teaching and building the fundamentals of decentralized technology. Are you ready to bring your Web3 project to life?
         </h2>
-        <ContractForm class="block lg:hidden p-9"></ContractForm>
+        <ContractForm additionalClasses="block lg:hidden p-9"></ContractForm>
         </div>
       </div>
 
       {/* Our projects component */ }
-      <div class="flex flex-col items-center justify-center text-center">
+      <div className="flex flex-col items-center justify-center text-center">
         <div id="projects" className="projects flex flex-col text-center m-10 max-w-7xl">
           <h5 className="text-5xl tracking-tight">Our Projects</h5>
           <h6 className="text-gray-400 text-3xl font-light py-3">We enjoy collaborating, experimenting, and shipping products using blockchain technology. Below is a collecton of projects we have worked on. Do you have an idea that would like to see brought to life? Let`s chat!</h6>
@@ -70,7 +70,7 @@ export default function Home() {
       </div>
 
       {/* About us */ }
-      <div class="flex flex-col items-center justify-center text-center">
+      <div className="flex flex-col items-center justify-center text-center">
         <div id="about" className="p-5 m-10 max-w-7xl">
           <h5 className="text-5xl font-light py-5">About us</h5>
           <p>Started in 2016 as a meetup group on Long Island, Long Island Blockchain has grown to not only foster a growing community of passionate builders in our region but has had the opportunity to work with may great clients in the space. We focus primarily on educational resources and product development, getting your team up to speed with the ever changing Web3 space.</p>
@@ -78,7 +78,7 @@ export default function Home() {
       </div>
 
       {/* Our services component */ }
-      <div class="flex flex-col items-center justify-center text-center">
+      <div className="flex flex-col items-center justify-center text-center">
       <div id="services" className="projects flex flex-col text-center m-10 max-w-7xl">
         <h5 className="text-5xl tracking-tight">Services</h5>
         <h6 className="text-gray-400 text-3xl font-light py-3">Whether you are just starting to figure out what this Web3 thing is, or you have a clear plan that needs to be executed, we have you covered.</h6>
