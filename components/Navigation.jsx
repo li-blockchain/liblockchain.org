@@ -1,6 +1,4 @@
 import Hamburger from "hamburger-react";
-import Image from "next/image";
-import Link from "next/link";
 import { useState } from "react";
 import ContractForm from "./ContactForm";
 
@@ -38,9 +36,10 @@ export default function Navigation() {
         <>
         <div className="p-10">
                 <nav role="navigation" className="flex flex-col justify-center items-center uppercase">
-                <a href="#about" className="relative no-underline p-9">About</a>
-                <a href="#projects" className="relative no-underline p-9">Projects</a>
-                <a href="#services" className="relative no-underline p-9">Services</a>
+                <a href="/#about" className="relative no-underline p-9">About</a>
+                <a href="/#projects" className="relative no-underline p-9">Projects</a>
+                <a href="/#services" className="relative no-underline p-9">Services</a>
+                <a href="/eth-staking" className="relative no-underline p-9">Staking</a>
                 <a href="https://www.youtube.com/c/LongIslandBlockchain" className="relative no-underline p-9">Learn</a>
                 </nav> 
         </div>
