@@ -15,6 +15,11 @@ export default function Home() {
       <Head>
         <title>Long Island Blockchain - Your trusted Blockchain builders</title>
         <meta name="description" content="Blockchain developers, consultants, and educators. #BUIDL" />
+        <link
+          rel="canonical"
+          href="https://liblockchain.xyz"
+          key="canonical"
+        />
       </Head>
 
       <Navigation></Navigation>

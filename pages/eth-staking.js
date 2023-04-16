@@ -14,8 +14,13 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Long Island Blockchain - Your trusted Ethereum staking consultants</title>
-        <meta name="description" content="Blockchain developers, consultants, and educators. #BUIDL" />
+        <title>Long Island Blockchain - Non-Custodial Ethereum Staking Services</title>
+        <meta name="description" content="Ethereum Staking and Rocketpool node operator services." />
+        <link
+          rel="canonical"
+          href="https://liblockchain.xyz/eth-staking"
+          key="canonical"
+        />
       </Head>
 
       <Navigation></Navigation>
