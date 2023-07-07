@@ -26,12 +26,12 @@ export default function Home() {
       <Navigation></Navigation>
 
       {/* Hero Component */}
-      <div className="hero flex flex-col items-center justify-center h-auto bg-staking-hero bg-cover">
-        <div className="flex flex-col items-center justify-center w-1/2">
+      <div className="hero flex flex-col items-center justify-center h-auto bg-staking-hero bg-cover pt-10">
+        <div className="flex flex-col items-center justify-center lg:w-1/2 md:w-1/3 md:px-10">
         <h1 className="text-4xl drop-shadow-md lg:text-6xl text-white text-center tracking-tight font-extrabold lg:m-5 lg:m-2 sm:m-0 sm:pt-10">
           Non-Custodial Ethereum Staking Services
         </h1>
-        <h2 className="lg:text-xl drop-shadow-md lg:text-md sm:text-md tracking-tight text-gray-300 text-center">
+        <h2 className="lg:text-xl drop-shadow-md lg:text-md sm:text-md tracking-tight text-gray-300 text-center px-10">
           With extensive experience helping folks take advantage of the Ethereum proof-of-stake protocol, we can help you get started and starting earning rewards!
         </h2>
         <ContractForm additionalClasses="block p-10" cta></ContractForm>
