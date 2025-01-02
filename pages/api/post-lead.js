@@ -30,6 +30,55 @@ async function postToDiscord(message) {
   }
 }
 
+async function postToNotion(data) {
+  const NOTION_API_KEY = process.env.NOTION_API_KEY;
+  const NOTION_DATABASE_ID = process.env.NOTION_DATABASE_ID;
+
+  try {
+    const response = await fetch(`https://api.notion.com/v1/pages`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${NOTION_API_KEY}`,
+        'Content-Type': 'application/json',
+        'Notion-Version': '2022-06-28'
+      },
+      body: JSON.stringify({
+        parent: {
+          type: "database_id",
+          database_id: NOTION_DATABASE_ID
+        },
+        properties: {
+          "Email": {
+            type: "email",
+            email: data.properties.Email.email
+          },
+          "Project description": {
+            type: "rich_text",
+            rich_text: [{
+              type: "text",
+              text: {
+                content: data.properties["Services interested in"].multi_select[0].name
+              }
+            }]
+          }
+        }
+      })
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Notion API error details:', errorData);
+      throw new Error(`Notion API error: ${response.status}`);
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error posting to Notion:', error);
+    return false;
+  }
+}
+
+
 async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -48,16 +97,23 @@ async function handler(req, res) {
 
     const message = `🚨 New Contact Form Submission 🚨 \nEmail: ${email}\nServices Interested In: ${servicesText}`;
     
-    const success = await postToDiscord(message);
-    
-    if (success) {
-      res.status(200).json({ status: 'success' });
-    } else {
-      res.status(500).json({ error: 'Failed to post to Discord' });
+    const discordSuccess = await postToDiscord(message);
+    const notionSuccess = await postToNotion(data);
+
+    if (!discordSuccess || !notionSuccess) {
+      console.error('Failed to post to services:', {
+        discord: discordSuccess,
+        notion: notionSuccess
+      });
+      return res.status(500).json({ 
+        error: 'Failed to save contact submission'
+      });
     }
+
+    res.status(200).json({ status: 'success' });
   } catch (error) {
     console.error('Error processing request:', error);
-    res.status(400).json({ error: 'Invalid request data' });
+    res.status(500).json({ error: 'Failed to process request' });
   }
 }
 export default handler;
