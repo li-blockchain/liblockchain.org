@@ -21,6 +21,7 @@ export default function Navigation() {
             <a href="/#projects" className="relative no-underline p-9">Projects</a>
             <a href="/#services" className="relative no-underline p-9">Services</a>
             <a href="/eth-staking" className="relative no-underline p-9">Staking</a>
+            <a href="https://mirror.xyz/0x372051ff945eD07b8073872C7B77C9E84e000e06" className="relative no-underline p-9">Blog</a>
             <a href="https://www.youtube.com/c/LongIslandBlockchain" className="relative no-underline p-9">Learn</a>
             </nav>
         </div>
