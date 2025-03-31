@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+
+		<title>Demystifying Crypto</title>
+
+		<meta name="description" content="Demystifying Crypto">
+		<meta name="author" content="Long Island Blockchain">
+
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/black.css" id="theme">
+		<link rel="stylesheet" href="css/custom.css">
+    <link rel="stylesheet" href="sego/sego_style.css">
+    <link rel="stylesheet" href="sego/code2art.css">
+
+
+		<!-- Code syntax highlighting -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+		</script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.7/p5.min.js" integrity="sha256-hTadFyx999S2PaNVgI6MyGaojC6fzBZb2D5GibT/Fno=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.7/addons/p5.dom.min.js" integrity="sha256-XJv4F6vIKIxDBK9yFUP0+7QP6z7AHjwNvmAS/ZsNogM=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.7/addons/p5.sound.min.js" integrity="sha256-6pVtCAjafcylu7oG0UhoMkUxhAMMMKP5elLWf9UXS+c=" crossorigin="anonymous"></script>
+
+     <script src="js/sketch1.js"></script>
+     <script src="js/sketch2.js"></script>
+     <script src="js/sketch3.js"></script>
+
+		<!--[if lt IE 9]>
+		<script src="lib/js/html5shiv.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+    <header>
+    </header>
+
+    <div id="sketch"></div>
+
+		<div class="reveal">
+
+			<!-- Any section element inside of this container is displayed as a slide -->
+			<div class="slides">
+				<section data-state="openning">
+					<div style="background-color: rgba(0, 0, 0, 0.8);">
+            <h5 style="margin-bottom: 0px; font-size: 1em"><span class='lowlight'>Demystifying</h5>
+            <h2 style="margin-bottom: 0px; font-size: 3em"><span>Crypto</span></h2>
+            <div style="display: flex; align-content: center; justify-content: center; gap:50px; font-size: .8em; border-top: 1px solid #eeeeee; width: 80%; margin: 0 auto; padding-top: 40px;">
+              <div><div>Nick Selvaggio</div><div>nick@liblockchain.org</div></div>
+              <div><div>Craig Rudes</div><div>craig@liblockchain.org</div></div>
+            </div>
+          </div>
+				</section>
+
+        <section>
+          <section data-state="sketch2">
+            <h2>A little about us.</h2>
+            <ul style="font-size: .8em; background-color: rgba(0, 0, 0, 0.6);">
+              <li style="display:flex; gap: 10px;"><strong>2017: </strong>We start as a meetup group with a focus on education and connecting people.</li>
+              <li style="display:flex; gap: 10px;"><strong>2019: </strong>Launch first create your own crypto smart contract</li>
+              <li style="display:flex; gap: 10px;"><strong>2022: </strong>Worked with CBS on a Metaverse activation and various NFT projects.</li>
+              <li style="display:flex; gap: 10px;"><strong>2024: </strong>Developed and launched a non-custotial staking platform.</li>
+              <li style="display:flex; gap: 10px;"><strong>2025: </strong>Continue to develop our educational programs and staking platform.</li>
+            </ul>
+          </section>
+        </section>
+
+
+        <section>
+          <section>
+            <h2>What is a Cryptocurrency</h2>
+          </section>
+          <section data-state="clear" style="text-align: left; font-size: .7em">
+            <h2>Lets break it down</h2>
+            <p class="fragment" data-fragment-index="1"><span style="background-color: yellow; color: black;">Crypto</span>: "What is needed is an electronic payment system based on cryptographic proof instead of trust, allowing any two willing parties to transact directly with each other without the need for a trusted third party" - Satoshi Nakamoto</p>
+            <p class="fragment" data-fragment-index="2"><span style="background-color: yellow; color: black;">Currency</span>: "We have proposed a system for electronic transactions without relying on trust. We started with the usual framework of coins made from digital signatures, which provides strong control of ownership, but is incomplete without a way to prevent double-spending"</p>
+            <aside class="notes">
+              <ul>
+                <li>Bitcoin - A peer to peer electrontic cash system.</li>
+              </ul>
+            </aside>
+          </section>
+          <section  data-state="clear" style="width: 100%; background: url('images/btc.png') no-repeat top right; background-size: 200px; background-color: black;">
+            <h2 style="margin-bottom: 0px; padding-bottom: 0px">Bitcoin</h2>
+            <p style="font-size: .8em; margin-top: 0px; padding-top: 0px">“A purely peer-to-peer version of electronic cash”</p>
+            <ul>
+            <li class="fragment" data-fragment-index="1">Designed to generate 21 Million through “mining”</li>
+            <li class="fragment" data-fragment-index="2">A global electronic cash payment system that works 24/7</li>
+            <li class="fragment" data-fragment-index="3">Protected by incentive mechanisms</li>
+            <ul>
+            <li class="fragment" data-fragment-index="4">Proof-of-Work ensures a high cost to attack the system.</li>  
+            <li class="fragment" data-fragment-index="5">Coin Issuance ensures good actors are rewarded for their
+              services</li>
+            </ul>
+            </ul>
+          </section>
+        
+          
+        </section>
+        <section>
+          <section data-background="#505050">
+            <h2>Bitcoin is only one type of Blockchain</h2>
+            <p class="fragment" data-fragment-index="1">A blockchain more generally tracks shared consensus.</p>
+          </section>
+          <section>
+            <img src="images/monkey.png"></img>
+            <!-- <p>Ethereum does this by building what is essentially the ultimate abstract foundational layer: a blockchain with a <span style="background-color: yellow; color: black;">built-in Turing-complete programming language</span>, allowing anyone to write smart contracts and decentralized applications where they can create their own arbitrary rules for ownership, transaction formats and state transition functions.</p> -->
+          </section>
+          <section>
+            <h2>What’s happening today with Stablecoins?</h2>
+            <div style="display: flex">
+              <div>
+                <div><img src="images/stable-graph.png"/></div>
+              </div>
+              <div>
+                <div style="font-size: .7em; width: 560px;">
+                  <ul>
+                    <li>The GENIUS Act (Guiding and Establishing National Innovation for U.S. Stablecoins) was approved by the Senate Banking Committee March 3, 2025 with an 18-6 vote and awaits scheduling for debate with full Senate.</li>
+                    <li>Over $233 Billion Stablecoins in circulating supply today with over $27 trillion in transfer volume in 2024.</li>
+                    <li>It is a borderless, instantaneous, global dollar with access to "programmable money"</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <span style="font-size: .4em">Source: <a href="https://www.weforum.org/stories/2025/03/stablecoins-cryptocurrency-on-rise-financial-systems/">https://www.weforum.org/stories/2025/03/stablecoins-cryptocurrency-on-rise-financial-systems/</a></span>
+            
+          </section>
+          <section>
+            <h2>A Digital Assets Market Structure Bill</h2>
+            <ul>
+              <li>The Financial Innovation and Technology for the 21st Century Act (FIT21) was passed in May 2024</li>
+            </ul>
+          </section>
+      </section>
+      <section>
+          <p>Thank you!</p>
+          <h3>Questions?</h3>
+          <p>Twitter: <a href="http://twitter.com/direct">@direct</a></p>
+          <p><a href="https://liblockchain.xyz">https://liblockchain.xyz</p>
+      </section>
+			</div>
+		<footer class="sego-logo">
+      <a href="http://liblockchain.xyz"><img src="images/libc-logo.png" alt="LIBC logo" height="100" /></a>
+    </footer>
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+
+			// Full list of configuration options available at:
+			// https://github.com/hakimel/reveal.js#configuration
+			Reveal.initialize({
+				controls: true,
+				progress: true,
+				history: true,
+				center: true,
+
+				transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+				// Parallax scrolling
+				//parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
+				//parallaxBackgroundSize: '2100px 900px',
+
+				// Optional libraries used to extend on reveal.js
+				dependencies: [
+					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+					{ src: 'plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+					{ src: 'plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+				]
+      });
+      
+      //our initial sketch
+      var myp5 = new p5(s3, 'sketch');
+
+      Reveal.addEventListener('openning', function() {
+        document.getElementById("sketch").innerHTML = "";
+        //start given sketch.
+        var myp5 = new p5(s3, 'sketch');
+      });
+
+      Reveal.addEventListener('sketch2', function() {
+        document.getElementById("sketch").innerHTML = "";
+        //start given sketch.
+        var myp5 = new p5(s2, 'sketch');
+      });
+
+      Reveal.addEventListener('clear', function() {
+        document.getElementById("sketch").innerHTML = "";
+      });
+
+		</script>
+
+	</body>
+</html>

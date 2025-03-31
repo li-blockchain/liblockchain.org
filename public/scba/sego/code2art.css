@@ -1,0 +1,96 @@
+#sketch {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+}
+
+.headline, .code-with-me {
+  color: white;
+  position: fixed; /* or absolute */
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  /* bring your own prefixes */
+  transform: translate(-50%, -50%);
+
+  font-family: 'Raleway', sans-serif;
+
+  background-color: #1e2528;
+  padding: 10px !important;
+  border: 10px solid rgba(141,142,174,.2);
+}
+
+.headline h1 {
+  margin-bottom: 0px;
+  margin-top: 0px;
+}
+
+.headline p {
+  font-size: .75em;
+}
+
+.headline .highlight {
+  background-color: #8e0000;
+  padding: 2px;
+}
+
+
+.headline h5 a {
+    font-size: 1.8em;
+    margin: 0;
+    display: block;
+    text-align: center;
+}
+
+.headline h5 a {
+    color: #e07700;
+}
+
+.background-overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    background: url(../images/overlay-vignette.png);
+    background-size: 100% 100%;
+    opacity: 0;
+}
+
+.play a {
+    font-size: 1.8em;
+    margin-top: 20px;
+    display: block;
+    padding: 5px;
+    cursor: pointer;
+    color: #e07700;
+    border: 1px solid;
+    text-align: center;
+}
+
+.code-with-me {
+  display: none;
+  background: rgba(50,50,50,.96);
+}
+
+.code-with-me .close {
+  cursor: pointer;
+  float: right;
+}
+
+.code-with-me .comments {
+  color: #70c5ff;
+}
+
+.code-with-me .token {
+  color: #faa81d;
+}
+
+@media only screen and (min-device-width: 375px) and (max-device-width: 667px) and (orientation : portrait) {
+    /* iPhone 6 Portrait */
+    .headline h1 .lowlight{
+      font-size: .4em;
+    }
+}
