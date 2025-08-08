@@ -25,7 +25,7 @@ export default function Privacy() {
             
             <div className="prose prose-lg max-w-none">
               <p className="text-gray-700 mb-6">
-                LI Blockchain LLC ("we," "our," or "us") respects your privacy. This Privacy Policy describes how we collect, use, and protect your information when you use our mobile application (the "App"), which includes a self-custody cryptocurrency wallet powered by Privy.
+                LI Blockchain LLC (&ldquo;we,&rdquo; &ldquo;our,&rdquo; or &ldquo;us&rdquo;) respects your privacy. This Privacy Policy describes how we collect, use, and protect your information when you use our mobile application (the &ldquo;App&rdquo;), which includes a self-custody cryptocurrency wallet powered by Privy.
               </p>
 
               <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">1. Information We Collect</h2>
@@ -41,7 +41,7 @@ export default function Privacy() {
                 We do not collect information with advertisers or unrelated third parties.
               </p>
 
-              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">5. Children's Privacy</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mt-8 mb-4">5. Children&rsquo;s Privacy</h2>
               <p className="text-gray-700 mb-6">
                 Our app is not intended for children under the age of 13. We do not knowingly collect personal data from children.
               </p>
