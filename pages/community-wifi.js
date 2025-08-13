@@ -24,7 +24,7 @@ export default function CommunityWifi() {
             Transform Your WiFi Into Revenue
           </h1>
           <h2 className="lg:text-xl lg:text-md sm:text-md tracking-tight text-gray-300 text-center mt-4">
-            Join Long Island's community-driven WiFi network and turn your internet connection into a business opportunity while providing superior connectivity to your customers.
+            Join Long Island&apos;s community-driven WiFi network and turn your internet connection into a business opportunity while providing superior connectivity to your customers.
           </h2>
         </div>
       </div>
