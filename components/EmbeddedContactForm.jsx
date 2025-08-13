@@ -63,7 +63,7 @@ const EmbeddedContactForm = function(props) {
         <div className={`bg-white rounded-lg p-8 shadow-lg max-w-2xl mx-auto ${additionalClasses}`}>
             <div className="mb-6 text-center">
                 <h2 className="text-2xl font-bold mb-2">Join the Community WiFi Network</h2>
-                <p className="text-gray-600">Fill out the form below and we'll get in touch within 24 hours</p>
+                <p className="text-gray-600">Fill out the form below and we&apos;ll get in touch within 24 hours</p>
             </div>
 
             <form onSubmit={handleSubmit}>
@@ -109,7 +109,7 @@ const EmbeddedContactForm = function(props) {
                 {submitStatus === 'success' && (
                     <div className="mt-6 p-4 bg-green-100 border border-green-400 text-green-700 rounded-lg text-center">
                         <p className="font-semibold">Thank you for your interest!</p>
-                        <p>We'll contact you within 24 hours to discuss how you can join our community WiFi network.</p>
+                        <p>We&apos;ll contact you within 24 hours to discuss how you can join our community WiFi network.</p>
                     </div>
                 )}
                 

@@ -18,8 +18,7 @@ export default function Navigation() {
         <div className="hidden lg:block flex items-center justify-center inset-0 menu">
             <nav role="navigation" className="flex justify-center items-center uppercase">
             <a href="/#about" className="relative no-underline p-9">About</a>
-            <a href="/#projects" className="relative no-underline p-9">Projects</a>
-            <a href="/#services" className="relative no-underline p-9">Services</a>
+            <a href="/community-wifi" className="relative no-underline p-9">Neutral Host</a>
             <a href="/eth-staking" className="relative no-underline p-9">Staking</a>
             <a href="https://mirror.xyz/0x372051ff945eD07b8073872C7B77C9E84e000e06" className="relative no-underline p-9">Blog</a>
             <a href="https://www.youtube.com/c/LongIslandBlockchain" className="relative no-underline p-9">Learn</a>
@@ -38,8 +37,7 @@ export default function Navigation() {
         <div className="p-10">
                 <nav role="navigation" className="flex flex-col justify-center items-center uppercase">
                 <a href="/#about" className="relative no-underline p-9">About</a>
-                <a href="/#projects" className="relative no-underline p-9">Projects</a>
-                <a href="/#services" className="relative no-underline p-9">Services</a>
+                <a href="/community-wifi" className="relative no-underline p-9">Neutral Host</a>
                 <a href="/eth-staking" className="relative no-underline p-9">Staking</a>
                 <a href="https://mirror.xyz/0x372051ff945eD07b8073872C7B77C9E84e000e06" className="relative no-underline p-9">Blog</a>
                 <a href="https://www.youtube.com/c/LongIslandBlockchain" className="relative no-underline p-9">Learn</a>
