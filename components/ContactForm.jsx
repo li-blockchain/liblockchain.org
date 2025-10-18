@@ -81,10 +81,10 @@ const ContractForm = function(props) {
     };
 
     return (
-        <div className={classes}>
-            <button 
+        <div className={classes + " flex justify-center"}>
+            <button
                 onClick={() => setIsOpen(true)}
-                className="bg-[#5209B2] text-white text-xl rounded-full px-8 py-3 font-bold hover:bg-[#4207A0] transition-colors"
+                className="border-2 border-brand-cyan-500 text-brand-cyan-500 text-xl rounded-full px-8 py-3 font-bold hover:bg-brand-cyan-500 hover:text-white transition-colors"
             >
                 Get in touch
             </button>
@@ -135,7 +135,7 @@ const ContractForm = function(props) {
                             <button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full bg-[#5209B2] text-white py-2 rounded hover:bg-[#4207A0] transition-colors disabled:opacity-50"
+                                className="w-full bg-brand-cyan-500 text-white py-2 rounded hover:bg-brand-cyan-600 transition-colors disabled:opacity-50"
                             >
                                 {isSubmitting ? 'Submitting...' : 'Submit'}
                             </button>

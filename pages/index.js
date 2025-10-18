@@ -1,139 +1,242 @@
 import Head from 'next/head'
-import Hamburger from 'hamburger-react'
 import styles from '../styles/Home.module.css'
 import ContractForm from '../components/ContactForm'
 import Link from 'next/link'
-import { useState } from 'react'
 import Navigation from '../components/Navigation'
+import StatsSection from '../components/StatsSection'
+import NetworksGrid from '../components/NetworksGrid'
+import TrustIndicators from '../components/TrustIndicators'
 
 export default function Home() {
-  // Mobile menu state.
-  const [isOpen, setOpen] = useState(false);
-
   return (
     <>
       <Head>
-        <title>Long Island Blockchain - Your trusted Blockchain builders</title>
-        <meta name="description" content="Blockchain developers, consultants, and educators. #BUIDL" />
+        <title>Long Island Blockchain - White Label Ethereum Validators</title>
+        <meta name="description" content="Enterprise Ethereum validator infrastructure for institutions. $100M+ staked, top 5% performance. Supporting Lido, Rocketpool, and native staking from our SOC-2 datacenter since 2016." />
         <link
           rel="canonical"
           href="https://liblockchain.xyz"
           key="canonical"
         />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
       </Head>
 
       <Navigation></Navigation>
 
-      {/* Hero Component */}
-      <div className="hero flex flex-col items-center justify-center h-auto bg-[url('/sky.jpg')] bg-cover mx-auto py-16">
-        <div className="flex flex-col items-center justify-center w-1/2">
-        <h1 className="text-4xl lg:text-6xl text-white text-center tracking-tight font-extrabold lg:m-5 lg:m-2 sm:m-0 sm:pt-10">
-          Your Web3 Development & Education Resource
-        </h1>
-        <h2 className="lg:text-xl lg:text-md sm:text-md tracking-tight text-gray-300 text-center">
-          Since 2016, Long Island Blockchain has been teaching and building the fundamentals of decentralized technology. Are you ready to bring your Web3 project to life?
-        </h2>
-        <ContractForm additionalClasses="block lg:hidden p-9"></ContractForm>
-        </div>
-      </div>
+      {/* Hero Component - Staking Focused */}
+      <div id="staking" className="relative bg-brand-slate-900 overflow-hidden">
+        {/* Background gradient mesh */}
+        <div className="absolute inset-0 bg-hero-gradient"></div>
+        <div className="absolute inset-0 bg-hero-mesh"></div>
 
-      {/* Our projects component */ }
-      <div className="flex flex-col items-center justify-center text-center">
-        <div id="projects" className="projects flex flex-col text-center m-10 max-w-7xl">
-          <h5 className="text-5xl tracking-tight">Our Projects</h5>
-          <h6 className="text-gray-400 text-3xl font-light py-3">We enjoy collaborating, experimenting, and shipping products using blockchain technology. Below is a collecton of projects we have worked on. Do you have an idea that would like to see brought to life? Let`s chat!</h6>
-          <div className="project-list flex flex-col lg:flex-row justify-around w-full mt-10 text-left">
-            <div className="project w-full p-3 mb-20">
-              <a href="https://niftyunderground.app" target="_blank" rel="noreferrer">
-                <div className="relative overflow-hidden w-full card-wrapper">
-                  <img src="/nft.png" alt="NFT Platforms" className="absolute w-full h-full inset-0 object-cover object-center"/>
-                </div>
-                <h4 className="text-4xl tracking-tight font-bold py-4">Nifty Underground</h4>
-                <p>In collaboration with world renowned artists, we created an NFT minting platform for multiple networks. We are the first to bring a music NFT platform to the Polygon platform</p>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+          <div className="text-center">
+            {/* Badge */}
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-brand-cyan-500/10 border border-brand-cyan-500/30 text-brand-cyan-400 text-sm font-medium mb-8">
+              <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              $100M+ Staked • Top 5% Performance • SOC-2 Compliant
+            </div>
+
+            {/* Main Heading */}
+            <h1 className="text-5xl lg:text-7xl text-white font-bold tracking-tight mb-6">
+              White Label Ethereum
+              <span className="block text-transparent bg-clip-text bg-purple-gradient">
+                Validator Infrastructure
+              </span>
+            </h1>
+
+            {/* Subheading */}
+            <p className="text-xl lg:text-2xl text-brand-slate-300 max-w-3xl mx-auto mb-12 leading-relaxed">
+              Powering liquid staking protocols and institutional validators with enterprise-grade infrastructure. From our SOC-2 datacenter to your optimized DeFi strategies.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link
+                href="/create-vault"
+                className="px-8 py-4 bg-brand-cyan-500 hover:bg-brand-cyan-600 text-white text-lg font-semibold rounded-lg transition-all duration-300 hover:shadow-glow-lg transform hover:scale-105"
+              >
+                Stake Now
+              </Link>
+              <a
+                href="#contact"
+                className="px-8 py-4 border-2 border-brand-cyan-500 text-brand-cyan-400 hover:bg-brand-cyan-500 hover:text-white text-lg font-semibold rounded-lg transition-all duration-300 transform hover:scale-105"
+              >
+                Get in Touch
               </a>
             </div>
-            <div className="project w-full p-3 mb-20">
-              <a href="https://createcoin.surge.sh/" target="_blank" rel="noreferrer">
-                <div className="relative overflow-hidden w-full card-wrapper">
-                  <img src="/coin.png" alt="Create your own token" className="absolute w-full h-full inset-0 object-cover object-center"/>
-                </div>
-                <h4 className="text-4xl tracking-tight font-bold py-4">Create your own token</h4>
-                <p>With a single click create your own ERC-20 token on Ethereum or BSC.</p>
-              </a>
-            </div>
-            <div className="project w-full p-3 mb-20">
-              <a href="https://assetrouter.com" target="_blank" rel="noreferrer">
-                <div className="relative overflow-hidden w-full card-wrapper">
-                    <img src="/route.jpg" alt="Route funds between collaborators" className="absolute w-full h-full inset-0 object-cover object-center"/>
-                  </div>
-                  <h4 className="text-4xl tracking-tight font-bold py-4">Asset Router</h4>
-                  <p>Providing simple to use smart contract wallets to facilitate simple payment splitting between collaborators</p>
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      {/* About us */ }
-      <div className="flex flex-col items-center justify-center text-center">
-        <div id="about" className="p-5 m-10 max-w-7xl">
-          <h5 className="text-5xl font-light py-5">About us</h5>
-          <p>Started in 2016 as a meetup group on Long Island, Long Island Blockchain has grown to not only foster a growing community of passionate builders in our region but has had the opportunity to work with may great clients in the space. We focus primarily on educational resources and product development, getting your team up to speed with the ever changing Web3 space.</p>
-        </div>
-      </div>
-
-      {/* Our services component */ }
-      <div className="flex flex-col items-center justify-center text-center">
-      <div id="services" className="projects flex flex-col text-center m-10 max-w-7xl">
-        <h5 className="text-5xl tracking-tight">Services</h5>
-        <h6 className="text-gray-400 text-3xl font-light py-3">Whether you are just starting to figure out what this Web3 thing is, or you have a clear plan that needs to be executed, we have you covered.</h6>
-        <div className="project-list flex flex-col lg:flex-row justify-around w-full mt-10 text-left">
-          <div className="project w-full p-3 mb-20">
-            <a href="#" target="_blank">
-              <div className="relative overflow-hidden w-full card-wrapper">
-                <img src="/train.jpg" alt="Blockchain training services" className="absolute w-full h-full inset-0 object-cover object-center"/>
+            {/* Trust Signals */}
+            <div className="mt-16 flex flex-wrap justify-center items-center gap-8 text-brand-slate-300">
+              <div className="flex items-center space-x-2">
+                <svg className="w-5 h-5 text-brand-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span className="font-medium">Lido • Rocketpool • Native Staking</span>
               </div>
-              <h4 className="text-4xl tracking-tight font-bold py-4">Training</h4>
-              <p>Whether you need a top level overview of the landscape or low level knowledge for a specific challenge. Our training services will have you covered.</p>
-            </a>
-          </div>
-          <div className="project w-full p-3 mb-20">
-            <a href="#" target="_blank">
-              <div className="relative overflow-hidden w-full card-wrapper">
-                <img src="/create.jpg" alt="Blockchain development services" className="absolute w-full h-full inset-0 object-cover object-center"/>
+              <div className="flex items-center space-x-2">
+                <svg className="w-5 h-5 text-brand-purple-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span className="font-medium">Own Hardware • Own Datacenter</span>
               </div>
-              <h4 className="text-4xl tracking-tight font-bold py-4">Development</h4>
-              <p>Do you require a team of experienced developers to create and bring your ideas to life?</p>
-            </a>
-          </div>
-          <div className="project w-full p-3 mb-20">
-            <a href="#" target="_blank">
-              <div className="relative overflow-hidden w-full card-wrapper">
-                  <img src="/consult.jpg" alt="Blockchain consulting services" className="absolute w-full h-full inset-0 object-cover object-center"/>
-                </div>
-                <h4 className="text-4xl tracking-tight font-bold py-4">Consulting</h4>
-                <p>Does your team require a knowledgeable resource to help strategize your product vision and guide you on best practices?</p>
-            </a>
+              <div className="flex items-center space-x-2">
+                <svg className="w-5 h-5 text-brand-pink-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span className="font-medium">Protocol Agnostic</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Stats Section */}
+      <StatsSection />
+
+      {/* Trust Indicators */}
+      <TrustIndicators />
+
+      {/* Networks Grid */}
+      <div id="networks">
+        <NetworksGrid />
       </div>
-      {/* Contact us */ }
-      <div className="projects flex flex-col text-center m-10">
-      <h5 className="text-5xl tracking-tight mb-10">Ready to connect?</h5>
-        <ContractForm></ContractForm>
+
+      {/* How It Works Section */}
+      <div className="bg-brand-slate-900 py-16 lg:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+              Built for Speed and Flexibility
+            </h2>
+            <p className="text-lg text-brand-slate-300 max-w-2xl mx-auto">
+              From consultation to production validators in days, not months
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="text-center group">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-brand-cyan-500 to-brand-cyan-600 rounded-full mb-6 group-hover:shadow-glow transition-shadow duration-300">
+                <span className="text-2xl font-bold text-white">1</span>
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Strategy Consultation</h3>
+              <p className="text-brand-slate-400">
+                We work with your team to design optimal staking strategies across the DeFi ecosystem, maximizing yield while managing risk
+              </p>
+            </div>
+
+            <div className="text-center group">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-brand-purple-500 to-brand-purple-600 rounded-full mb-6 group-hover:shadow-glow-purple transition-shadow duration-300">
+                <span className="text-2xl font-bold text-white">2</span>
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Deploy Validators</h3>
+              <p className="text-brand-slate-400">
+                Launch white label validators on our SOC-2 compliant infrastructure with enterprise connectivity and proven uptime
+              </p>
+            </div>
+
+            <div className="text-center group">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-brand-pink-500 to-brand-pink-600 rounded-full mb-6 group-hover:shadow-glow-purple transition-shadow duration-300">
+                <span className="text-2xl font-bold text-white">3</span>
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Optimize & Scale</h3>
+              <p className="text-brand-slate-400">
+                Monitor top 5% performance metrics and adapt quickly to evolving opportunities in the Ethereum staking landscape
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
-     
-      <footer className={styles.footer}>
-        <a
-          href="https://liblockchain.xyz"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span className={styles.logo}>
-            <img className="w-40" alt="Long Island Blockchain Logo" src="/libc-logo.png"/>
-          </span>
-        </a>
+
+      {/* About Section */}
+      <div id="about" className="bg-white py-16 lg:py-24">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-3xl lg:text-4xl font-bold text-brand-slate-900 mb-6">
+              The Ethereum Staking Partner for Institutions
+            </h2>
+            <p className="text-lg text-brand-slate-600 leading-relaxed mb-8">
+              Since 2016, we've been powering validators for family offices, DAOs, and institutions with over $100M in stake. Our white label infrastructure supports the protocols you trust—Lido, Rocketpool, and native Ethereum staking—all running on hardware we own and operate in our SOC-2 compliant datacenter.
+            </p>
+            <p className="text-lg text-brand-slate-600 leading-relaxed">
+              What sets us apart is our ability to move fast in a rapidly evolving landscape. We don't just run validators—we help you craft optimized DeFi strategies that maximize your yield. With top 5% performance according to rated.network, enterprise-grade connectivity, and a proven track record of exceptional uptime, we're the ideal partner for Ethereum staking at scale.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Contact Section */}
+      <div id="contact" className="bg-brand-slate-900 py-16 lg:py-24">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold text-white mb-4">
+              Ready to Power Your Ethereum Yield?
+            </h2>
+            <p className="text-lg text-brand-slate-300">
+              Connect with our team to discuss white label validators and optimized DeFi strategies
+            </p>
+          </div>
+          <ContractForm></ContractForm>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-brand-slate-200 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            {/* Logo and Description */}
+            <div className="md:col-span-2">
+              <img className="w-40 mb-4" alt="Long Island Blockchain Logo" src="/libc-logo.png"/>
+              <p className="text-brand-slate-600 max-w-md">
+                White label Ethereum validators for institutions. $100M+ staked, top 5% performance, SOC-2 compliant infrastructure since 2016.
+              </p>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h4 className="text-brand-slate-900 font-semibold mb-4">Quick Links</h4>
+              <ul className="space-y-2">
+                <li><a href="/#staking" className="text-brand-slate-600 hover:text-brand-cyan-600 transition-colors">Staking</a></li>
+                <li><a href="/#networks" className="text-brand-slate-600 hover:text-brand-purple-600 transition-colors">Networks</a></li>
+                <li><a href="/#about" className="text-brand-slate-600 hover:text-brand-cyan-600 transition-colors">About</a></li>
+                <li><a href="/#contact" className="text-brand-slate-600 hover:text-brand-purple-600 transition-colors">Contact</a></li>
+              </ul>
+            </div>
+
+            {/* Resources */}
+            <div>
+              <h4 className="text-brand-slate-900 font-semibold mb-4">Resources</h4>
+              <ul className="space-y-2">
+                <li><a href="https://mirror.xyz/0x372051ff945eD07b8073872C7B77C9E84e000e06" target="_blank" rel="noopener noreferrer" className="text-brand-slate-600 hover:text-brand-cyan-600 transition-colors">Blog</a></li>
+                <li><a href="https://www.youtube.com/c/LongIslandBlockchain" target="_blank" rel="noopener noreferrer" className="text-brand-slate-600 hover:text-brand-purple-600 transition-colors">Learn</a></li>
+                <li><a href="/privacy" className="text-brand-slate-600 hover:text-brand-cyan-600 transition-colors">Privacy Policy</a></li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="border-t border-brand-slate-200 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p className="text-brand-slate-500 text-sm">
+              © {new Date().getFullYear()} Long Island Blockchain. All rights reserved.
+            </p>
+            <div className="flex space-x-6 mt-4 md:mt-0">
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-brand-slate-400 hover:text-brand-cyan-500 transition-colors">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
+                </svg>
+              </a>
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-brand-slate-400 hover:text-brand-purple-500 transition-colors">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
       </footer>
     </>
   )
