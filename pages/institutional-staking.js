@@ -1,13 +1,14 @@
 import Head from 'next/head'
 import Navigation from '../components/Navigation'
 import ContactForm from '../components/ContactForm'
+import Link from 'next/link'
 
 export default function InstitutionalStaking() {
   return (
     <>
       <Head>
-        <title>Institutional Staking Services - Long Island Blockchain</title>
-        <meta name="description" content="Enterprise-grade Ethereum staking solutions for institutions. Secure, compliant, and optimized for institutional requirements." />
+        <title>Whitelabel Validators & Institutional Staking - Long Island Blockchain</title>
+        <meta name="description" content="Enterprise Ethereum validator infrastructure for institutions. Custom branded staking solutions with SOC-2 compliance and top 5% performance." />
         <link
           rel="canonical"
           href="https://liblockchain.xyz/institutional-staking"
@@ -18,234 +19,306 @@ export default function InstitutionalStaking() {
       <Navigation />
 
       {/* Hero Section */}
-      <div className="hero flex flex-col items-center justify-center h-auto bg-[url('/sky.jpg')] bg-cover mx-auto py-20">
-        <div className="flex flex-col items-center justify-center max-w-6xl px-6">
-          <h1 className="text-4xl lg:text-6xl text-white text-center tracking-tight font-extrabold mb-6">
-            Institutional Ethereum Staking
-          </h1>
-          <h2 className="lg:text-2xl text-xl tracking-tight text-gray-200 text-center mb-8 max-w-4xl">
-            Enterprise-grade staking infrastructure designed for institutions. Maximize your Ethereum returns while maintaining the highest standards of security, compliance, and operational excellence.
-          </h2>
-          <div className="flex flex-col lg:flex-row gap-4">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-200">
-              Get Started
-            </button>
-            <button className="border border-white text-white hover:bg-white hover:text-black font-bold py-3 px-8 rounded-lg transition duration-200">
-              Schedule a Call
-            </button>
+      <div className="relative bg-brand-slate-900 overflow-hidden">
+        {/* Background gradient mesh */}
+        <div className="absolute inset-0 bg-hero-gradient"></div>
+        <div className="absolute inset-0 bg-hero-mesh"></div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+          <div className="text-center">
+            {/* Badge */}
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-brand-purple-500/10 border border-brand-purple-500/30 text-brand-purple-400 text-sm font-medium mb-8">
+              <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              Trusted by Family Offices & DAOs
+            </div>
+
+            {/* Main Heading */}
+            <h1 className="text-5xl lg:text-7xl text-white font-bold tracking-tight mb-6">
+              Whitelabel Validators &
+              <span className="block text-transparent bg-clip-text bg-purple-gradient">
+                Institutional Staking
+              </span>
+            </h1>
+
+            {/* Subheading */}
+            <p className="text-xl lg:text-2xl text-brand-slate-300 max-w-3xl mx-auto mb-12 leading-relaxed">
+              Custom branded Ethereum validator infrastructure running on our SOC-2 compliant datacenter. Your brand, our proven top 5% performance.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <a
+                href="#contact"
+                className="px-8 py-4 bg-brand-purple-500 hover:bg-brand-purple-600 text-white text-lg font-semibold rounded-lg transition-all duration-300 hover:shadow-glow-purple transform hover:scale-105"
+              >
+                Schedule Consultation
+              </a>
+              <Link
+                href="/create-vault"
+                className="px-8 py-4 border-2 border-brand-purple-500 text-brand-purple-400 hover:bg-brand-purple-500 hover:text-white text-lg font-semibold rounded-lg transition-all duration-300 transform hover:scale-105"
+              >
+                Create Vault
+              </Link>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Stats Section */}
-      <div className="py-16 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-6">
+      <div className="bg-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold text-blue-600 mb-2">$50M+</div>
-              <div className="text-gray-600">Assets Under Management</div>
+              <div className="text-4xl lg:text-5xl font-bold text-brand-cyan-600 mb-2">$100M+</div>
+              <div className="text-brand-slate-600 font-medium">Assets Under Management</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-blue-600 mb-2">99.9%</div>
-              <div className="text-gray-600">Uptime Guarantee</div>
+              <div className="text-4xl lg:text-5xl font-bold text-brand-purple-600 mb-2">Top 5%</div>
+              <div className="text-brand-slate-600 font-medium">Performance Ranking</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-blue-600 mb-2">7+</div>
-              <div className="text-gray-600">Years in Blockchain</div>
+              <div className="text-4xl lg:text-5xl font-bold text-brand-pink-600 mb-2">Since 2016</div>
+              <div className="text-brand-slate-600 font-medium">In Blockchain Infrastructure</div>
             </div>
           </div>
         </div>
       </div>
 
       {/* Why Choose Us Section */}
-      <div className="py-20">
-        <div className="max-w-6xl mx-auto px-6">
+      <div className="bg-brand-slate-50 py-16 lg:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h3 className="text-4xl font-bold mb-6">Why Institutions Choose Us</h3>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Built specifically for institutional requirements with enterprise-grade security, compliance, and support.
+            <h2 className="text-3xl lg:text-5xl font-bold text-brand-slate-900 mb-4">
+              Why Institutions Choose LIBC
+            </h2>
+            <p className="text-lg text-brand-slate-600 max-w-2xl mx-auto">
+              Purpose-built infrastructure for family offices, DAOs, and institutional validators
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            <div className="p-8 bg-white rounded-2xl border border-brand-slate-200 hover:border-brand-cyan-300 hover:shadow-lg transition-all duration-300 group">
+              <div className="w-12 h-12 bg-gradient-to-br from-brand-cyan-500 to-brand-cyan-600 rounded-lg flex items-center justify-center mb-6 group-hover:shadow-glow transition-shadow">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                 </svg>
               </div>
-              <h4 className="text-xl font-semibold mb-3">Enterprise Security</h4>
-              <p className="text-gray-600">Multi-signature custody, hardware security modules, and institutional-grade infrastructure protection.</p>
+              <h3 className="text-xl font-bold text-brand-slate-900 mb-3">Enterprise Security</h3>
+              <p className="text-brand-slate-600 leading-relaxed">
+                SOC-2 compliant datacenter with hardware we own and operate. Multi-signature custody, HSMs, and institutional-grade protection.
+              </p>
             </div>
 
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/>
+            <div className="p-8 bg-white rounded-2xl border border-brand-slate-200 hover:border-brand-purple-300 hover:shadow-lg transition-all duration-300 group">
+              <div className="w-12 h-12 bg-gradient-to-br from-brand-purple-500 to-brand-purple-600 rounded-lg flex items-center justify-center mb-6 group-hover:shadow-glow-purple transition-shadow">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <h4 className="text-xl font-semibold mb-3">Regulatory Compliance</h4>
-              <p className="text-gray-600">Full compliance with regulatory requirements, comprehensive reporting, and audit-ready documentation.</p>
+              <h3 className="text-xl font-bold text-brand-slate-900 mb-3">Regulatory Compliance</h3>
+              <p className="text-brand-slate-600 leading-relaxed">
+                Full compliance support, comprehensive reporting, audit-ready documentation, and transparent SLAs for institutional requirements.
+              </p>
             </div>
 
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            <div className="p-8 bg-white rounded-2xl border border-brand-slate-200 hover:border-brand-pink-300 hover:shadow-lg transition-all duration-300 group">
+              <div className="w-12 h-12 bg-gradient-to-br from-brand-pink-500 to-brand-pink-600 rounded-lg flex items-center justify-center mb-6 group-hover:shadow-glow-purple transition-shadow">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                 </svg>
               </div>
-              <h4 className="text-xl font-semibold mb-3">Optimized Returns</h4>
-              <p className="text-gray-600">Advanced MEV protection, optimal validator performance, and competitive fee structures.</p>
+              <h3 className="text-xl font-bold text-brand-slate-900 mb-3">Optimized Returns</h3>
+              <p className="text-brand-slate-600 leading-relaxed">
+                Top 5% performance on rated.network. Advanced MEV protection, optimal attestation effectiveness, competitive fee structures.
+              </p>
             </div>
 
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+            <div className="p-8 bg-white rounded-2xl border border-brand-slate-200 hover:border-brand-cyan-300 hover:shadow-lg transition-all duration-300 group">
+              <div className="w-12 h-12 bg-gradient-to-br from-brand-cyan-500 to-brand-cyan-600 rounded-lg flex items-center justify-center mb-6 group-hover:shadow-glow transition-shadow">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               </div>
-              <h4 className="text-xl font-semibold mb-3">Dedicated Support</h4>
-              <p className="text-gray-600">24/7 technical support, dedicated account management, and priority incident response.</p>
+              <h3 className="text-xl font-bold text-brand-slate-900 mb-3">24/7 Support</h3>
+              <p className="text-brand-slate-600 leading-relaxed">
+                Dedicated account management, priority incident response, technical support, and direct access to our infrastructure team.
+              </p>
             </div>
 
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M9 11H7v6h2v-6zm4 0h-2v6h2v-6zm4 0h-2v6h2v-6zm2.5-9L12 2 4.5 2 2 4.5v15L4.5 22h15l2.5-2.5v-15L19.5 2z"/>
+            <div className="p-8 bg-white rounded-2xl border border-brand-slate-200 hover:border-brand-purple-300 hover:shadow-lg transition-all duration-300 group">
+              <div className="w-12 h-12 bg-gradient-to-br from-brand-purple-500 to-brand-purple-600 rounded-lg flex items-center justify-center mb-6 group-hover:shadow-glow-purple transition-shadow" id="rewards">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
-              <h4 className="text-xl font-semibold mb-3">Transparent Reporting</h4>
-              <p className="text-gray-600">Real-time dashboards, detailed performance analytics, and comprehensive audit trails.</p>
+              <h3 className="text-xl font-bold text-brand-slate-900 mb-3">Transparent Reporting</h3>
+              <p className="text-brand-slate-600 leading-relaxed">
+                Real-time dashboards, detailed performance analytics, comprehensive audit trails, and automated reward tracking.
+              </p>
             </div>
 
-            <div className="text-center p-6">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+            <div className="p-8 bg-white rounded-2xl border border-brand-slate-200 hover:border-brand-pink-300 hover:shadow-lg transition-all duration-300 group">
+              <div className="w-12 h-12 bg-gradient-to-br from-brand-pink-500 to-brand-pink-600 rounded-lg flex items-center justify-center mb-6 group-hover:shadow-glow-purple transition-shadow">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
-              <h4 className="text-xl font-semibold mb-3">Risk Management</h4>
-              <p className="text-gray-600">Advanced slashing protection, diversified validator operations, and comprehensive insurance coverage.</p>
+              <h3 className="text-xl font-bold text-brand-slate-900 mb-3">Risk Management</h3>
+              <p className="text-brand-slate-600 leading-relaxed">
+                Advanced slashing protection, diversified validator operations, comprehensive monitoring, and optional insurance coverage.
+              </p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Services Section */}
-      <div className="py-20 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-6">
+      <div className="bg-white py-16 lg:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h3 className="text-4xl font-bold mb-6">Our Services</h3>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Comprehensive staking solutions tailored to your institution's specific requirements.
+            <h2 className="text-3xl lg:text-5xl font-bold text-brand-slate-900 mb-4">
+              Our Services
+            </h2>
+            <p className="text-lg text-brand-slate-600 max-w-2xl mx-auto">
+              Comprehensive staking solutions tailored to your institution&apos;s requirements
             </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-              <h4 className="text-2xl font-bold mb-4">White-Label Staking</h4>
-              <p className="text-gray-600 mb-6">
-                Fully branded staking infrastructure that integrates seamlessly with your existing systems and maintains your customer relationships.
+            <div className="p-8 bg-gradient-to-br from-brand-slate-50 to-white rounded-2xl border border-brand-slate-200 hover:border-brand-cyan-300 hover:shadow-xl transition-all duration-300">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-brand-cyan-500 to-brand-cyan-600 rounded-lg flex items-center justify-center mr-4">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-brand-slate-900">White-Label Validators</h3>
+              </div>
+              <p className="text-brand-slate-600 mb-6 leading-relaxed">
+                Fully branded staking infrastructure that maintains your customer relationships and integrates seamlessly with your existing systems.
               </p>
-              <ul className="space-y-2 text-gray-600">
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+              <ul className="space-y-3">
+                <li className="flex items-start">
+                  <svg className="w-5 h-5 text-brand-cyan-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  Custom branding and UI
+                  <span className="text-brand-slate-700">Custom branding and UI integration</span>
                 </li>
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                <li className="flex items-start">
+                  <svg className="w-5 h-5 text-brand-cyan-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  API integration support
+                  <span className="text-brand-slate-700">Complete API integration support</span>
                 </li>
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                <li className="flex items-start">
+                  <svg className="w-5 h-5 text-brand-cyan-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  Revenue sharing models
+                  <span className="text-brand-slate-700">Flexible revenue sharing models</span>
                 </li>
               </ul>
             </div>
 
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-              <h4 className="text-2xl font-bold mb-4">Custody Integration</h4>
-              <p className="text-gray-600 mb-6">
+            <div className="p-8 bg-gradient-to-br from-brand-slate-50 to-white rounded-2xl border border-brand-slate-200 hover:border-brand-purple-300 hover:shadow-xl transition-all duration-300">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-brand-purple-500 to-brand-purple-600 rounded-lg flex items-center justify-center mr-4">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-brand-slate-900">Custody Integration</h3>
+              </div>
+              <p className="text-brand-slate-600 mb-6 leading-relaxed">
                 Seamless integration with leading institutional custody providers while maintaining your existing security protocols.
               </p>
-              <ul className="space-y-2 text-gray-600">
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+              <ul className="space-y-3">
+                <li className="flex items-start">
+                  <svg className="w-5 h-5 text-brand-purple-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  Multi-custody support
+                  <span className="text-brand-slate-700">Multi-custody provider support</span>
                 </li>
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                <li className="flex items-start">
+                  <svg className="w-5 h-5 text-brand-purple-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  Non-custodial options
+                  <span className="text-brand-slate-700">Non-custodial staking options</span>
                 </li>
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                <li className="flex items-start">
+                  <svg className="w-5 h-5 text-brand-purple-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  Institutional-grade security
+                  <span className="text-brand-slate-700">Institutional-grade key management</span>
                 </li>
               </ul>
             </div>
 
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-              <h4 className="text-2xl font-bold mb-4">Portfolio Management</h4>
-              <p className="text-gray-600 mb-6">
+            <div className="p-8 bg-gradient-to-br from-brand-slate-50 to-white rounded-2xl border border-brand-slate-200 hover:border-brand-pink-300 hover:shadow-xl transition-all duration-300">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-brand-pink-500 to-brand-pink-600 rounded-lg flex items-center justify-center mr-4">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-brand-slate-900">Portfolio Management</h3>
+              </div>
+              <p className="text-brand-slate-600 mb-6 leading-relaxed">
                 Comprehensive portfolio management tools with real-time monitoring, performance analytics, and risk assessment.
               </p>
-              <ul className="space-y-2 text-gray-600">
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+              <ul className="space-y-3">
+                <li className="flex items-start">
+                  <svg className="w-5 h-5 text-brand-pink-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  Real-time dashboard
+                  <span className="text-brand-slate-700">Real-time performance dashboards</span>
                 </li>
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                <li className="flex items-start">
+                  <svg className="w-5 h-5 text-brand-pink-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  Performance analytics
+                  <span className="text-brand-slate-700">Advanced performance analytics</span>
                 </li>
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                <li className="flex items-start">
+                  <svg className="w-5 h-5 text-brand-pink-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  Risk monitoring
+                  <span className="text-brand-slate-700">Automated risk monitoring</span>
                 </li>
               </ul>
             </div>
 
-            <div className="bg-white p-8 rounded-lg shadow-lg">
-              <h4 className="text-2xl font-bold mb-4">Consulting & Advisory</h4>
-              <p className="text-gray-600 mb-6">
+            <div className="p-8 bg-gradient-to-br from-brand-slate-50 to-white rounded-2xl border border-brand-slate-200 hover:border-brand-cyan-300 hover:shadow-xl transition-all duration-300">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-brand-cyan-500 to-brand-cyan-600 rounded-lg flex items-center justify-center mr-4">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-brand-slate-900">Consulting & Advisory</h3>
+              </div>
+              <p className="text-brand-slate-600 mb-6 leading-relaxed">
                 Strategic guidance on staking operations, regulatory compliance, and blockchain infrastructure optimization.
               </p>
-              <ul className="space-y-2 text-gray-600">
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+              <ul className="space-y-3">
+                <li className="flex items-start">
+                  <svg className="w-5 h-5 text-brand-cyan-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  Strategic planning
+                  <span className="text-brand-slate-700">DeFi strategy optimization</span>
                 </li>
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                <li className="flex items-start">
+                  <svg className="w-5 h-5 text-brand-cyan-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  Compliance guidance
+                  <span className="text-brand-slate-700">Regulatory compliance guidance</span>
                 </li>
-                <li className="flex items-center">
-                  <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                <li className="flex items-start">
+                  <svg className="w-5 h-5 text-brand-cyan-600 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
-                  Technical optimization
+                  <span className="text-brand-slate-700">Infrastructure technical optimization</span>
                 </li>
               </ul>
             </div>
@@ -254,94 +327,81 @@ export default function InstitutionalStaking() {
       </div>
 
       {/* Client Types Section */}
-      <div className="py-20">
-        <div className="max-w-6xl mx-auto px-6">
+      <div className="bg-brand-slate-900 py-16 lg:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h3 className="text-4xl font-bold mb-6">Who We Serve</h3>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Trusted by leading financial institutions, corporations, and investment firms worldwide.
+            <h2 className="text-3xl lg:text-5xl font-bold text-white mb-4">
+              Who We Serve
+            </h2>
+            <p className="text-lg text-brand-slate-300 max-w-2xl mx-auto">
+              Trusted by leading financial institutions and investment firms worldwide
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-10 h-10 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            <div className="text-center group">
+              <div className="w-20 h-20 bg-gradient-to-br from-brand-cyan-500 to-brand-cyan-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:shadow-glow transition-shadow duration-300">
+                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
-              <h4 className="text-lg font-semibold mb-2">Asset Managers</h4>
-              <p className="text-gray-600 text-sm">Investment firms and fund managers seeking yield optimization</p>
+              <h4 className="text-lg font-semibold text-white mb-2">Family Offices</h4>
+              <p className="text-brand-slate-400 text-sm">High-net-worth individuals and family investment offices</p>
             </div>
 
-            <div className="text-center">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-10 h-10 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
+            <div className="text-center group">
+              <div className="w-20 h-20 bg-gradient-to-br from-brand-purple-500 to-brand-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:shadow-glow-purple transition-shadow duration-300">
+                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <h4 className="text-lg font-semibold mb-2">Banks</h4>
-              <p className="text-gray-600 text-sm">Traditional financial institutions entering digital assets</p>
+              <h4 className="text-lg font-semibold text-white mb-2">DAOs</h4>
+              <p className="text-brand-slate-400 text-sm">Decentralized organizations managing treasury assets</p>
             </div>
 
-            <div className="text-center">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-10 h-10 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
+            <div className="text-center group">
+              <div className="w-20 h-20 bg-gradient-to-br from-brand-pink-500 to-brand-pink-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:shadow-glow-purple transition-shadow duration-300">
+                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
-              <h4 className="text-lg font-semibold mb-2">Family Offices</h4>
-              <p className="text-gray-600 text-sm">High-net-worth individuals and family investment offices</p>
+              <h4 className="text-lg font-semibold text-white mb-2">Asset Managers</h4>
+              <p className="text-brand-slate-400 text-sm">Investment firms seeking optimized staking yield</p>
             </div>
 
-            <div className="text-center">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-10 h-10 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            <div className="text-center group">
+              <div className="w-20 h-20 bg-gradient-to-br from-brand-cyan-500 to-brand-cyan-600 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:shadow-glow transition-shadow duration-300">
+                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
-              <h4 className="text-lg font-semibold mb-2">Corporations</h4>
-              <p className="text-gray-600 text-sm">Enterprises with treasury management and yield requirements</p>
+              <h4 className="text-lg font-semibold text-white mb-2">Protocols</h4>
+              <p className="text-brand-slate-400 text-sm">DeFi protocols requiring validator infrastructure</p>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* CTA Section */}
-      <div className="py-20 bg-blue-600">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h3 className="text-4xl font-bold text-white mb-6">Ready to Start Staking?</h3>
-          <p className="text-xl text-blue-100 mb-8">
-            Join leading institutions who trust Long Island Blockchain for their Ethereum staking needs.
-          </p>
-          <div className="flex flex-col lg:flex-row gap-4 justify-center">
-            <button className="bg-white text-blue-600 font-bold py-3 px-8 rounded-lg hover:bg-gray-100 transition duration-200">
-              Schedule Consultation
-            </button>
-            <button className="border border-white text-white hover:bg-white hover:text-blue-600 font-bold py-3 px-8 rounded-lg transition duration-200">
-              Download Brochure
-            </button>
           </div>
         </div>
       </div>
 
       {/* Contact Form Section */}
-      <div className="py-20">
-        <div className="max-w-4xl mx-auto px-6">
+      <div id="contact" className="bg-white py-16 lg:py-24">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h3 className="text-4xl font-bold mb-6">Get in Touch</h3>
-            <p className="text-xl text-gray-600">
-              Speak with our institutional team about your staking requirements.
+            <h2 className="text-3xl lg:text-4xl font-bold text-brand-slate-900 mb-4">
+              Get in Touch
+            </h2>
+            <p className="text-lg text-brand-slate-600">
+              Speak with our institutional team about your staking requirements
             </p>
           </div>
           <ContactForm />
         </div>
       </div>
 
-      <footer className="bg-gray-900 py-12">
-        <div className="max-w-6xl mx-auto px-6 text-center">
+      {/* Footer */}
+      <footer className="bg-brand-slate-900 border-t border-brand-slate-800 py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <img className="w-40 mx-auto mb-4" alt="Long Island Blockchain Logo" src="/libc-logo.png"/>
-          <p className="text-gray-400">Trusted blockchain infrastructure since 2016</p>
+          <p className="text-brand-slate-400">White label Ethereum validators • SOC-2 compliant • Since 2016</p>
         </div>
       </footer>
     </>

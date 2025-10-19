@@ -2,6 +2,7 @@ import Hamburger from "hamburger-react";
 import { useState } from "react";
 import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 interface NavigationProps {
     showConnectWallet?: boolean;
@@ -9,6 +10,8 @@ interface NavigationProps {
 
 export default function Navigation({ showConnectWallet = false }: NavigationProps) {
     const [isOpen, setOpen] = useState(false);
+    const [isProductsOpen, setIsProductsOpen] = useState(false);
+    const [isMobileProductsOpen, setIsMobileProductsOpen] = useState(false);
 
     return (
         <>
@@ -60,11 +63,60 @@ export default function Navigation({ showConnectWallet = false }: NavigationProp
 
                     {/* Desktop Navigation */}
                     <div className="hidden lg:flex items-center space-x-1">
-                        <Link href="/#staking" className="px-4 py-2 text-brand-slate-600 hover:text-brand-cyan-600 font-medium transition-colors">
-                            Staking
-                        </Link>
-                        <Link href="/#networks" className="px-4 py-2 text-brand-slate-600 hover:text-brand-purple-600 font-medium transition-colors">
-                            Networks
+                        {/* Products Dropdown */}
+                        <div
+                            className="relative"
+                            onMouseEnter={() => setIsProductsOpen(true)}
+                            onMouseLeave={() => setIsProductsOpen(false)}
+                        >
+                            <button className="px-4 py-2 text-brand-slate-600 hover:text-brand-cyan-600 font-medium transition-colors flex items-center gap-1">
+                                Products
+                                <ChevronDownIcon className={`w-4 h-4 transition-transform ${isProductsOpen ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {/* Dropdown Menu */}
+                            {isProductsOpen && (
+                                <div className="absolute top-full left-0 pt-2 w-80 z-50">
+                                <div className="bg-white rounded-lg shadow-xl border border-brand-slate-200 py-2">
+                                    <Link href="/create-vault" className="block px-6 py-3 hover:bg-brand-slate-50 transition-colors group">
+                                        <div className="font-semibold text-brand-slate-900 group-hover:text-brand-cyan-600 transition-colors">
+                                            ETH Staking Vaults
+                                        </div>
+                                        <div className="text-sm text-brand-slate-600 mt-1">
+                                            Stake ETH, mint stETH, flexible DeFi strategies
+                                        </div>
+                                    </Link>
+                                    <Link href="/institutional-staking" className="block px-6 py-3 hover:bg-brand-slate-50 transition-colors group">
+                                        <div className="font-semibold text-brand-slate-900 group-hover:text-brand-cyan-600 transition-colors">
+                                            Whitelabel Validators
+                                        </div>
+                                        <div className="text-sm text-brand-slate-600 mt-1">
+                                            Custom branded staking infrastructure
+                                        </div>
+                                    </Link>
+                                    <Link href="/institutional-staking#rewards" className="block px-6 py-3 hover:bg-brand-slate-50 transition-colors group">
+                                        <div className="font-semibold text-brand-slate-900 group-hover:text-brand-cyan-600 transition-colors">
+                                            Rewards Reporting
+                                        </div>
+                                        <div className="text-sm text-brand-slate-600 mt-1">
+                                            Comprehensive staking analytics and tracking
+                                        </div>
+                                    </Link>
+                                    <Link href="/community-wifi" className="block px-6 py-3 hover:bg-brand-slate-50 transition-colors group">
+                                        <div className="font-semibold text-brand-slate-900 group-hover:text-brand-cyan-600 transition-colors">
+                                            DePIN Infrastructure
+                                        </div>
+                                        <div className="text-sm text-brand-slate-600 mt-1">
+                                            Decentralized physical infrastructure networks
+                                        </div>
+                                    </Link>
+                                </div>
+                                </div>
+                            )}
+                        </div>
+
+                        <Link href="/#why-libc" className="px-4 py-2 text-brand-slate-600 hover:text-brand-purple-600 font-medium transition-colors">
+                            Why LIBC
                         </Link>
                         <Link href="/#about" className="px-4 py-2 text-brand-slate-600 hover:text-brand-cyan-600 font-medium transition-colors">
                             About
@@ -101,11 +153,38 @@ export default function Navigation({ showConnectWallet = false }: NavigationProp
             {isOpen && (
                 <div className="lg:hidden bg-white border-t border-brand-slate-200">
                     <div className="px-4 pt-2 pb-6 space-y-1">
-                        <Link href="/#staking" className="block px-4 py-3 text-brand-slate-600 hover:text-brand-cyan-600 hover:bg-brand-slate-50 rounded-lg transition-colors">
-                            Staking
-                        </Link>
-                        <Link href="/#networks" className="block px-4 py-3 text-brand-slate-600 hover:text-brand-purple-600 hover:bg-brand-slate-50 rounded-lg transition-colors">
-                            Networks
+                        {/* Mobile Products Dropdown */}
+                        <div>
+                            <button
+                                onClick={() => setIsMobileProductsOpen(!isMobileProductsOpen)}
+                                className="w-full flex items-center justify-between px-4 py-3 text-brand-slate-600 hover:text-brand-cyan-600 hover:bg-brand-slate-50 rounded-lg transition-colors"
+                            >
+                                <span className="font-medium">Products</span>
+                                <ChevronDownIcon className={`w-4 h-4 transition-transform ${isMobileProductsOpen ? 'rotate-180' : ''}`} />
+                            </button>
+                            {isMobileProductsOpen && (
+                                <div className="ml-4 mt-1 space-y-1">
+                                    <Link href="/create-vault" className="block px-4 py-3 text-sm text-brand-slate-600 hover:text-brand-cyan-600 hover:bg-brand-slate-50 rounded-lg transition-colors">
+                                        <div className="font-medium">ETH Staking Vaults</div>
+                                        <div className="text-xs text-brand-slate-500 mt-0.5">Stake ETH, mint stETH, flexible DeFi strategies</div>
+                                    </Link>
+                                    <Link href="/institutional-staking" className="block px-4 py-3 text-sm text-brand-slate-600 hover:text-brand-cyan-600 hover:bg-brand-slate-50 rounded-lg transition-colors">
+                                        <div className="font-medium">Whitelabel Validators</div>
+                                        <div className="text-xs text-brand-slate-500 mt-0.5">Custom branded staking infrastructure</div>
+                                    </Link>
+                                    <Link href="/institutional-staking#rewards" className="block px-4 py-3 text-sm text-brand-slate-600 hover:text-brand-cyan-600 hover:bg-brand-slate-50 rounded-lg transition-colors">
+                                        <div className="font-medium">Rewards Reporting</div>
+                                        <div className="text-xs text-brand-slate-500 mt-0.5">Comprehensive staking analytics</div>
+                                    </Link>
+                                    <Link href="/community-wifi" className="block px-4 py-3 text-sm text-brand-slate-600 hover:text-brand-cyan-600 hover:bg-brand-slate-50 rounded-lg transition-colors">
+                                        <div className="font-medium">DePIN Infrastructure</div>
+                                        <div className="text-xs text-brand-slate-500 mt-0.5">Decentralized physical networks</div>
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
+                        <Link href="/#why-libc" className="block px-4 py-3 text-brand-slate-600 hover:text-brand-purple-600 hover:bg-brand-slate-50 rounded-lg transition-colors">
+                            Why LIBC
                         </Link>
                         <Link href="/#about" className="block px-4 py-3 text-brand-slate-600 hover:text-brand-cyan-600 hover:bg-brand-slate-50 rounded-lg transition-colors">
                             About

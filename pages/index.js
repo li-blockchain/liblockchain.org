@@ -98,6 +98,100 @@ export default function Home() {
       {/* Stats Section */}
       <StatsSection />
 
+      {/* Why Choose Us - The LIBC Difference */}
+      <div id="why-libc" className="bg-white py-16 lg:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl lg:text-5xl font-bold text-brand-slate-900 mb-4">
+              The LIBC Difference
+            </h2>
+            <p className="text-lg text-brand-slate-600 max-w-2xl mx-auto">
+              Why leading institutions trust us with their Ethereum staking infrastructure
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Own Infrastructure */}
+            <div className="p-8 rounded-2xl border border-brand-slate-200 hover:border-brand-cyan-300 hover:shadow-lg transition-all duration-300 group">
+              <div className="w-12 h-12 bg-gradient-to-br from-brand-cyan-500 to-brand-cyan-600 rounded-lg flex items-center justify-center mb-6 group-hover:shadow-glow transition-shadow">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-brand-slate-900 mb-3">Own Hardware & Datacenter</h3>
+              <p className="text-brand-slate-600 leading-relaxed">
+                Complete infrastructure ownership in our SOC-2 compliant datacenter. No cloud dependencies, no third-party risk. Enterprise connectivity and proven 99.9%+ uptime.
+              </p>
+            </div>
+
+            {/* Top Performance */}
+            <div className="p-8 rounded-2xl border border-brand-slate-200 hover:border-brand-purple-300 hover:shadow-lg transition-all duration-300 group">
+              <div className="w-12 h-12 bg-gradient-to-br from-brand-purple-500 to-brand-purple-600 rounded-lg flex items-center justify-center mb-6 group-hover:shadow-glow-purple transition-shadow">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-brand-slate-900 mb-3">Top 5% Performance</h3>
+              <p className="text-brand-slate-600 leading-relaxed">
+                Ranked in the top 5% of all validators on rated.network. Optimized attestation effectiveness, minimal missed duties, and maximized rewards for your stake.
+              </p>
+            </div>
+
+            {/* Protocol Agnostic */}
+            <div className="p-8 rounded-2xl border border-brand-slate-200 hover:border-brand-pink-300 hover:shadow-lg transition-all duration-300 group">
+              <div className="w-12 h-12 bg-gradient-to-br from-brand-pink-500 to-brand-pink-600 rounded-lg flex items-center justify-center mb-6 group-hover:shadow-glow-purple transition-shadow">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-brand-slate-900 mb-3">Protocol Agnostic</h3>
+              <p className="text-brand-slate-600 leading-relaxed">
+                Support for Lido, Rocketpool, native staking, and emerging protocols. One infrastructure partner for all your Ethereum staking strategies.
+              </p>
+            </div>
+
+            {/* Rapid Deployment */}
+            <div className="p-8 rounded-2xl border border-brand-slate-200 hover:border-brand-cyan-300 hover:shadow-lg transition-all duration-300 group">
+              <div className="w-12 h-12 bg-gradient-to-br from-brand-cyan-500 to-brand-cyan-600 rounded-lg flex items-center justify-center mb-6 group-hover:shadow-glow transition-shadow">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-brand-slate-900 mb-3">Days, Not Months</h3>
+              <p className="text-brand-slate-600 leading-relaxed">
+                From initial consultation to production validators in days. No bureaucracy, no delays. Move at the speed of opportunity in the evolving DeFi landscape.
+              </p>
+            </div>
+
+            {/* DeFi Strategy Expertise */}
+            <div className="p-8 rounded-2xl border border-brand-slate-200 hover:border-brand-purple-300 hover:shadow-lg transition-all duration-300 group">
+              <div className="w-12 h-12 bg-gradient-to-br from-brand-purple-500 to-brand-purple-600 rounded-lg flex items-center justify-center mb-6 group-hover:shadow-glow-purple transition-shadow">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-brand-slate-900 mb-3">DeFi Strategy Optimization</h3>
+              <p className="text-brand-slate-600 leading-relaxed">
+                We don&apos;t just run validators—we help design optimal yield strategies across liquid staking, restaking, and emerging DeFi opportunities.
+              </p>
+            </div>
+
+            {/* Institutional Grade */}
+            <div className="p-8 rounded-2xl border border-brand-slate-200 hover:border-brand-pink-300 hover:shadow-lg transition-all duration-300 group">
+              <div className="w-12 h-12 bg-gradient-to-br from-brand-pink-500 to-brand-pink-600 rounded-lg flex items-center justify-center mb-6 group-hover:shadow-glow-purple transition-shadow">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-brand-slate-900 mb-3">Institutional Standards</h3>
+              <p className="text-brand-slate-600 leading-relaxed">
+                SOC-2 compliance, comprehensive reporting, and transparent SLAs. Built for family offices, DAOs, and institutions managing significant ETH holdings.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Trust Indicators */}
       <TrustIndicators />
 
@@ -160,10 +254,10 @@ export default function Home() {
               The Ethereum Staking Partner for Institutions
             </h2>
             <p className="text-lg text-brand-slate-600 leading-relaxed mb-8">
-              Since 2016, we've been powering validators for family offices, DAOs, and institutions with over $100M in stake. Our white label infrastructure supports the protocols you trust—Lido, Rocketpool, and native Ethereum staking—all running on hardware we own and operate in our SOC-2 compliant datacenter.
+              Since 2016, we&apos;ve been powering validators for family offices, DAOs, and institutions with over $100M in stake. Our white label infrastructure supports the protocols you trust—Lido, Rocketpool, and native Ethereum staking—all running on hardware we own and operate in our SOC-2 compliant datacenter.
             </p>
             <p className="text-lg text-brand-slate-600 leading-relaxed">
-              What sets us apart is our ability to move fast in a rapidly evolving landscape. We don't just run validators—we help you craft optimized DeFi strategies that maximize your yield. With top 5% performance according to rated.network, enterprise-grade connectivity, and a proven track record of exceptional uptime, we're the ideal partner for Ethereum staking at scale.
+              What sets us apart is our ability to move fast in a rapidly evolving landscape. We don&apos;t just run validators—we help you craft optimized DeFi strategies that maximize your yield. With top 5% performance according to rated.network, enterprise-grade connectivity, and a proven track record of exceptional uptime, we&apos;re the ideal partner for Ethereum staking at scale.
             </p>
           </div>
         </div>
