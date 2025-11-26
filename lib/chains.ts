@@ -46,5 +46,9 @@ export const hoodi = defineChain({
   testnet: true,
 });
 
-// Export Hoodi testnet by default
-export const holeskyWithCustomChainId = hoodi;
+// Export the appropriate chain based on environment
+// If NEXT_PUBLIC_USE_LOCAL_ANVIL is set to 'true', use localAnvil, otherwise use hoodi
+export const holeskyWithCustomChainId =
+  process.env.NEXT_PUBLIC_USE_LOCAL_ANVIL === 'true'
+    ? localAnvil
+    : hoodi;
