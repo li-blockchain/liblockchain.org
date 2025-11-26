@@ -68,5 +68,5 @@ export function basisPointsToPercent(basisPoints: bigint): number {
 }
 
 // Default values
-export const DEFAULT_CONFIRM_EXPIRY = 86400n; // 24 hours in seconds
-export const DEFAULT_NODE_OPERATOR_FEE_BP = 500n; // 5%
+export const DEFAULT_CONFIRM_EXPIRY = BigInt(86400); // 24 hours in seconds
+export const DEFAULT_NODE_OPERATOR_FEE_BP = BigInt(500); // 5%
