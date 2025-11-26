@@ -2,7 +2,11 @@
 const nextConfig = {
   reactStrictMode: true,
   productionBrowserSourceMaps: false,
-  transpilePackages: ['@rainbow-me/rainbowkit'],
+  transpilePackages: [
+    '@rainbow-me/rainbowkit',
+    '@walletconnect/ethereum-provider',
+    '@reown/appkit'
+  ],
   webpack: (config, { dev, isServer }) => {
     config.externals.push('pino-pretty', 'lokijs', 'encoding');
     config.resolve.fallback = {
