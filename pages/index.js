@@ -43,9 +43,9 @@ export default function Home() {
 
             {/* Main Heading */}
             <h1 className="text-5xl lg:text-7xl text-white font-bold tracking-tight mb-6">
-              White Label Ethereum
+              We make blocks.
               <span className="block text-transparent bg-clip-text bg-purple-gradient">
-                Validator Infrastructure
+                Not Ice Tea.
               </span>
             </h1>
 
