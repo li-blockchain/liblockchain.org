@@ -1,4 +1,5 @@
 import Head from 'next/head'
+import { useState } from 'react'
 import styles from '../styles/Home.module.css'
 import ContractForm from '../components/ContactForm'
 import Link from 'next/link'
@@ -8,6 +9,8 @@ import NetworksGrid from '../components/NetworksGrid'
 import TrustIndicators from '../components/TrustIndicators'
 
 export default function Home() {
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
   return (
     <>
       <Head>
@@ -54,20 +57,14 @@ export default function Home() {
               Powering liquid staking protocols and institutional validators with enterprise-grade infrastructure. From our SOC-2 datacenter to your optimized DeFi strategies.
             </p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Link
-                href="/create-vault"
+            {/* CTA Button */}
+            <div className="flex justify-center items-center">
+              <button
+                onClick={() => setIsContactModalOpen(true)}
                 className="px-8 py-4 bg-brand-cyan-500 hover:bg-brand-cyan-600 text-white text-lg font-semibold rounded-lg transition-all duration-300 hover:shadow-glow-lg transform hover:scale-105"
               >
-                Stake Now
-              </Link>
-              <a
-                href="#contact"
-                className="px-8 py-4 border-2 border-brand-cyan-500 text-brand-cyan-400 hover:bg-brand-cyan-500 hover:text-white text-lg font-semibold rounded-lg transition-all duration-300 transform hover:scale-105"
-              >
                 Get in Touch
-              </a>
+              </button>
             </div>
 
             {/* Trust Signals */}
