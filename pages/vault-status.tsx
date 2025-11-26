@@ -167,7 +167,7 @@ export default function VaultStatus() {
               </span>
             </h1>
             <p className="text-lg text-brand-slate-600 max-w-2xl">
-              Monitor your private vault's performance, capacity, and configuration
+              Monitor your private vault&apos;s performance, capacity, and configuration
             </p>
           </div>
         </div>
@@ -378,19 +378,19 @@ export default function VaultStatus() {
                   <div>
                     <div className="text-sm font-semibold text-brand-slate-600 mb-2">Total Value</div>
                     <div className="text-2xl font-bold text-brand-slate-900">
-                      {formatEth(latestReport[0])} ETH
+                      {formatEth(latestReport.totalValue)} ETH
                     </div>
                   </div>
                   <div>
                     <div className="text-sm font-semibold text-brand-slate-600 mb-2">In/Out Delta</div>
-                    <div className={`text-2xl font-bold ${Number(latestReport[1]) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {Number(latestReport[1]) >= 0 ? '+' : ''}{formatEth(latestReport[1])} ETH
+                    <div className={`text-2xl font-bold ${Number(latestReport.inOutDelta) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {Number(latestReport.inOutDelta) >= 0 ? '+' : ''}{formatEth(latestReport.inOutDelta)} ETH
                     </div>
                   </div>
                   <div>
                     <div className="text-sm font-semibold text-brand-slate-600 mb-2">Timestamp</div>
                     <div className="text-lg text-brand-slate-900">
-                      {new Date(Number(latestReport[2]) * 1000).toLocaleString()}
+                      {new Date(Number(latestReport.timestamp) * 1000).toLocaleString()}
                     </div>
                   </div>
                 </div>
@@ -412,7 +412,7 @@ export default function VaultStatus() {
               {vaultConnection && (
                 <div className="bg-white rounded-xl p-6 border-2 border-brand-slate-200">
                   <div className="text-sm font-semibold text-brand-slate-600 mb-2">Vault Owner</div>
-                  <div className="font-mono text-sm text-brand-slate-900 break-all">{vaultConnection[0]}</div>
+                  <div className="font-mono text-sm text-brand-slate-900 break-all">{vaultConnection.owner}</div>
                 </div>
               )}
             </div>

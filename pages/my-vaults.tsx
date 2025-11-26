@@ -144,7 +144,7 @@ export default function MyVaults() {
                   <div>
                     <h3 className="text-lg font-bold text-yellow-800 mb-2">Wrong Network</h3>
                     <p className="text-yellow-700 mb-2">
-                      You're currently connected to chain ID <strong>{chainId}</strong>, but this app requires chain ID <strong>{expectedChainId}</strong>.
+                      You&apos;re currently connected to chain ID <strong>{chainId}</strong>, but this app requires chain ID <strong>{expectedChainId}</strong>.
                     </p>
                     <p className="text-yellow-700 mb-3">
                       Required Network: <strong>{holeskyWithCustomChainId.name}</strong>
@@ -204,7 +204,7 @@ export default function MyVaults() {
               </div>
               <h2 className="text-2xl font-bold text-brand-slate-900 mb-4">No Vaults Found</h2>
               <p className="text-lg text-brand-slate-600 mb-8">
-                You haven't created any vaults yet
+                You haven&apos;t created any vaults yet
               </p>
               <Link
                 href="/create-vault"

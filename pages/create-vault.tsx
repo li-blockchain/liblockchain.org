@@ -114,8 +114,8 @@ export default function CreateVault() {
         functionName: 'createVaultWithDashboard',
         args: [
           address, // defaultAdmin (connected wallet)
-          formData.nodeOperator,
-          formData.nodeOperatorManager,
+          formData.nodeOperator as `0x${string}`,
+          formData.nodeOperatorManager as `0x${string}`,
           nodeOperatorFeeBP,
           confirmExpiry,
           [], // roleAssignments (empty for now)
@@ -156,7 +156,7 @@ export default function CreateVault() {
               </span>
             </h1>
             <p className="text-lg text-brand-slate-600 max-w-2xl">
-              Your private vault enables custom staking strategies, all powered by LIBC's reliable, battle-tested infrastructure.
+              Your private vault enables custom staking strategies, all powered by LIBC&apos;s reliable, battle-tested infrastructure.
             </p>
           </div>
         </div>
