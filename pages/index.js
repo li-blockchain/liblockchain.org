@@ -26,7 +26,7 @@ export default function Home() {
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
       </Head>
 
-      <Navigation></Navigation>
+      <Navigation onContactClick={() => setIsContactModalOpen(true)}></Navigation>
 
       {/* Hero Component - Staking Focused */}
       <div id="staking" className="relative bg-brand-slate-900 overflow-hidden">
@@ -329,6 +329,128 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* Contact Modal */}
+      {isContactModalOpen && <ContactModal onClose={() => setIsContactModalOpen(false)} />}
     </>
   )
+}
+
+function ContactModal({ onClose }) {
+  const [email, setEmail] = useState('');
+  const [services, setServices] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
+  const [emailError, setEmailError] = useState('');
+
+  const validateEmail = (email) => {
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setEmailError('');
+
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/post-lead', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          data: {
+            properties: {
+              'Email': { email },
+              'Services interested in': {
+                multi_select: [{ name: services }]
+              }
+            }
+          }
+        })
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setEmail('');
+        setServices('');
+        setTimeout(() => {
+          onClose();
+          setSubmitStatus(null);
+        }, 2000);
+      } else {
+        setSubmitStatus('error');
+      }
+    } catch (error) {
+      setSubmitStatus('error');
+    }
+    setIsSubmitting(false);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-light"
+        >
+          ✕
+        </button>
+
+        <div className="mb-4">
+          <h2 className="text-2xl font-bold text-brand-slate-900">Let&apos;s connect</h2>
+          <p className="text-sm text-brand-slate-600 mt-1">A member of our team will be in contact within 24 hours</p>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-brand-slate-700 font-medium mb-2">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (emailError) setEmailError('');
+              }}
+              className={`w-full p-3 border rounded-lg ${emailError ? 'border-red-500' : 'border-brand-slate-300'} focus:outline-none focus:ring-2 focus:ring-brand-cyan-500`}
+              required
+            />
+            {emailError && (
+              <p className="text-red-500 text-sm mt-1">{emailError}</p>
+            )}
+          </div>
+          <div className="mb-6">
+            <label className="block text-brand-slate-700 font-medium mb-2">Services Interested In</label>
+            <textarea
+              value={services}
+              onChange={(e) => setServices(e.target.value)}
+              className="w-full p-3 border border-brand-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-cyan-500"
+              rows="4"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-brand-cyan-500 text-white py-3 rounded-lg font-semibold hover:bg-brand-cyan-600 transition-colors disabled:opacity-50"
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit'}
+          </button>
+          {submitStatus === 'success' && (
+            <p className="text-green-600 text-center mt-3 font-medium">Thanks! We will be in contact shortly.</p>
+          )}
+          {submitStatus === 'error' && (
+            <p className="text-red-600 text-center mt-3">Something went wrong. Please try again.</p>
+          )}
+        </form>
+      </div>
+    </div>
+  );
 }

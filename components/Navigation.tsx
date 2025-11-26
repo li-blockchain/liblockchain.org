@@ -6,9 +6,10 @@ import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 interface NavigationProps {
     showConnectWallet?: boolean;
+    onContactClick?: () => void;
 }
 
-export default function Navigation({ showConnectWallet = false }: NavigationProps) {
+export default function Navigation({ showConnectWallet = false, onContactClick }: NavigationProps) {
     const [isOpen, setOpen] = useState(false);
     const [isProductsOpen, setIsProductsOpen] = useState(false);
     const [isMobileProductsOpen, setIsMobileProductsOpen] = useState(false);
@@ -135,6 +136,10 @@ export default function Navigation({ showConnectWallet = false }: NavigationProp
                             <div className="connect-wallet-custom">
                                 <ConnectButton />
                             </div>
+                        ) : onContactClick ? (
+                            <button onClick={onContactClick} className="px-6 py-2.5 bg-brand-cyan-500 hover:bg-brand-cyan-600 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-glow">
+                                Get in Touch
+                            </button>
                         ) : (
                             <Link href="/create-vault" className="px-6 py-2.5 bg-brand-cyan-500 hover:bg-brand-cyan-600 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-glow">
                                 Stake Now
@@ -200,6 +205,10 @@ export default function Navigation({ showConnectWallet = false }: NavigationProp
                                 <div className="flex justify-center connect-wallet-custom">
                                     <ConnectButton />
                                 </div>
+                            ) : onContactClick ? (
+                                <button onClick={() => { onContactClick(); setOpen(false); }} className="block w-full px-6 py-3 bg-brand-cyan-500 hover:bg-brand-cyan-600 text-white text-center font-semibold rounded-lg transition-colors">
+                                    Get in Touch
+                                </button>
                             ) : (
                                 <Link href="/create-vault" className="block w-full px-6 py-3 bg-brand-cyan-500 hover:bg-brand-cyan-600 text-white text-center font-semibold rounded-lg transition-colors">
                                     Stake Now
