@@ -1,9 +1,12 @@
 import Head from 'next/head'
+import { useState } from 'react'
 import Navigation from '../components/Navigation'
 import ContactForm from '../components/ContactForm'
 import Link from 'next/link'
 
 export default function InstitutionalStaking() {
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false);
+
   return (
     <>
       <Head>
@@ -16,7 +19,7 @@ export default function InstitutionalStaking() {
         />
       </Head>
 
-      <Navigation />
+      <Navigation onContactClick={() => setIsContactModalOpen(true)} />
 
       {/* Hero Section */}
       <div className="relative bg-brand-slate-900 overflow-hidden">
@@ -48,19 +51,13 @@ export default function InstitutionalStaking() {
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <a
-                href="#contact"
+            <div className="flex justify-center items-center">
+              <button
+                onClick={() => setIsContactModalOpen(true)}
                 className="px-8 py-4 bg-brand-purple-500 hover:bg-brand-purple-600 text-white text-lg font-semibold rounded-lg transition-all duration-300 hover:shadow-glow-purple transform hover:scale-105"
               >
                 Schedule Consultation
-              </a>
-              <Link
-                href="/create-vault"
-                className="px-8 py-4 border-2 border-brand-purple-500 text-brand-purple-400 hover:bg-brand-purple-500 hover:text-white text-lg font-semibold rounded-lg transition-all duration-300 transform hover:scale-105"
-              >
-                Create Vault
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -326,6 +323,159 @@ export default function InstitutionalStaking() {
         </div>
       </div>
 
+      {/* Rewards Reporting & Analysis Section */}
+      <div id="rewards" className="bg-brand-slate-50 py-16 lg:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl lg:text-5xl font-bold text-brand-slate-900 mb-4">
+              Comprehensive Rewards Analysis
+            </h2>
+            <p className="text-lg text-brand-slate-600 max-w-2xl mx-auto">
+              Deep insights into validator performance and staking rewards with institutional-grade analytics
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+            <div className="bg-white rounded-xl p-8 border border-brand-slate-200">
+              <h3 className="text-2xl font-bold text-brand-slate-900 mb-6">Real-Time Performance Tracking</h3>
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <div className="w-8 h-8 bg-brand-purple-100 rounded-lg flex items-center justify-center mr-4 mt-1 flex-shrink-0">
+                    <svg className="w-5 h-5 text-brand-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-brand-slate-900 mb-1">Attestation Effectiveness</h4>
+                    <p className="text-brand-slate-600 text-sm">Monitor validator attestation performance in real-time with detailed metrics on source, target, and head vote accuracy. Track inclusion distance and participation rates across all your validators.</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-8 h-8 bg-brand-purple-100 rounded-lg flex items-center justify-center mr-4 mt-1 flex-shrink-0">
+                    <svg className="w-5 h-5 text-brand-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-brand-slate-900 mb-1">Block Proposal Tracking</h4>
+                    <p className="text-brand-slate-600 text-sm">Complete visibility into block proposals including successful proposals, missed opportunities, MEV rewards, and priority fees. Historical analysis of proposal patterns and optimization opportunities.</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-8 h-8 bg-brand-purple-100 rounded-lg flex items-center justify-center mr-4 mt-1 flex-shrink-0">
+                    <svg className="w-5 h-5 text-brand-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-brand-slate-900 mb-1">Comparative Benchmarking</h4>
+                    <p className="text-brand-slate-600 text-sm">See how your validators perform against the entire network using rated.network data. Rankings update continuously showing your position in the top 5% of all validators with trend analysis over time.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl p-8 border border-brand-slate-200">
+              <h3 className="text-2xl font-bold text-brand-slate-900 mb-6">Rewards Analytics & Reporting</h3>
+              <div className="space-y-4">
+                <div className="flex items-start">
+                  <div className="w-8 h-8 bg-brand-cyan-100 rounded-lg flex items-center justify-center mr-4 mt-1 flex-shrink-0">
+                    <svg className="w-5 h-5 text-brand-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-brand-slate-900 mb-1">Granular Reward Breakdown</h4>
+                    <p className="text-brand-slate-600 text-sm">Detailed accounting of all reward streams: consensus layer rewards, execution layer tips, MEV rewards, and sync committee participation. Track every ETH earned with complete transaction-level transparency.</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-8 h-8 bg-brand-cyan-100 rounded-lg flex items-center justify-center mr-4 mt-1 flex-shrink-0">
+                    <svg className="w-5 h-5 text-brand-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-brand-slate-900 mb-1">Tax & Compliance Ready</h4>
+                    <p className="text-brand-slate-600 text-sm">Export detailed reports formatted for tax preparation and regulatory compliance. Historical cost basis tracking, realized vs unrealized gains, and customizable reporting periods aligned with your fiscal calendar.</p>
+                  </div>
+                </div>
+                <div className="flex items-start">
+                  <div className="w-8 h-8 bg-brand-cyan-100 rounded-lg flex items-center justify-center mr-4 mt-1 flex-shrink-0">
+                    <svg className="w-5 h-5 text-brand-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-brand-slate-900 mb-1">APR Projections & Trends</h4>
+                    <p className="text-brand-slate-600 text-sm">Forward-looking yield analysis based on historical performance, network conditions, and MEV opportunity trends. Scenario modeling for different market conditions with confidence intervals.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-brand-purple-600 to-brand-purple-700 rounded-2xl p-8 lg:p-12">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+              <div>
+                <h3 className="text-2xl lg:text-3xl font-bold text-white mb-4">
+                  Custom Dashboard & API Access
+                </h3>
+                <p className="text-white/90 mb-6 leading-relaxed">
+                  Access all your staking data through our secure web dashboard or integrate directly with your internal systems via our comprehensive API. Real-time webhooks, historical data exports, and custom alerting configured to your specifications.
+                </p>
+                <ul className="space-y-3 text-white/90">
+                  <li className="flex items-start">
+                    <svg className="w-5 h-5 text-white mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span>RESTful API with comprehensive documentation</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="w-5 h-5 text-white mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span>WebSocket feeds for real-time updates</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="w-5 h-5 text-white mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span>Customizable alerting thresholds and notifications</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="w-5 h-5 text-white mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span>Historical data exports in multiple formats (CSV, JSON, Parquet)</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                <div className="text-center mb-4">
+                  <div className="text-4xl font-bold text-white mb-2">99.9%</div>
+                  <div className="text-white/80 text-sm">Dashboard Uptime</div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white mb-1">24/7</div>
+                    <div className="text-white/80 text-xs">Monitoring</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-white mb-1">&lt;100ms</div>
+                    <div className="text-white/80 text-xs">API Latency</div>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-white mb-1">Unlimited</div>
+                  <div className="text-white/80 text-xs">API Requests</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Client Types Section */}
       <div className="bg-brand-slate-900 py-16 lg:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -404,6 +554,127 @@ export default function InstitutionalStaking() {
           <p className="text-brand-slate-400">White label Ethereum validators • SOC-2 compliant • Since 2016</p>
         </div>
       </footer>
+
+      {isContactModalOpen && <ContactModal onClose={() => setIsContactModalOpen(false)} defaultServices="Whitelabel Validators & Institutional Staking" />}
     </>
   )
+}
+
+function ContactModal({ onClose, defaultServices = '' }) {
+  const [email, setEmail] = useState('');
+  const [services, setServices] = useState(defaultServices);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
+  const [emailError, setEmailError] = useState('');
+
+  const validateEmail = (email) => {
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setEmailError('');
+
+    if (!validateEmail(email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/post-lead', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          data: {
+            properties: {
+              'Email': { email },
+              'Services interested in': {
+                multi_select: [{ name: services }]
+              }
+            }
+          }
+        })
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setEmail('');
+        setServices('');
+        setTimeout(() => {
+          onClose();
+          setSubmitStatus(null);
+        }, 2000);
+      } else {
+        setSubmitStatus('error');
+      }
+    } catch (error) {
+      setSubmitStatus('error');
+    }
+    setIsSubmitting(false);
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg p-6 max-w-md w-full relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 text-2xl font-light"
+        >
+          ✕
+        </button>
+
+        <div className="mb-4">
+          <h2 className="text-2xl font-bold text-brand-slate-900">Let&apos;s connect</h2>
+          <p className="text-sm text-brand-slate-600 mt-1">A member of our team will be in contact within 24 hours</p>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label className="block text-brand-slate-700 font-medium mb-2">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (emailError) setEmailError('');
+              }}
+              className={`w-full p-3 border rounded-lg ${emailError ? 'border-red-500' : 'border-brand-slate-300'} focus:outline-none focus:ring-2 focus:ring-brand-purple-500`}
+              required
+            />
+            {emailError && (
+              <p className="text-red-500 text-sm mt-1">{emailError}</p>
+            )}
+          </div>
+          <div className="mb-6">
+            <label className="block text-brand-slate-700 font-medium mb-2">Services Interested In</label>
+            <textarea
+              value={services}
+              onChange={(e) => setServices(e.target.value)}
+              className="w-full p-3 border border-brand-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-purple-500"
+              rows="4"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full bg-brand-purple-500 text-white py-3 rounded-lg font-semibold hover:bg-brand-purple-600 transition-colors disabled:opacity-50"
+          >
+            {isSubmitting ? 'Submitting...' : 'Submit'}
+          </button>
+          {submitStatus === 'success' && (
+            <p className="text-green-600 text-center mt-3 font-medium">Thanks! We will be in contact shortly.</p>
+          )}
+          {submitStatus === 'error' && (
+            <p className="text-red-600 text-center mt-3">Something went wrong. Please try again.</p>
+          )}
+        </form>
+      </div>
+    </div>
+  );
 }
