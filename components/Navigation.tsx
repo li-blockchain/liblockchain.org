@@ -79,7 +79,7 @@ export default function Navigation({ showConnectWallet = false, onContactClick }
                             {isProductsOpen && (
                                 <div className="absolute top-full left-0 pt-2 w-80 z-50">
                                 <div className="bg-white rounded-lg shadow-xl border border-brand-slate-200 py-2">
-                                    <Link href="/create-vault" className="block px-6 py-3 hover:bg-brand-slate-50 transition-colors group">
+                                    <Link href="/staking-vaults" className="block px-6 py-3 hover:bg-brand-slate-50 transition-colors group">
                                         <div className="font-semibold text-brand-slate-900 group-hover:text-brand-cyan-600 transition-colors">
                                             ETH Staking Vaults
                                         </div>
@@ -141,8 +141,8 @@ export default function Navigation({ showConnectWallet = false, onContactClick }
                                 Get in Touch
                             </button>
                         ) : (
-                            <Link href="/create-vault" className="px-6 py-2.5 bg-brand-cyan-500 hover:bg-brand-cyan-600 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-glow">
-                                Stake Now
+                            <Link href="/#contact" className="px-6 py-2.5 bg-brand-cyan-500 hover:bg-brand-cyan-600 text-white font-semibold rounded-lg transition-all duration-300 hover:shadow-glow">
+                                Get in Touch
                             </Link>
                         )}
                     </div>
@@ -169,7 +169,7 @@ export default function Navigation({ showConnectWallet = false, onContactClick }
                             </button>
                             {isMobileProductsOpen && (
                                 <div className="ml-4 mt-1 space-y-1">
-                                    <Link href="/create-vault" className="block px-4 py-3 text-sm text-brand-slate-600 hover:text-brand-cyan-600 hover:bg-brand-slate-50 rounded-lg transition-colors">
+                                    <Link href="/staking-vaults" className="block px-4 py-3 text-sm text-brand-slate-600 hover:text-brand-cyan-600 hover:bg-brand-slate-50 rounded-lg transition-colors">
                                         <div className="font-medium">ETH Staking Vaults</div>
                                         <div className="text-xs text-brand-slate-500 mt-0.5">Stake ETH, mint stETH, flexible DeFi strategies</div>
                                     </Link>
@@ -210,8 +210,8 @@ export default function Navigation({ showConnectWallet = false, onContactClick }
                                     Get in Touch
                                 </button>
                             ) : (
-                                <Link href="/create-vault" className="block w-full px-6 py-3 bg-brand-cyan-500 hover:bg-brand-cyan-600 text-white text-center font-semibold rounded-lg transition-colors">
-                                    Stake Now
+                                <Link href="/#contact" className="block w-full px-6 py-3 bg-brand-cyan-500 hover:bg-brand-cyan-600 text-white text-center font-semibold rounded-lg transition-colors">
+                                    Get in Touch
                                 </Link>
                             )}
                         </div>
