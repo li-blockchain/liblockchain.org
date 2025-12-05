@@ -48,13 +48,13 @@ export default function Home() {
             <h1 className="text-5xl lg:text-7xl text-white font-bold tracking-tight mb-6">
               We make blocks.
               <span className="block text-transparent bg-clip-text bg-purple-gradient">
-                Not Ice Tea.
+                Not Iced Tea.
               </span>
             </h1>
 
             {/* Subheading */}
             <p className="text-xl lg:text-2xl text-brand-slate-300 max-w-3xl mx-auto mb-12 leading-relaxed">
-              Powering liquid staking protocols and institutional validators with enterprise-grade infrastructure. From our SOC-2 datacenter to your optimized DeFi strategies.
+              We are Long Island Blockchain. Powering liquid staking protocols and institutional validators with enterprise-grade infrastructure. From our SOC-2 datacenter to your optimized DeFi strategies.
             </p>
 
             {/* CTA Button */}
