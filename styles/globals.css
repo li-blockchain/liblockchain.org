@@ -22,3 +22,104 @@ a {
 * {
   box-sizing: border-box;
 }
+
+
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 215 28% 17%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 28% 17%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 28% 17%;
+    /* Primary: Brand Cyan #0099cc - hsl(192, 100%, 40%) */
+    --primary: 192 100% 40%;
+    --primary-foreground: 0 0% 100%;
+    /* Secondary: Brand Purple #a855f7 - hsl(271, 91%, 65%) */
+    --secondary: 271 91% 65%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215 16% 47%;
+    /* Accent: Brand Purple for accent elements */
+    --accent: 271 91% 65%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 192 100% 40%;
+    --chart-1: 192 100% 40%;
+    --chart-2: 271 91% 65%;
+    --chart-3: 330 81% 60%;
+    --chart-4: 215 28% 17%;
+    --chart-5: 192 80% 50%;
+    --radius: 0.5rem;
+    /* Brand color CSS variables for direct use */
+    --brand-cyan: 192 100% 40%;
+    --brand-purple: 271 91% 65%;
+    --brand-pink: 330 81% 60%;
+    --brand-slate: 215 28% 17%;
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+  .dark {
+    --background: 222 47% 11%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 11%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 11%;
+    --popover-foreground: 210 40% 98%;
+    /* Primary: Brand Cyan - slightly brighter for dark mode */
+    --primary: 192 100% 45%;
+    --primary-foreground: 222 47% 11%;
+    /* Secondary: Brand Purple */
+    --secondary: 271 91% 65%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    /* Accent: Brand Purple */
+    --accent: 271 91% 65%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
+    --ring: 192 100% 45%;
+    --chart-1: 192 100% 45%;
+    --chart-2: 271 91% 65%;
+    --chart-3: 330 81% 60%;
+    --chart-4: 210 40% 80%;
+    --chart-5: 192 80% 55%;
+    /* Brand color CSS variables for direct use */
+    --brand-cyan: 192 100% 45%;
+    --brand-purple: 271 91% 65%;
+    --brand-pink: 330 81% 60%;
+    --brand-slate: 215 20% 65%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
