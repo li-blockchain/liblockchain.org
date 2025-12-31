@@ -1,4 +1,8 @@
 import { defineChain } from 'viem';
+import { mainnet } from 'viem/chains';
+
+// Re-export mainnet for convenience
+export { mainnet };
 
 // Local Anvil fork configuration
 export const localAnvil = defineChain({
@@ -25,8 +29,8 @@ export const localAnvil = defineChain({
 
 // Hoodi testnet configuration (Lido's testnet) - for production
 export const hoodi = defineChain({
-  id: 17864, // Hoodi chain ID
-  name: 'Hoodi Testnet',
+  id: 560048, // Hoodi chain ID
+  name: 'LIBC Hoodi Testnet',
   nativeCurrency: {
     decimals: 18,
     name: 'Ether',
@@ -34,14 +38,14 @@ export const hoodi = defineChain({
   },
   rpcUrls: {
     default: {
-      http: [process.env.NEXT_PUBLIC_HOODI_RPC_URL || 'http://libc-testnets:8545'],
+      http: [process.env.NEXT_PUBLIC_HOODI_RPC_URL || 'https://eth-hoodi.g.alchemy.com/v2/Sww4JwlwEIR5dWXC2k7nnZOlbJasNEPe'],
     },
     public: {
-      http: ['http://libc-testnets:8545'],
+      http: ['https://eth-hoodi.g.alchemy.com/v2/Sww4JwlwEIR5dWXC2k7nnZOlbJasNEPe'],
     },
   },
   blockExplorers: {
-    default: { name: 'Explorer', url: 'https://explorer-hoodi.testnet.fi' },
+    default: { name: 'Etherscan', url: 'https://hoodi.etherscan.io' },
   },
   testnet: true,
 });
