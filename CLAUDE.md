@@ -6,10 +6,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a Next.js application. Common development commands:
 
-- `npm run dev` - Start development server (localhost:3000)
-- `npm run build` - Build production application
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint for code quality
+- `pnpm dev` - Start development server (localhost:3000)
+- `pnpm build` - Build production application
+- `pnpm start` - Start production server
+- `pnpm lint` - Run ESLint for code quality
+
+Note: This project uses pnpm as the package manager.
 
 ## Architecture Overview
 
@@ -19,30 +21,46 @@ This is a Next.js-based website for Long Island Blockchain (liblockchain.org) wi
 - **Framework**: Next.js 14 with React 18 and TypeScript
 - **Styling**: Tailwind CSS with custom brand colors (cyan, purple, slate)
 - **Web3**: Wagmi v2, Viem, RainbowKit for wallet connections
+- **Data Fetching**: TanStack React Query for async state management
 - **Forms**: Formik for form handling
 - **UI Components**: Heroicons, hamburger-react for mobile menu
 
 ### Directory Structure
-- `pages/` - Next.js pages (file-based routing)
+- `pages/` - Next.js Pages Router (public marketing pages)
   - `index.js` - Homepage with hero, projects, services, and contact sections
   - `eth-staking.js` - Ethereum staking service page
+  - `institutional-staking.js` - Whitelabel validators & institutional staking for enterprises
+  - `staking-vaults.js` - Liquidity-enabled staking vaults (Lido v3 stVault) landing page
   - `community-wifi.js` - Community WiFi/Neutral Host service page
   - `privacy.js` - Privacy policy page
-  - **`my-vaults.tsx`** - View all user's private staking vaults (TypeScript)
-  - **`create-vault.tsx`** - Create new private staking vault (TypeScript)
-  - **`vault-status.tsx`** - View individual vault details and metrics (TypeScript)
   - `api/` - API routes (contains post-lead.js for form submissions)
+- `app/` - Next.js App Router (authenticated vault management app)
+  - `layout.tsx` - Root layout with providers
+  - `providers.tsx` - Wagmi/RainbowKit providers
+  - `app/` - Vault management pages (all under `/app/*` URL)
+    - `page.tsx` - Redirects to `/app/my-vaults`
+    - `layout.tsx` - Vault pages layout with sidebar
+    - `VaultSidebarClient.tsx` - Left sidebar navigation
+    - `NavigationClient.tsx` - Top navigation with wallet connection
+    - `my-vaults/` - View all user's private staking vaults (`/app/my-vaults`)
+    - `create-vault/` - Create new private staking vault (`/app/create-vault`)
+    - `vault-status/` - View individual vault details (`/app/vault-status`)
 - `components/` - Reusable React components
   - `Navigation.tsx` - Main navigation with mobile hamburger menu and RainbowKit wallet connection
-  - **`VaultSidebar.tsx`** - Left sidebar navigation for vault management pages (TypeScript)
+  - `VaultSidebar.tsx` - Legacy sidebar (pages router version)
   - `ContactForm.jsx` - Contact form component using Formik
   - `EmbeddedContactForm.jsx` - Embedded version of contact form
   - `StakingFeature.jsx` - Staking-related feature component
+  - `NetworksGrid.jsx` - Grid display of supported blockchain networks
+  - `StatsSection.jsx` - Statistics/metrics display section
+  - `TrustIndicators.jsx` - Trust badges and credibility indicators
+  - `ui/` - shadcn/ui components (Button, Card, Badge, etc.)
 - `lib/` - Utility functions and configurations
   - **`chains.ts`** - Custom blockchain network configurations (Hoodi testnet, local Anvil)
+  - **`wagmi.ts`** - Wagmi/RainbowKit configuration
+  - **`utils.ts`** - Utility functions (cn for className merging)
   - **`contracts/`** - Smart contract ABIs and addresses
     - `vaultFactory.ts` - Vault factory contract configuration
-    - `vault.ts` - Individual vault contract configuration
     - `dashboard.ts` - Dashboard contract configuration
 - `public/` - Static assets (images, logos, etc.)
 
@@ -92,12 +110,9 @@ The site includes a private Ethereum staking vault management application that a
 - **Brand Colors**: Cyan (#0099cc) and purple accents, slate gray for text
 
 ### Network Configuration
-- **Hoodi Testnet** (Chain ID: 17864): Primary network for production
-  - RPC: http://libc-testnets:8545
+- **Hoodi Testnet** (Chain ID: 560048): Primary network for testing
+  - RPC: http://libc-testnets:8545 (local) or Alchemy
   - Lido's testnet environment
-- **Local Anvil** (Chain ID: 560048): Development network (optional)
-  - RPC: http://127.0.0.1:8545
-  - For local testing with forked state
 
 ### Network Detection
 - App detects which network the user's wallet is connected to
