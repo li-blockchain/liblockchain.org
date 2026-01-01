@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt, useAccount, useBalance, useChainId, useChains, usePublicClient } from 'wagmi'
 import { parseEther, formatEther, parseAbiItem } from 'viem'
@@ -26,7 +26,21 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { cn } from '@/lib/utils'
+import { isAddress } from 'viem'
 
 // Icons
 import {
@@ -49,7 +63,14 @@ import {
   ArrowUpFromLine,
   Loader2,
   RefreshCw,
-  History
+  History,
+  Users,
+  Copy,
+  Check,
+  UserPlus,
+  UserMinus,
+  HelpCircle,
+  Info
 } from 'lucide-react'
 
 // Health status types
@@ -249,10 +270,14 @@ function parseErrorMessage(error: any): string {
 // Fund Vault Dialog Component
 function FundVaultDialog({
   dashboardAddress,
-  onSuccess
+  onSuccess,
+  hasRole = true,
+  isAdmin = false
 }: {
   dashboardAddress: string
   onSuccess?: () => void
+  hasRole?: boolean
+  isAdmin?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const [amount, setAmount] = useState('')
@@ -262,6 +287,8 @@ function FundVaultDialog({
   const chainId = useChainId()
   const chains = useChains()
   const { data: walletBalance } = useBalance({ address })
+
+  const canPerformAction = hasRole || isAdmin
 
   const { writeContract, data: hash, isPending, error: writeError, reset } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
@@ -313,12 +340,28 @@ function FundVaultDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-brand-cyan-600 hover:bg-brand-cyan-700 text-white">
-          <ArrowDownToLine className="w-4 h-4 mr-2" />
-          Fund Vault
-        </Button>
-      </DialogTrigger>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span>
+              <DialogTrigger asChild>
+                <Button
+                  className="bg-brand-cyan-600 hover:bg-brand-cyan-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!canPerformAction}
+                >
+                  <ArrowDownToLine className="w-4 h-4 mr-2" />
+                  Fund Vault
+                </Button>
+              </DialogTrigger>
+            </span>
+          </TooltipTrigger>
+          {!canPerformAction && (
+            <TooltipContent>
+              <p className="text-sm">Requires Fund role or Admin permission</p>
+            </TooltipContent>
+          )}
+        </Tooltip>
+      </TooltipProvider>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -442,12 +485,16 @@ function MintStETHDialog({
   dashboardAddress,
   remainingMintingCapacity,
   liabilityShares,
-  onSuccess
+  onSuccess,
+  hasRole = true,
+  isAdmin = false
 }: {
   dashboardAddress: string
   remainingMintingCapacity: bigint | undefined
   liabilityShares: bigint | undefined
   onSuccess?: () => void
+  hasRole?: boolean
+  isAdmin?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const [amount, setAmount] = useState('')
@@ -456,6 +503,8 @@ function MintStETHDialog({
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
   const chains = useChains()
+
+  const canPerformAction = hasRole || isAdmin
 
   const { writeContract, data: hash, isPending, error: writeError, reset } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
@@ -517,12 +566,29 @@ function MintStETHDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="border-green-300 text-green-700 hover:bg-green-50 hover:text-green-800">
-          <Coins className="w-4 h-4 mr-2" />
-          Mint stETH
-        </Button>
-      </DialogTrigger>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="border-green-300 text-green-700 hover:bg-green-50 hover:text-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!canPerformAction}
+                >
+                  <Coins className="w-4 h-4 mr-2" />
+                  Mint stETH
+                </Button>
+              </DialogTrigger>
+            </span>
+          </TooltipTrigger>
+          {!canPerformAction && (
+            <TooltipContent>
+              <p className="text-sm">Requires Mint role or Admin permission</p>
+            </TooltipContent>
+          )}
+        </Tooltip>
+      </TooltipProvider>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -668,13 +734,17 @@ function BurnStETHDialog({
   liabilityShares,
   reserveRatioBP,
   totalValue,
-  onSuccess
+  onSuccess,
+  hasRole = true,
+  isAdmin = false
 }: {
   dashboardAddress: string
   liabilityShares: bigint | undefined
   reserveRatioBP: number | undefined
   totalValue: bigint | undefined
   onSuccess?: () => void
+  hasRole?: boolean
+  isAdmin?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const [amount, setAmount] = useState('')
@@ -683,6 +753,8 @@ function BurnStETHDialog({
   const { isConnected } = useAccount()
   const chainId = useChainId()
   const chains = useChains()
+
+  const canPerformAction = hasRole || isAdmin
 
   const { writeContract, data: hash, isPending, error: writeError, reset } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
@@ -755,12 +827,29 @@ function BurnStETHDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="border-red-300 text-red-700 hover:bg-red-50 hover:text-red-800">
-          <XCircle className="w-4 h-4 mr-2" />
-          Burn stETH
-        </Button>
-      </DialogTrigger>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="border-red-300 text-red-700 hover:bg-red-50 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!canPerformAction}
+                >
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Burn stETH
+                </Button>
+              </DialogTrigger>
+            </span>
+          </TooltipTrigger>
+          {!canPerformAction && (
+            <TooltipContent>
+              <p className="text-sm">Requires Burn role or Admin permission</p>
+            </TooltipContent>
+          )}
+        </Tooltip>
+      </TooltipProvider>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -924,11 +1013,15 @@ function BurnStETHDialog({
 function WithdrawDialog({
   dashboardAddress,
   withdrawableValue,
-  onSuccess
+  onSuccess,
+  hasRole = true,
+  isAdmin = false
 }: {
   dashboardAddress: string
   withdrawableValue: bigint | undefined
   onSuccess?: () => void
+  hasRole?: boolean
+  isAdmin?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const [amount, setAmount] = useState('')
@@ -937,6 +1030,8 @@ function WithdrawDialog({
   const { address, isConnected } = useAccount()
   const chainId = useChainId()
   const chains = useChains()
+
+  const canPerformAction = hasRole || isAdmin
 
   const { writeContract, data: hash, isPending, error: writeError, reset } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
@@ -994,12 +1089,29 @@ function WithdrawDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" className="border-brand-purple-300 text-brand-purple-700 hover:bg-brand-purple-50 hover:text-brand-purple-800">
-          <ArrowUpFromLine className="w-4 h-4 mr-2" />
-          Withdraw
-        </Button>
-      </DialogTrigger>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="border-brand-purple-300 text-brand-purple-700 hover:bg-brand-purple-50 hover:text-brand-purple-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={!canPerformAction}
+                >
+                  <ArrowUpFromLine className="w-4 h-4 mr-2" />
+                  Withdraw
+                </Button>
+              </DialogTrigger>
+            </span>
+          </TooltipTrigger>
+          {!canPerformAction && (
+            <TooltipContent>
+              <p className="text-sm">Requires Withdraw role or Admin permission</p>
+            </TooltipContent>
+          )}
+        </Tooltip>
+      </TooltipProvider>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -1130,19 +1242,52 @@ function WithdrawDialog({
 
 // Activity event type
 interface VaultActivity {
-  type: 'funded' | 'withdrawn' | 'staged' | 'unstaged'
+  type: 'funded' | 'withdrawn' | 'staged' | 'unstaged' | 'role_granted' | 'role_revoked'
   amount: bigint
   blockNumber: bigint
   transactionHash: string
   timestamp?: number
+  // Role event specific fields
+  role?: string
+  account?: string
+  roleName?: string
+}
+
+// Map role bytes32 to human-readable names
+const getRoleNameFromBytes = (roleBytes: string): string => {
+  // Common role hashes
+  const roleMap: Record<string, string> = {
+    '0x0000000000000000000000000000000000000000000000000000000000000000': 'Vault Owner',
+  }
+
+  // Check known roles first
+  if (roleMap[roleBytes.toLowerCase()]) {
+    return roleMap[roleBytes.toLowerCase()]
+  }
+
+  // Try to match against ROLE_CONFIG keys by checking common patterns
+  // These are keccak256 hashes of role names
+  const knownRoles: Record<string, string> = {
+    'FUND_ROLE': 'Fund',
+    'WITHDRAW_ROLE': 'Withdraw',
+    'MINT_ROLE': 'Mint',
+    'BURN_ROLE': 'Burn',
+    'REBALANCE_ROLE': 'Rebalance',
+    'NODE_OPERATOR_MANAGER_ROLE': 'Node Operator Manager',
+  }
+
+  // Return truncated hash as fallback
+  return `Role ${roleBytes.slice(0, 10)}...`
 }
 
 // Recent Activity Component
 function RecentActivity({
   vaultAddress,
+  dashboardAddress,
   isLoading: parentLoading
 }: {
   vaultAddress: string
+  dashboardAddress: string
   isLoading?: boolean
 }) {
   const [activities, setActivities] = useState<VaultActivity[]>([])
@@ -1177,8 +1322,12 @@ function RecentActivity({
       const stagedEvent = parseAbiItem('event EtherStaged(uint256 amount)')
       const unstagedEvent = parseAbiItem('event EtherUnstaged(uint256 amount)')
 
+      // Define event signatures for role management (from Dashboard/AccessControl)
+      const roleGrantedEvent = parseAbiItem('event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender)')
+      const roleRevokedEvent = parseAbiItem('event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender)')
+
       // Fetch all event types in parallel
-      const [fundedLogs, withdrawnLogs, stagedLogs, unstagedLogs] = await Promise.all([
+      const [fundedLogs, withdrawnLogs, stagedLogs, unstagedLogs, roleGrantedLogs, roleRevokedLogs] = await Promise.all([
         publicClient.getLogs({
           address: vaultAddress as `0x${string}`,
           event: fundedEvent,
@@ -1203,6 +1352,19 @@ function RecentActivity({
           fromBlock,
           toBlock: 'latest',
         }).catch(() => []),
+        // Fetch role events from Dashboard contract
+        dashboardAddress ? publicClient.getLogs({
+          address: dashboardAddress as `0x${string}`,
+          event: roleGrantedEvent,
+          fromBlock,
+          toBlock: 'latest',
+        }).catch(() => []) : Promise.resolve([]),
+        dashboardAddress ? publicClient.getLogs({
+          address: dashboardAddress as `0x${string}`,
+          event: roleRevokedEvent,
+          fromBlock,
+          toBlock: 'latest',
+        }).catch(() => []) : Promise.resolve([]),
       ])
 
       // Parse and combine activities
@@ -1244,6 +1406,34 @@ function RecentActivity({
         })
       })
 
+      // Parse role granted events
+      roleGrantedLogs.forEach(log => {
+        const args = log.args as any
+        allActivities.push({
+          type: 'role_granted',
+          amount: 0n,
+          blockNumber: log.blockNumber,
+          transactionHash: log.transactionHash,
+          role: args?.role,
+          account: args?.account,
+          roleName: getRoleNameFromBytes(args?.role || ''),
+        })
+      })
+
+      // Parse role revoked events
+      roleRevokedLogs.forEach(log => {
+        const args = log.args as any
+        allActivities.push({
+          type: 'role_revoked',
+          amount: 0n,
+          blockNumber: log.blockNumber,
+          transactionHash: log.transactionHash,
+          role: args?.role,
+          account: args?.account,
+          roleName: getRoleNameFromBytes(args?.role || ''),
+        })
+      })
+
       // Sort by block number descending and take last 20
       allActivities.sort((a, b) => Number(b.blockNumber - a.blockNumber))
 
@@ -1268,11 +1458,11 @@ function RecentActivity({
     }
   }
 
-  // Fetch on mount and when vault address changes
+  // Fetch on mount and when vault/dashboard address changes
   useEffect(() => {
     fetchActivityLogs()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vaultAddress, publicClient])
+  }, [vaultAddress, dashboardAddress, publicClient])
 
   const getActivityConfig = (type: VaultActivity['type']) => {
     switch (type) {
@@ -1306,6 +1496,22 @@ function RecentActivity({
           label: 'Unstaged',
           color: 'text-orange-600',
           bgColor: 'bg-orange-100',
+          sign: ''
+        }
+      case 'role_granted':
+        return {
+          icon: UserPlus,
+          label: 'Role Granted',
+          color: 'text-cyan-600',
+          bgColor: 'bg-cyan-100',
+          sign: ''
+        }
+      case 'role_revoked':
+        return {
+          icon: UserMinus,
+          label: 'Role Revoked',
+          color: 'text-red-600',
+          bgColor: 'bg-red-100',
           sign: ''
         }
     }
@@ -1448,11 +1654,24 @@ function RecentActivity({
                     </div>
                   </div>
 
-                  {/* Amount */}
+                  {/* Amount or Role Info */}
                   <div className="text-right">
-                    <p className={cn("font-mono font-medium text-sm", config.color)}>
-                      {config.sign}{formatEth(activity.amount)} ETH
-                    </p>
+                    {activity.type === 'role_granted' || activity.type === 'role_revoked' ? (
+                      <>
+                        <p className={cn("font-medium text-sm", config.color)}>
+                          {activity.roleName || 'Unknown Role'}
+                        </p>
+                        {activity.account && (
+                          <p className="text-xs text-muted-foreground font-mono">
+                            {activity.account.slice(0, 6)}...{activity.account.slice(-4)}
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      <p className={cn("font-mono font-medium text-sm", config.color)}>
+                        {config.sign}{formatEth(activity.amount)} ETH
+                      </p>
+                    )}
                     <a
                       href={`${explorerUrl}/tx/${activity.transactionHash}`}
                       target="_blank"
@@ -1467,6 +1686,828 @@ function RecentActivity({
             })}
           </div>
         )}
+      </CardContent>
+    </Card>
+  )
+}
+
+// Role type definition
+interface RoleInfo {
+  name: string
+  description: string
+  roleFunctionName: string
+  color: string
+  bgColor: string
+  canBeGrantedBy: 'admin' | 'nodeOperatorManager' | 'both'
+}
+
+// Role configuration mapping
+const ROLE_CONFIG: Record<string, RoleInfo> = {
+  DEFAULT_ADMIN_ROLE: {
+    name: 'Vault Owner',
+    description: 'Full administrative control over the vault. Can grant/revoke all other roles.',
+    roleFunctionName: 'DEFAULT_ADMIN_ROLE',
+    color: 'text-purple-700',
+    bgColor: 'bg-purple-100',
+    canBeGrantedBy: 'admin'
+  },
+  FUND_ROLE: {
+    name: 'Fund',
+    description: 'Can deposit ETH into the staking vault.',
+    roleFunctionName: 'FUND_ROLE',
+    color: 'text-green-700',
+    bgColor: 'bg-green-100',
+    canBeGrantedBy: 'admin'
+  },
+  WITHDRAW_ROLE: {
+    name: 'Withdraw',
+    description: 'Can withdraw available ETH from the vault.',
+    roleFunctionName: 'WITHDRAW_ROLE',
+    color: 'text-blue-700',
+    bgColor: 'bg-blue-100',
+    canBeGrantedBy: 'admin'
+  },
+  MINT_ROLE: {
+    name: 'Mint',
+    description: 'Can mint stETH against vault collateral.',
+    roleFunctionName: 'MINT_ROLE',
+    color: 'text-cyan-700',
+    bgColor: 'bg-cyan-100',
+    canBeGrantedBy: 'admin'
+  },
+  BURN_ROLE: {
+    name: 'Burn',
+    description: 'Can burn stETH to reduce vault liability.',
+    roleFunctionName: 'BURN_ROLE',
+    color: 'text-orange-700',
+    bgColor: 'bg-orange-100',
+    canBeGrantedBy: 'admin'
+  },
+  REBALANCE_ROLE: {
+    name: 'Rebalance',
+    description: 'Can perform voluntary vault rebalancing.',
+    roleFunctionName: 'REBALANCE_ROLE',
+    color: 'text-indigo-700',
+    bgColor: 'bg-indigo-100',
+    canBeGrantedBy: 'admin'
+  },
+  NODE_OPERATOR_MANAGER_ROLE: {
+    name: 'Node Operator Manager',
+    description: 'Manages node operator permissions and parameters.',
+    roleFunctionName: 'NODE_OPERATOR_MANAGER_ROLE',
+    color: 'text-amber-700',
+    bgColor: 'bg-amber-100',
+    canBeGrantedBy: 'admin'
+  }
+}
+
+// Address display component with copy functionality
+function AddressDisplay({ address }: { address: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(address)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="flex items-center gap-2 group">
+      <span className="font-mono text-sm">
+        {address.slice(0, 6)}...{address.slice(-4)}
+      </span>
+      <button
+        onClick={handleCopy}
+        className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-muted rounded"
+        title="Copy address"
+      >
+        {copied ? (
+          <Check className="w-3 h-3 text-green-600" />
+        ) : (
+          <Copy className="w-3 h-3 text-muted-foreground" />
+        )}
+      </button>
+    </div>
+  )
+}
+
+// Grant Role Dialog Component
+function GrantRoleDialog({
+  dashboardAddress,
+  roleBytes32Map,
+  isAdmin,
+  onSuccess
+}: {
+  dashboardAddress: string
+  roleBytes32Map: Record<string, `0x${string}` | undefined>
+  isAdmin: boolean
+  onSuccess?: () => void
+}) {
+  const [open, setOpen] = useState(false)
+  const [selectedRole, setSelectedRole] = useState<string>('')
+  const [addressInput, setAddressInput] = useState('')
+  const [localError, setLocalError] = useState<string | null>(null)
+
+  const chainId = useChainId()
+  const chains = useChains()
+
+  const { writeContract, data: hash, isPending, error: writeError, reset } = useWriteContract()
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
+
+  const explorerUrl = getExplorerUrl(chainId, chains)
+
+  // Track if we've already called onSuccess for this transaction
+  const hasCalledSuccess = useRef(false)
+
+  // Reset state when dialog opens/closes
+  useEffect(() => {
+    if (!open) {
+      setSelectedRole('')
+      setAddressInput('')
+      setLocalError(null)
+      hasCalledSuccess.current = false
+      reset()
+    }
+  }, [open, reset])
+
+  // Handle success - only call onSuccess once per transaction
+  useEffect(() => {
+    if (isSuccess && !hasCalledSuccess.current) {
+      hasCalledSuccess.current = true
+      onSuccess?.()
+    }
+  }, [isSuccess, onSuccess])
+
+  const handleGrant = async () => {
+    setLocalError(null)
+
+    if (!selectedRole) {
+      setLocalError('Please select a role')
+      return
+    }
+
+    if (!addressInput || !isAddress(addressInput)) {
+      setLocalError('Please enter a valid Ethereum address')
+      return
+    }
+
+    const roleBytes = roleBytes32Map[selectedRole]
+    if (!roleBytes) {
+      setLocalError('Role not found')
+      return
+    }
+
+    try {
+      await writeContract({
+        address: dashboardAddress as `0x${string}`,
+        abi: DASHBOARD_ABI,
+        functionName: 'grantRole',
+        args: [roleBytes, addressInput as `0x${string}`],
+      })
+    } catch (err) {
+      setLocalError(parseErrorMessage(err))
+    }
+  }
+
+  const displayError = localError || (writeError ? parseErrorMessage(writeError) : null)
+
+  // Get grantable roles (exclude DEFAULT_ADMIN_ROLE as it's the main admin)
+  const grantableRoles = Object.entries(ROLE_CONFIG).filter(
+    ([key]) => key !== 'DEFAULT_ADMIN_ROLE'
+  )
+
+  if (!isAdmin) return null
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button size="sm" className="bg-brand-cyan-600 hover:bg-brand-cyan-700 text-white">
+          <UserPlus className="w-4 h-4 mr-2" />
+          Grant Role
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <UserPlus className="w-5 h-5 text-brand-cyan-600" />
+            Grant Role
+          </DialogTitle>
+          <DialogDescription>
+            Grant a permission role to an Ethereum address. The address will be able to perform the associated action.
+          </DialogDescription>
+        </DialogHeader>
+
+        {isSuccess ? (
+          <div className="py-6 text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-8 h-8 text-green-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-green-800 mb-2">Role Granted!</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              The {ROLE_CONFIG[selectedRole]?.name} role has been granted successfully.
+            </p>
+            {hash && (
+              <a
+                href={`${explorerUrl}/tx/${hash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand-cyan-600 hover:underline text-sm flex items-center justify-center gap-1"
+              >
+                View transaction <ExternalLink className="w-3 h-3" />
+              </a>
+            )}
+            <Button onClick={() => setOpen(false)} className="mt-4">
+              Close
+            </Button>
+          </div>
+        ) : (
+          <>
+            <div className="space-y-4 py-4">
+              {/* Role Selection */}
+              <div className="space-y-2">
+                <Label htmlFor="role-select">Role</Label>
+                <Select value={selectedRole} onValueChange={setSelectedRole} disabled={isPending || isConfirming}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a role to grant" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {grantableRoles.map(([key, config]) => (
+                      <SelectItem key={key} value={key}>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline" className={cn("text-xs", config.color, config.bgColor)}>
+                            {config.name}
+                          </Badge>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedRole && ROLE_CONFIG[selectedRole] && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {ROLE_CONFIG[selectedRole].description}
+                  </p>
+                )}
+              </div>
+
+              {/* Address Input */}
+              <div className="space-y-2">
+                <Label htmlFor="grant-address">Ethereum Address</Label>
+                <Input
+                  id="grant-address"
+                  type="text"
+                  placeholder="0x..."
+                  value={addressInput}
+                  onChange={(e) => setAddressInput(e.target.value)}
+                  className="font-mono"
+                  disabled={isPending || isConfirming}
+                />
+              </div>
+
+              {/* Error Message */}
+              {displayError && (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>{displayError}</AlertDescription>
+                </Alert>
+              )}
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending || isConfirming}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleGrant}
+                disabled={isPending || isConfirming || !selectedRole || !addressInput}
+                className="bg-brand-cyan-500 hover:bg-brand-cyan-600"
+              >
+                {isPending || isConfirming ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {isPending ? 'Confirm in Wallet...' : 'Processing...'}
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Grant Role
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// Revoke Role Dialog Component
+function RevokeRoleDialog({
+  dashboardAddress,
+  roleKey,
+  roleBytes32,
+  roleName,
+  memberAddress,
+  isAdmin,
+  onSuccess
+}: {
+  dashboardAddress: string
+  roleKey: string
+  roleBytes32: `0x${string}`
+  roleName: string
+  memberAddress: string
+  isAdmin: boolean
+  onSuccess?: () => void
+}) {
+  const [open, setOpen] = useState(false)
+  const [localError, setLocalError] = useState<string | null>(null)
+
+  const chainId = useChainId()
+  const chains = useChains()
+
+  const { writeContract, data: hash, isPending, error: writeError, reset } = useWriteContract()
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
+
+  const explorerUrl = getExplorerUrl(chainId, chains)
+
+  // Track if we've already called onSuccess for this transaction
+  const hasCalledSuccess = useRef(false)
+
+  // Reset state when dialog opens/closes
+  useEffect(() => {
+    if (!open) {
+      setLocalError(null)
+      hasCalledSuccess.current = false
+      reset()
+    }
+  }, [open, reset])
+
+  // Handle success - only call onSuccess once per transaction
+  useEffect(() => {
+    if (isSuccess && !hasCalledSuccess.current) {
+      hasCalledSuccess.current = true
+      onSuccess?.()
+      setOpen(false)
+    }
+  }, [isSuccess, onSuccess])
+
+  const handleRevoke = async () => {
+    setLocalError(null)
+
+    try {
+      await writeContract({
+        address: dashboardAddress as `0x${string}`,
+        abi: DASHBOARD_ABI,
+        functionName: 'revokeRole',
+        args: [roleBytes32, memberAddress as `0x${string}`],
+      })
+    } catch (err) {
+      setLocalError(parseErrorMessage(err))
+    }
+  }
+
+  const displayError = localError || (writeError ? parseErrorMessage(writeError) : null)
+
+  if (!isAdmin) return null
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button
+          variant="outline"
+          size="sm"
+          className="opacity-0 group-hover:opacity-100 transition-opacity border-red-200 bg-red-50 text-red-600 hover:text-red-700 hover:bg-red-100 hover:border-red-300"
+        >
+          <UserMinus className="w-4 h-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-red-600">
+            <UserMinus className="w-5 h-5" />
+            Revoke Role
+          </DialogTitle>
+          <DialogDescription>
+            Are you sure you want to revoke this role? This action cannot be undone without granting the role again.
+          </DialogDescription>
+        </DialogHeader>
+
+        {isSuccess ? (
+          <div className="py-6 text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-8 h-8 text-green-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-green-800 mb-2">Role Revoked!</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              The role has been revoked successfully.
+            </p>
+            {hash && (
+              <a
+                href={`${explorerUrl}/tx/${hash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand-cyan-600 hover:underline text-sm flex items-center justify-center gap-1"
+              >
+                View transaction <ExternalLink className="w-3 h-3" />
+              </a>
+            )}
+          </div>
+        ) : (
+          <>
+            <div className="space-y-4 py-4">
+              {/* Confirmation Details */}
+              <div className="bg-red-50 rounded-lg p-4 border border-red-200 space-y-3">
+                <div>
+                  <p className="text-xs text-red-700 mb-1">Role</p>
+                  <Badge variant="outline" className={cn(
+                    "text-sm",
+                    ROLE_CONFIG[roleKey]?.color || 'text-gray-700',
+                    ROLE_CONFIG[roleKey]?.bgColor || 'bg-gray-100'
+                  )}>
+                    {roleName}
+                  </Badge>
+                </div>
+                <div>
+                  <p className="text-xs text-red-700 mb-1">Address</p>
+                  <p className="font-mono text-sm break-all">{memberAddress}</p>
+                </div>
+              </div>
+
+              {/* Warning */}
+              <Alert>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  Revoking this role will immediately remove the address's ability to perform {roleName.toLowerCase()} operations.
+                </AlertDescription>
+              </Alert>
+
+              {/* Error Message */}
+              {displayError && (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>{displayError}</AlertDescription>
+                </Alert>
+              )}
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending || isConfirming}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleRevoke}
+                disabled={isPending || isConfirming}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                {isPending || isConfirming ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {isPending ? 'Confirm in Wallet...' : 'Processing...'}
+                  </>
+                ) : (
+                  <>
+                    <UserMinus className="w-4 h-4 mr-2" />
+                    Revoke Role
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// Roles Section Component
+function RolesSection({
+  dashboardAddress,
+  isLoading: parentLoading
+}: {
+  dashboardAddress: string
+  isLoading?: boolean
+}) {
+  const [refreshKey, setRefreshKey] = useState(0)
+  const { address: userAddress } = useAccount()
+  const chainId = useChainId()
+  const chains = useChains()
+
+  const explorerUrl = getExplorerUrl(chainId, chains)
+
+  // Fetch role bytes32 constants
+  const { data: defaultAdminRole } = useReadContract({
+    address: dashboardAddress as `0x${string}`,
+    abi: DASHBOARD_ABI,
+    functionName: 'DEFAULT_ADMIN_ROLE',
+  })
+
+  const { data: fundRole } = useReadContract({
+    address: dashboardAddress as `0x${string}`,
+    abi: DASHBOARD_ABI,
+    functionName: 'FUND_ROLE',
+  })
+
+  const { data: withdrawRole } = useReadContract({
+    address: dashboardAddress as `0x${string}`,
+    abi: DASHBOARD_ABI,
+    functionName: 'WITHDRAW_ROLE',
+  })
+
+  const { data: mintRole } = useReadContract({
+    address: dashboardAddress as `0x${string}`,
+    abi: DASHBOARD_ABI,
+    functionName: 'MINT_ROLE',
+  })
+
+  const { data: burnRole } = useReadContract({
+    address: dashboardAddress as `0x${string}`,
+    abi: DASHBOARD_ABI,
+    functionName: 'BURN_ROLE',
+  })
+
+  const { data: rebalanceRole } = useReadContract({
+    address: dashboardAddress as `0x${string}`,
+    abi: DASHBOARD_ABI,
+    functionName: 'REBALANCE_ROLE',
+  })
+
+  const { data: nodeOperatorManagerRole } = useReadContract({
+    address: dashboardAddress as `0x${string}`,
+    abi: DASHBOARD_ABI,
+    functionName: 'NODE_OPERATOR_MANAGER_ROLE',
+  })
+
+  // Create role bytes32 map
+  const roleBytes32Map: Record<string, `0x${string}` | undefined> = {
+    DEFAULT_ADMIN_ROLE: defaultAdminRole,
+    FUND_ROLE: fundRole,
+    WITHDRAW_ROLE: withdrawRole,
+    MINT_ROLE: mintRole,
+    BURN_ROLE: burnRole,
+    REBALANCE_ROLE: rebalanceRole,
+    NODE_OPERATOR_MANAGER_ROLE: nodeOperatorManagerRole,
+  }
+
+  // Fetch role members for each role
+  const { data: adminMembers, isLoading: adminLoading, refetch: refetchAdmin } = useReadContract({
+    address: dashboardAddress as `0x${string}`,
+    abi: DASHBOARD_ABI,
+    functionName: 'getRoleMembers',
+    args: defaultAdminRole ? [defaultAdminRole] : undefined,
+    query: { enabled: !!defaultAdminRole }
+  })
+
+  const { data: fundMembers, isLoading: fundLoading, refetch: refetchFund } = useReadContract({
+    address: dashboardAddress as `0x${string}`,
+    abi: DASHBOARD_ABI,
+    functionName: 'getRoleMembers',
+    args: fundRole ? [fundRole] : undefined,
+    query: { enabled: !!fundRole }
+  })
+
+  const { data: withdrawMembers, isLoading: withdrawLoading, refetch: refetchWithdraw } = useReadContract({
+    address: dashboardAddress as `0x${string}`,
+    abi: DASHBOARD_ABI,
+    functionName: 'getRoleMembers',
+    args: withdrawRole ? [withdrawRole] : undefined,
+    query: { enabled: !!withdrawRole }
+  })
+
+  const { data: mintMembers, isLoading: mintLoading, refetch: refetchMint } = useReadContract({
+    address: dashboardAddress as `0x${string}`,
+    abi: DASHBOARD_ABI,
+    functionName: 'getRoleMembers',
+    args: mintRole ? [mintRole] : undefined,
+    query: { enabled: !!mintRole }
+  })
+
+  const { data: burnMembers, isLoading: burnLoading, refetch: refetchBurn } = useReadContract({
+    address: dashboardAddress as `0x${string}`,
+    abi: DASHBOARD_ABI,
+    functionName: 'getRoleMembers',
+    args: burnRole ? [burnRole] : undefined,
+    query: { enabled: !!burnRole }
+  })
+
+  const { data: rebalanceMembers, isLoading: rebalanceLoading, refetch: refetchRebalance } = useReadContract({
+    address: dashboardAddress as `0x${string}`,
+    abi: DASHBOARD_ABI,
+    functionName: 'getRoleMembers',
+    args: rebalanceRole ? [rebalanceRole] : undefined,
+    query: { enabled: !!rebalanceRole }
+  })
+
+  const { data: nodeOpMembers, isLoading: nodeOpLoading, refetch: refetchNodeOp } = useReadContract({
+    address: dashboardAddress as `0x${string}`,
+    abi: DASHBOARD_ABI,
+    functionName: 'getRoleMembers',
+    args: nodeOperatorManagerRole ? [nodeOperatorManagerRole] : undefined,
+    query: { enabled: !!nodeOperatorManagerRole }
+  })
+
+  // Check if current user is admin
+  const { data: isUserAdmin } = useReadContract({
+    address: dashboardAddress as `0x${string}`,
+    abi: DASHBOARD_ABI,
+    functionName: 'hasRole',
+    args: defaultAdminRole && userAddress ? [defaultAdminRole, userAddress] : undefined,
+    query: { enabled: !!defaultAdminRole && !!userAddress }
+  })
+
+  // Combine role data
+  const roleData: { key: string; members: readonly string[]; isLoading: boolean }[] = [
+    { key: 'DEFAULT_ADMIN_ROLE', members: adminMembers || [], isLoading: adminLoading },
+    { key: 'FUND_ROLE', members: fundMembers || [], isLoading: fundLoading },
+    { key: 'WITHDRAW_ROLE', members: withdrawMembers || [], isLoading: withdrawLoading },
+    { key: 'MINT_ROLE', members: mintMembers || [], isLoading: mintLoading },
+    { key: 'BURN_ROLE', members: burnMembers || [], isLoading: burnLoading },
+    { key: 'REBALANCE_ROLE', members: rebalanceMembers || [], isLoading: rebalanceLoading },
+    { key: 'NODE_OPERATOR_MANAGER_ROLE', members: nodeOpMembers || [], isLoading: nodeOpLoading },
+  ]
+
+  const isLoading = parentLoading || roleData.some(r => r.isLoading)
+
+  const handleRefresh = () => {
+    refetchAdmin()
+    refetchFund()
+    refetchWithdraw()
+    refetchMint()
+    refetchBurn()
+    refetchRebalance()
+    refetchNodeOp()
+    setRefreshKey(k => k + 1)
+  }
+
+  if (parentLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Users className="w-5 h-5" />
+            Roles & Permissions
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="p-4 rounded-lg border">
+                <Skeleton className="h-5 w-32 mb-3" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-48" />
+                  <Skeleton className="h-4 w-40" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Users className="w-5 h-5" />
+              Roles & Permissions
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button className="text-muted-foreground hover:text-foreground">
+                      <HelpCircle className="w-4 h-4" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent className="max-w-xs p-4">
+                    <p className="text-sm mb-2 font-medium">Role Management</p>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      Vault Owners can delegate specific permissions to other addresses.
+                      Each role grants the ability to perform specific vault operations.
+                    </p>
+                    <a
+                      href="https://docs.lido.fi/run-on-lido/stvaults/roles-and-permissions"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-brand-cyan-600 hover:underline flex items-center gap-1"
+                    >
+                      Learn more <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </CardTitle>
+            <CardDescription>
+              Manage who can perform vault operations
+            </CardDescription>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isLoading}
+            >
+              <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
+            </Button>
+            <GrantRoleDialog
+              dashboardAddress={dashboardAddress}
+              roleBytes32Map={roleBytes32Map}
+              isAdmin={!!isUserAdmin}
+              onSuccess={handleRefresh}
+            />
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          {roleData.map(({ key, members, isLoading: roleLoading }) => {
+            const config = ROLE_CONFIG[key]
+            if (!config) return null
+
+            const roleBytes = roleBytes32Map[key]
+
+            return (
+              <div
+                key={key}
+                className="p-4 rounded-lg border border-gray-200 hover:border-gray-300 transition-colors"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className={cn("text-sm font-medium", config.color, config.bgColor)}>
+                      {config.name}
+                    </Badge>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="text-muted-foreground hover:text-foreground">
+                            <Info className="w-3.5 h-3.5" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p className="text-sm">{config.description}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {members.length} {members.length === 1 ? 'member' : 'members'}
+                  </span>
+                </div>
+
+                {roleLoading ? (
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-48" />
+                    <Skeleton className="h-4 w-40" />
+                  </div>
+                ) : members.length === 0 ? (
+                  <p className="text-sm text-muted-foreground italic">
+                    No addresses have this role
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {members.map((member) => (
+                      <div
+                        key={member}
+                        className="flex items-center justify-between group py-1"
+                      >
+                        <div className="flex items-center gap-2">
+                          <AddressDisplay address={member} />
+                          {member.toLowerCase() === userAddress?.toLowerCase() && (
+                            <Badge variant="outline" className="text-xs bg-brand-cyan-50 text-brand-cyan-700 border-brand-cyan-200">
+                              You
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <a
+                            href={`${explorerUrl}/address/${member}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-brand-cyan-600"
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                          {roleBytes && (
+                            <RevokeRoleDialog
+                              dashboardAddress={dashboardAddress}
+                              roleKey={key}
+                              roleBytes32={roleBytes}
+                              roleName={config.name}
+                              memberAddress={member}
+                              isAdmin={!!isUserAdmin}
+                              onSuccess={handleRefresh}
+                            />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
+        </div>
       </CardContent>
     </Card>
   )
@@ -1560,6 +2601,90 @@ export default function VaultStatusClient() {
     abi: DASHBOARD_ABI,
     functionName: 'vaultConnection',
     query: { enabled: hasValidAddresses }
+  })
+
+  // User address and role checks
+  const { address: userAddress } = useAccount()
+
+  // Fetch role constants
+  const { data: defaultAdminRole } = useReadContract({
+    address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
+    abi: DASHBOARD_ABI,
+    functionName: 'DEFAULT_ADMIN_ROLE',
+    query: { enabled: hasValidAddresses }
+  })
+
+  const { data: fundRole } = useReadContract({
+    address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
+    abi: DASHBOARD_ABI,
+    functionName: 'FUND_ROLE',
+    query: { enabled: hasValidAddresses }
+  })
+
+  const { data: withdrawRole } = useReadContract({
+    address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
+    abi: DASHBOARD_ABI,
+    functionName: 'WITHDRAW_ROLE',
+    query: { enabled: hasValidAddresses }
+  })
+
+  const { data: mintRole } = useReadContract({
+    address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
+    abi: DASHBOARD_ABI,
+    functionName: 'MINT_ROLE',
+    query: { enabled: hasValidAddresses }
+  })
+
+  const { data: burnRole } = useReadContract({
+    address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
+    abi: DASHBOARD_ABI,
+    functionName: 'BURN_ROLE',
+    query: { enabled: hasValidAddresses }
+  })
+
+  // Check if user has admin role
+  const { data: isUserAdmin } = useReadContract({
+    address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
+    abi: DASHBOARD_ABI,
+    functionName: 'hasRole',
+    args: defaultAdminRole && userAddress ? [defaultAdminRole, userAddress] : undefined,
+    query: { enabled: hasValidAddresses && !!defaultAdminRole && !!userAddress }
+  })
+
+  // Check if user has fund role
+  const { data: hasUserFundRole } = useReadContract({
+    address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
+    abi: DASHBOARD_ABI,
+    functionName: 'hasRole',
+    args: fundRole && userAddress ? [fundRole, userAddress] : undefined,
+    query: { enabled: hasValidAddresses && !!fundRole && !!userAddress }
+  })
+
+  // Check if user has withdraw role
+  const { data: hasUserWithdrawRole } = useReadContract({
+    address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
+    abi: DASHBOARD_ABI,
+    functionName: 'hasRole',
+    args: withdrawRole && userAddress ? [withdrawRole, userAddress] : undefined,
+    query: { enabled: hasValidAddresses && !!withdrawRole && !!userAddress }
+  })
+
+  // Check if user has mint role
+  const { data: hasUserMintRole } = useReadContract({
+    address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
+    abi: DASHBOARD_ABI,
+    functionName: 'hasRole',
+    args: mintRole && userAddress ? [mintRole, userAddress] : undefined,
+    query: { enabled: hasValidAddresses && !!mintRole && !!userAddress }
+  })
+
+  // Check if user has burn role
+  const { data: hasUserBurnRole } = useReadContract({
+    address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
+    abi: DASHBOARD_ABI,
+    functionName: 'hasRole',
+    args: burnRole && userAddress ? [burnRole, userAddress] : undefined,
+    query: { enabled: hasValidAddresses && !!burnRole && !!userAddress }
   })
 
   // Calculate reserve ratio percentage
@@ -1715,17 +2840,23 @@ export default function VaultStatusClient() {
             <FundVaultDialog
               dashboardAddress={dashboardAddress}
               onSuccess={() => {}}
+              hasRole={!!hasUserFundRole}
+              isAdmin={!!isUserAdmin}
             />
             <WithdrawDialog
               dashboardAddress={dashboardAddress}
               withdrawableValue={withdrawableValue}
               onSuccess={() => {}}
+              hasRole={!!hasUserWithdrawRole}
+              isAdmin={!!isUserAdmin}
             />
             <MintStETHDialog
               dashboardAddress={dashboardAddress}
               remainingMintingCapacity={remainingMintingCapacity}
               liabilityShares={liabilityShares}
               onSuccess={() => {}}
+              hasRole={!!hasUserMintRole}
+              isAdmin={!!isUserAdmin}
             />
             <BurnStETHDialog
               dashboardAddress={dashboardAddress}
@@ -1733,6 +2864,8 @@ export default function VaultStatusClient() {
               reserveRatioBP={reserveRatioBP}
               totalValue={totalValue}
               onSuccess={() => {}}
+              hasRole={!!hasUserBurnRole}
+              isAdmin={!!isUserAdmin}
             />
           </div>
         </div>
@@ -1858,10 +2991,19 @@ export default function VaultStatusClient() {
           <section>
             <RecentActivity
               vaultAddress={vaultAddress}
+              dashboardAddress={dashboardAddress}
               isLoading={initLoading}
             />
           </section>
         )}
+
+        {/* Roles & Permissions */}
+        <section>
+          <RolesSection
+            dashboardAddress={dashboardAddress}
+            isLoading={initLoading}
+          />
+        </section>
 
         {/* Advanced Details Toggle */}
         <section>
