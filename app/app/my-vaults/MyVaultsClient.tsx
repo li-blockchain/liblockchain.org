@@ -1,9 +1,23 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { useAccount, usePublicClient, useChainId } from 'wagmi'
+import { useAccount, usePublicClient, useChainId, useReadContracts } from 'wagmi'
 import { getVaultFactoryAddress, VAULT_FACTORY_ADDRESSES } from '../../../lib/contracts/vaultFactory'
+import { DASHBOARD_ABI } from '../../../lib/contracts/dashboard'
+
+// Role function names to check - user needs ANY of these roles to see a vault
+const ROLE_FUNCTION_NAMES = [
+  'DEFAULT_ADMIN_ROLE',
+  'FUND_ROLE',
+  'WITHDRAW_ROLE',
+  'MINT_ROLE',
+  'BURN_ROLE',
+  'REBALANCE_ROLE',
+  'NODE_OPERATOR_MANAGER_ROLE',
+] as const
+
+type RoleFunctionName = typeof ROLE_FUNCTION_NAMES[number]
 
 // shadcn components
 import { Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription } from '@/components/ui/card'
@@ -14,7 +28,7 @@ import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 // Icons
-import { AlertTriangle, AlertCircle, Wallet, Box, Plus, ArrowRight } from 'lucide-react'
+import { AlertTriangle, AlertCircle, Wallet, Box, Plus, ArrowRight, Shield } from 'lucide-react'
 
 interface VaultInfo {
   vaultAddress: string
@@ -22,12 +36,19 @@ interface VaultInfo {
   blockNumber: bigint
 }
 
+// Helper to format role name for display
+const formatRoleName = (role: string): string => {
+  return role
+    .replace('_ROLE', '')
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
 export default function MyVaultsClient() {
   const { address, isConnected } = useAccount()
   const publicClient = usePublicClient()
   const chainId = useChainId()
-  const [vaults, setVaults] = useState<VaultInfo[]>([])
-  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   // Get the vault factory address for the current chain
@@ -65,29 +86,100 @@ export default function MyVaultsClient() {
     ],
   }
 
-  useEffect(() => {
-    console.log('MyVaults useEffect - isConnected:', isConnected, 'address:', address, 'chainId:', chainId, 'isSupportedNetwork:', isSupportedNetwork)
+  // Get known vaults for current chain
+  const knownVaults = KNOWN_VAULTS[chainId] || []
+  const firstDashboard = knownVaults[0]?.dashboardAddress as `0x${string}` | undefined
 
-    if (!isConnected || !address) {
-      setVaults([])
-      setIsLoading(false)
-      return
+  // Phase 1: Fetch role constants from first dashboard (same across all dashboards)
+  const roleConstantContracts = useMemo(
+    () =>
+      firstDashboard
+        ? ROLE_FUNCTION_NAMES.map((fn) => ({
+            address: firstDashboard,
+            abi: DASHBOARD_ABI,
+            functionName: fn,
+          }))
+        : [],
+    [firstDashboard]
+  )
+
+  const { data: roleConstantsData, isLoading: roleConstantsLoading } = useReadContracts({
+    contracts: roleConstantContracts,
+    query: { enabled: !!firstDashboard && isConnected },
+  })
+
+  // Transform role constants to a map
+  const roleConstants = useMemo(() => {
+    if (!roleConstantsData) return undefined
+    return ROLE_FUNCTION_NAMES.reduce((acc, name, i) => {
+      const result = roleConstantsData[i]
+      if (result?.status === 'success') {
+        acc[name] = result.result as `0x${string}`
+      }
+      return acc
+    }, {} as Record<RoleFunctionName, `0x${string}`>)
+  }, [roleConstantsData])
+
+  // Phase 2: Check all roles for all vaults
+  const hasAllRoleConstants = roleConstants && Object.keys(roleConstants).length === ROLE_FUNCTION_NAMES.length
+
+  const roleCheckContracts = useMemo(() => {
+    if (!hasAllRoleConstants || !address || knownVaults.length === 0) return []
+
+    return knownVaults.flatMap((vault) =>
+      ROLE_FUNCTION_NAMES.map((roleName) => ({
+        address: vault.dashboardAddress as `0x${string}`,
+        abi: DASHBOARD_ABI,
+        functionName: 'hasRole' as const,
+        args: [roleConstants![roleName], address],
+      }))
+    )
+  }, [hasAllRoleConstants, address, knownVaults, roleConstants])
+
+  const { data: roleCheckData, isLoading: roleCheckLoading } = useReadContracts({
+    contracts: roleCheckContracts,
+    query: {
+      enabled: roleCheckContracts.length > 0,
+    },
+  })
+
+  // Filter vaults based on role checks - user must have at least one role
+  const { filteredVaults, vaultRoles } = useMemo(() => {
+    if (!roleCheckData || knownVaults.length === 0) {
+      return { filteredVaults: [], vaultRoles: {} as Record<string, string[]> }
     }
 
-    // Don't fetch if not on a supported network
-    if (!isSupportedNetwork || !vaultFactoryAddress) {
-      setVaults([])
-      setIsLoading(false)
-      return
-    }
+    const roles: Record<string, string[]> = {}
+    const filtered = knownVaults.filter((vault, vaultIndex) => {
+      const startIdx = vaultIndex * ROLE_FUNCTION_NAMES.length
+      const userRoles: string[] = []
 
-    // Use known vaults for the current chain
-    const knownVaults = KNOWN_VAULTS[chainId] || []
-    console.log('Known vaults for chain', chainId, ':', knownVaults)
+      ROLE_FUNCTION_NAMES.forEach((roleName, roleIdx) => {
+        const result = roleCheckData[startIdx + roleIdx]
+        if (result?.status === 'success' && result.result === true) {
+          userRoles.push(roleName)
+        }
+      })
 
-    setVaults(knownVaults)
-    setIsLoading(false)
-  }, [address, isConnected, isSupportedNetwork, vaultFactoryAddress, chainId])
+      if (userRoles.length > 0) {
+        roles[vault.dashboardAddress] = userRoles
+        return true
+      }
+      return false
+    })
+
+    return { filteredVaults: filtered, vaultRoles: roles }
+  }, [roleCheckData, knownVaults])
+
+  // Combined loading state
+  const isLoading = (roleConstantsLoading || roleCheckLoading) && isConnected && isSupportedNetwork
+
+  // Loading message
+  const getLoadingMessage = () => {
+    if (roleConstantsLoading) return 'Loading role definitions...'
+    if (roleCheckLoading) return 'Checking your permissions...'
+    return 'Loading...'
+  }
 
   return (
     <>
@@ -153,9 +245,8 @@ export default function MyVaultsClient() {
           {/* Loading State with Skeletons */}
           {isConnected && isSupportedNetwork && isLoading && (
             <div className="space-y-8">
-              <div className="flex justify-between items-center">
-                <Skeleton className="h-8 w-48" />
-                <Skeleton className="h-10 w-40" />
+              <div className="text-center text-muted-foreground mb-4">
+                {getLoadingMessage()}
               </div>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[1, 2, 3].map((i) => (
@@ -193,21 +284,22 @@ export default function MyVaultsClient() {
             </div>
           )}
 
-          {/* Empty State */}
-          {isConnected && isSupportedNetwork && !isLoading && !error && vaults.length === 0 && (
+          {/* Empty State - User has no roles in any vault */}
+          {isConnected && isSupportedNetwork && !isLoading && !error && filteredVaults.length === 0 && (
             <Card className="max-w-md mx-auto text-center py-12">
               <CardContent className="pt-6">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-primary/10 rounded-full mb-6">
-                  <Box className="w-10 h-10 text-primary" />
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-yellow-100 rounded-full mb-6">
+                  <Shield className="w-10 h-10 text-yellow-600" />
                 </div>
-                <CardTitle className="text-2xl mb-4">No Vaults Found</CardTitle>
+                <CardTitle className="text-2xl mb-4">No Vault Access</CardTitle>
                 <CardDescription className="text-lg mb-8">
-                  You haven&apos;t created any vaults yet
+                  You don&apos;t have any roles assigned in the available vaults.
+                  Contact a vault administrator to request access.
                 </CardDescription>
-                <Button asChild size="lg" className="bg-primary hover:bg-primary/90">
+                <Button asChild size="lg" className="bg-brand-cyan-600 hover:bg-brand-cyan-700 text-white">
                   <Link href="/app/create-vault">
                     <Plus className="w-5 h-5 mr-2" />
-                    Create Your First Vault
+                    Create Your Own Vault
                   </Link>
                 </Button>
               </CardContent>
@@ -215,10 +307,10 @@ export default function MyVaultsClient() {
           )}
 
           {/* Vaults Grid */}
-          {isConnected && isSupportedNetwork && !isLoading && !error && vaults.length > 0 && (
+          {isConnected && isSupportedNetwork && !isLoading && !error && filteredVaults.length > 0 && (
             <>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {vaults.map((vault, index) => (
+                {filteredVaults.map((vault, index) => (
                   <Card
                     key={vault.vaultAddress}
                     className={cn(
@@ -229,7 +321,7 @@ export default function MyVaultsClient() {
                     <CardHeader className="bg-gray-50 border-b border-gray-200">
                       <div className="flex items-center justify-between">
                         <CardTitle className="text-gray-900 text-lg">
-                          Vault #{vaults.length - index}
+                          Vault #{filteredVaults.length - index}
                         </CardTitle>
                         <Badge
                           variant="outline"
@@ -239,9 +331,20 @@ export default function MyVaultsClient() {
                           Active
                         </Badge>
                       </div>
-                      <CardDescription className="text-gray-500">
-                        Created at block {vault.blockNumber.toString()}
-                      </CardDescription>
+                      {/* Show user's roles in this vault */}
+                      {vaultRoles[vault.dashboardAddress] && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {vaultRoles[vault.dashboardAddress].map((role) => (
+                            <Badge
+                              key={role}
+                              variant="secondary"
+                              className="text-xs bg-brand-cyan-50 text-brand-cyan-700 border-brand-cyan-200"
+                            >
+                              {formatRoleName(role)}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
                     </CardHeader>
 
                     <CardContent className="pt-6">
