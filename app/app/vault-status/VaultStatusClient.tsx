@@ -1313,8 +1313,22 @@ function RecentActivity({
       // Get current block number
       const currentBlock = await publicClient.getBlockNumber()
 
-      // Look back ~10000 blocks (roughly 1-2 days on Ethereum)
-      const fromBlock = currentBlock > 10000n ? currentBlock - 10000n : 0n
+      // Alchemy free tier: 10 blocks per request, rate limited
+      // Use smaller lookback and sequential fetching to avoid 429s
+      const chunkSize = 10n
+      const totalLookback = 200n // ~200 blocks, 20 chunks per event type
+      const fromBlock = currentBlock > totalLookback ? currentBlock - totalLookback : 0n
+
+      console.log('[Activity] Fetching activity logs:', {
+        chainId,
+        vaultAddress,
+        dashboardAddress,
+        currentBlock: currentBlock.toString(),
+        fromBlock: fromBlock.toString(),
+        blockRange: (currentBlock - fromBlock).toString(),
+        chunkSize: chunkSize.toString(),
+        note: 'Using sequential chunked fetching for Alchemy free tier',
+      })
 
       // Define event signatures for the StakingVault
       const fundedEvent = parseAbiItem('event EtherFunded(uint256 amount)')
@@ -1326,111 +1340,145 @@ function RecentActivity({
       const roleGrantedEvent = parseAbiItem('event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender)')
       const roleRevokedEvent = parseAbiItem('event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender)')
 
-      // Fetch all event types in parallel
-      const [fundedLogs, withdrawnLogs, stagedLogs, unstagedLogs, roleGrantedLogs, roleRevokedLogs] = await Promise.all([
-        publicClient.getLogs({
-          address: vaultAddress as `0x${string}`,
-          event: fundedEvent,
-          fromBlock,
-          toBlock: 'latest',
-        }).catch(() => []),
-        publicClient.getLogs({
-          address: vaultAddress as `0x${string}`,
-          event: withdrawnEvent,
-          fromBlock,
-          toBlock: 'latest',
-        }).catch(() => []),
-        publicClient.getLogs({
-          address: vaultAddress as `0x${string}`,
-          event: stagedEvent,
-          fromBlock,
-          toBlock: 'latest',
-        }).catch(() => []),
-        publicClient.getLogs({
-          address: vaultAddress as `0x${string}`,
-          event: unstagedEvent,
-          fromBlock,
-          toBlock: 'latest',
-        }).catch(() => []),
-        // Fetch role events from Dashboard contract
-        dashboardAddress ? publicClient.getLogs({
-          address: dashboardAddress as `0x${string}`,
-          event: roleGrantedEvent,
-          fromBlock,
-          toBlock: 'latest',
-        }).catch(() => []) : Promise.resolve([]),
-        dashboardAddress ? publicClient.getLogs({
-          address: dashboardAddress as `0x${string}`,
-          event: roleRevokedEvent,
-          fromBlock,
-          toBlock: 'latest',
-        }).catch(() => []) : Promise.resolve([]),
-      ])
+      // Track errors for each event type
+      const errors: { name: string; error: unknown }[] = []
+
+      // Small delay to avoid rate limits
+      const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+
+      // Helper to fetch logs in chunks sequentially with rate limiting
+      const fetchLogsInChunks = async <T,>(
+        name: string,
+        address: `0x${string}`,
+        event: ReturnType<typeof parseAbiItem>
+      ): Promise<T[]> => {
+        const allLogs: T[] = []
+        let start = fromBlock
+        let failedChunks = 0
+
+        while (start < currentBlock) {
+          const end = start + chunkSize > currentBlock ? currentBlock : start + chunkSize
+          try {
+            const logs = await publicClient.getLogs({
+              address,
+              event: event as any,
+              fromBlock: start,
+              toBlock: end,
+            })
+            allLogs.push(...(logs as T[]))
+          } catch (err) {
+            failedChunks++
+            if (failedChunks === 1) {
+              console.error(`[Activity] Error fetching ${name} chunk:`, err)
+            }
+            // On rate limit, wait longer
+            if (String(err).includes('429') || String(err).includes('Too Many')) {
+              await delay(500)
+            }
+          }
+          start = end + 1n
+          // Small delay between requests to avoid rate limits
+          await delay(50)
+        }
+
+        if (failedChunks > 0) {
+          console.warn(`[Activity] ${name}: ${failedChunks} chunks failed`)
+          if (failedChunks > 5) {
+            errors.push({ name, error: `${failedChunks} chunks failed` })
+          }
+        }
+
+        console.log(`[Activity] ${name}: found ${allLogs.length} events`)
+        return allLogs
+      }
+
+      // Fetch event types SEQUENTIALLY to avoid rate limits (not in parallel)
+      const fundedLogs = await fetchLogsInChunks('EtherFunded', vaultAddress as `0x${string}`, fundedEvent)
+      const withdrawnLogs = await fetchLogsInChunks('EtherWithdrawn', vaultAddress as `0x${string}`, withdrawnEvent)
+      const stagedLogs = await fetchLogsInChunks('EtherStaged', vaultAddress as `0x${string}`, stagedEvent)
+      const unstagedLogs = await fetchLogsInChunks('EtherUnstaged', vaultAddress as `0x${string}`, unstagedEvent)
+      const roleGrantedLogs = dashboardAddress
+        ? await fetchLogsInChunks('RoleGranted', dashboardAddress as `0x${string}`, roleGrantedEvent)
+        : []
+      const roleRevokedLogs = dashboardAddress
+        ? await fetchLogsInChunks('RoleRevoked', dashboardAddress as `0x${string}`, roleRevokedEvent)
+        : []
+
+      // If all event queries failed, show an error
+      if (errors.length === 6 || (errors.length === 4 && !dashboardAddress)) {
+        console.error('[Activity] All event queries failed:', errors.map(e => e.name))
+        setError('Unable to load recent activity. Please check your network connection.')
+        setIsLoading(false)
+        return
+      }
+
+      // Log a warning if some queries failed
+      if (errors.length > 0) {
+        console.warn('[Activity] Some event queries failed:', errors.map(e => e.name))
+      }
 
       // Parse and combine activities
       const allActivities: VaultActivity[] = []
 
-      fundedLogs.forEach(log => {
+      fundedLogs.forEach((log: any) => {
         allActivities.push({
           type: 'funded',
-          amount: (log.args as any)?.amount || 0n,
+          amount: log.args?.amount || 0n,
           blockNumber: log.blockNumber,
           transactionHash: log.transactionHash,
         })
       })
 
-      withdrawnLogs.forEach(log => {
+      withdrawnLogs.forEach((log: any) => {
         allActivities.push({
           type: 'withdrawn',
-          amount: (log.args as any)?.amount || 0n,
+          amount: log.args?.amount || 0n,
           blockNumber: log.blockNumber,
           transactionHash: log.transactionHash,
         })
       })
 
-      stagedLogs.forEach(log => {
+      stagedLogs.forEach((log: any) => {
         allActivities.push({
           type: 'staged',
-          amount: (log.args as any)?.amount || 0n,
+          amount: log.args?.amount || 0n,
           blockNumber: log.blockNumber,
           transactionHash: log.transactionHash,
         })
       })
 
-      unstagedLogs.forEach(log => {
+      unstagedLogs.forEach((log: any) => {
         allActivities.push({
           type: 'unstaged',
-          amount: (log.args as any)?.amount || 0n,
+          amount: log.args?.amount || 0n,
           blockNumber: log.blockNumber,
           transactionHash: log.transactionHash,
         })
       })
 
       // Parse role granted events
-      roleGrantedLogs.forEach(log => {
-        const args = log.args as any
+      roleGrantedLogs.forEach((log: any) => {
         allActivities.push({
           type: 'role_granted',
           amount: 0n,
           blockNumber: log.blockNumber,
           transactionHash: log.transactionHash,
-          role: args?.role,
-          account: args?.account,
-          roleName: getRoleNameFromBytes(args?.role || ''),
+          role: log.args?.role,
+          account: log.args?.account,
+          roleName: getRoleNameFromBytes(log.args?.role || ''),
         })
       })
 
       // Parse role revoked events
-      roleRevokedLogs.forEach(log => {
-        const args = log.args as any
+      roleRevokedLogs.forEach((log: any) => {
         allActivities.push({
           type: 'role_revoked',
           amount: 0n,
           blockNumber: log.blockNumber,
           transactionHash: log.transactionHash,
-          role: args?.role,
-          account: args?.account,
-          roleName: getRoleNameFromBytes(args?.role || ''),
+          role: log.args?.role,
+          account: log.args?.account,
+          roleName: getRoleNameFromBytes(log.args?.role || ''),
         })
       })
 
@@ -1449,20 +1497,37 @@ function RecentActivity({
         })
       )
 
+      console.log('[Activity] Summary:', {
+        totalActivitiesFound: allActivities.length,
+        displayedActivities: activitiesWithTimestamps.length,
+        byType: {
+          funded: fundedLogs.length,
+          withdrawn: withdrawnLogs.length,
+          staged: stagedLogs.length,
+          unstaged: unstagedLogs.length,
+          roleGranted: roleGrantedLogs.length,
+          roleRevoked: roleRevokedLogs.length,
+        }
+      })
+
       setActivities(activitiesWithTimestamps)
     } catch (err) {
-      console.error('Error fetching activity logs:', err)
-      setError('Unable to load recent activity')
+      console.error('[Activity] Error fetching activity logs:', err)
+      setError('Unable to load recent activity. Check browser console for details.')
     } finally {
       setIsLoading(false)
     }
   }
 
-  // Fetch on mount and when vault/dashboard address changes
-  useEffect(() => {
-    fetchActivityLogs()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vaultAddress, dashboardAddress, publicClient])
+  // TEMPORARILY DISABLED: Activity fetching causes rate limit issues with Alchemy free tier
+  // TODO: Re-enable when using a paid RPC plan with higher rate limits
+  // useEffect(() => {
+  //   fetchActivityLogs()
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [vaultAddress, dashboardAddress, publicClient])
+
+  // Show "Coming Soon" instead of fetching
+  const isFeatureDisabled = true
 
   const getActivityConfig = (type: VaultActivity['type']) => {
     switch (type) {
@@ -1530,6 +1595,34 @@ function RecentActivity({
     if (diffHours < 24) return `${diffHours}h ago`
     if (diffDays < 7) return `${diffDays}d ago`
     return date.toLocaleDateString()
+  }
+
+  // Show "Coming Soon" when feature is disabled
+  if (isFeatureDisabled) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <History className="w-5 h-5" />
+            Recent Activity
+          </CardTitle>
+          <CardDescription>
+            Vault transactions and role changes
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-8">
+            <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
+              <Clock className="w-6 h-6 text-muted-foreground" />
+            </div>
+            <p className="text-muted-foreground font-medium">Coming Soon</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              Activity tracking will be available in a future update
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   if (parentLoading || isLoading) {
@@ -1616,9 +1709,26 @@ function RecentActivity({
             <div className="mx-auto w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
               <History className="w-6 h-6 text-muted-foreground" />
             </div>
-            <p className="text-muted-foreground">No recent activity</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Vault transactions will appear here
+            <p className="text-muted-foreground font-medium">No recent activity found</p>
+            <p className="text-sm text-muted-foreground mt-1 mb-3">
+              The following activities will appear here when they occur:
+            </p>
+            <div className="text-xs text-muted-foreground space-y-1 mb-4">
+              <p>• ETH deposits (Fund) and withdrawals</p>
+              <p>• Staging and unstaging for validators</p>
+              <p>• Role grants and revocations</p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={fetchActivityLogs}
+              className="gap-2"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Refresh Activity
+            </Button>
+            <p className="text-xs text-muted-foreground mt-3">
+              Check browser console for diagnostic logs
             </p>
           </div>
         ) : (
@@ -2516,6 +2626,7 @@ function RolesSection({
 export default function VaultStatusClient() {
   const searchParams = useSearchParams()
   const [showAdvanced, setShowAdvanced] = useState(false)
+  const [showMintingDetails, setShowMintingDetails] = useState(false)
 
   // Get addresses from URL params only
   const dashboardAddress = searchParams?.get('dashboard') || ''
@@ -2565,6 +2676,20 @@ export default function VaultStatusClient() {
     abi: DASHBOARD_ABI,
     functionName: 'remainingMintingCapacityShares',
     args: [0n],
+    query: { enabled: hasValidAddresses }
+  })
+
+  const { data: minimalReserve, isLoading: minimalReserveLoading } = useReadContract({
+    address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
+    abi: DASHBOARD_ABI,
+    functionName: 'minimalReserve',
+    query: { enabled: hasValidAddresses }
+  })
+
+  const { data: locked, isLoading: lockedLoading } = useReadContract({
+    address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
+    abi: DASHBOARD_ABI,
+    functionName: 'locked',
     query: { enabled: hasValidAddresses }
   })
 
@@ -2923,6 +3048,21 @@ export default function VaultStatusClient() {
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="w-5 h-5" />
                 Minting Capacity
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button className="text-muted-foreground hover:text-foreground">
+                        <Info className="w-4 h-4" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p className="text-sm">
+                        Minting capacity is calculated based on your vault&apos;s total value and reserve ratio.
+                        Values are shown in stETH shares, which may differ slightly from ETH due to the stETH exchange rate.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </CardTitle>
               <CardDescription>
                 Your available capacity to mint additional stETH
@@ -2954,6 +3094,82 @@ export default function VaultStatusClient() {
                       {capacityUsedPercent.toFixed(1)}% used
                     </span>
                   </div>
+
+                  {/* Calculation Details Toggle */}
+                  <button
+                    onClick={() => setShowMintingDetails(!showMintingDetails)}
+                    className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mt-2"
+                  >
+                    {showMintingDetails ? (
+                      <ChevronUp className="w-4 h-4" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4" />
+                    )}
+                    {showMintingDetails ? 'Hide' : 'Show'} calculation details
+                  </button>
+
+                  {/* Collapsible Calculation Details */}
+                  {showMintingDetails && (
+                    <div className="mt-4 p-4 bg-muted/50 rounded-lg space-y-3 text-sm">
+                      <h4 className="font-medium text-foreground mb-3">How Minting Capacity is Calculated</h4>
+
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Total Vault Value</span>
+                          <span className="font-mono">{totalValue ? formatEth(totalValue) : '0.0000'} ETH</span>
+                        </div>
+
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Reserve Ratio</span>
+                          <span className="font-mono">{reserveRatioPercent}%</span>
+                        </div>
+
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Required Reserve</span>
+                          <span className="font-mono">
+                            {totalValue && vaultConnection?.reserveRatioBP
+                              ? formatEth((totalValue * BigInt(vaultConnection.reserveRatioBP)) / 10000n)
+                              : '0.0000'} ETH
+                          </span>
+                        </div>
+
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Minimal Reserve</span>
+                          <span className="font-mono">{minimalReserve ? formatEth(minimalReserve) : '0.0000'} ETH</span>
+                        </div>
+
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Currently Locked</span>
+                          <span className="font-mono">{locked ? formatEth(locked) : '0.0000'} ETH</span>
+                        </div>
+
+                        <Separator className="my-2" />
+
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Current stETH Minted</span>
+                          <span className="font-mono">{liabilityShares ? formatEth(liabilityShares) : '0.0000'} stETH</span>
+                        </div>
+
+                        <div className="flex justify-between">
+                          <span className="text-muted-foreground">Total Minting Capacity</span>
+                          <span className="font-mono">{totalMintingCapacity ? formatEth(totalMintingCapacity) : '0.0000'} stETH</span>
+                        </div>
+
+                        <div className="flex justify-between font-medium text-green-600">
+                          <span>Remaining Capacity</span>
+                          <span className="font-mono">{remainingMintingCapacity ? formatEth(remainingMintingCapacity) : '0.0000'} stETH</span>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                        <p className="text-xs text-blue-800">
+                          <strong>Note:</strong> Values are shown in stETH shares. The stETH share rate fluctuates based on
+                          protocol rewards, so share values may differ slightly from a simple ETH calculation. This is expected
+                          behavior of Lido&apos;s rebasing mechanism.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </CardContent>
