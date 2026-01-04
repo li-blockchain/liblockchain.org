@@ -39,10 +39,10 @@ function validateConfirmationWindow(hours: string): string | null {
 }
 
 function validateDeposit(amount: string): string | null {
-  if (!amount || amount === '0') return null // Optional field
+  if (!amount) return 'Connection deposit is required'
   const num = parseFloat(amount)
   if (isNaN(num)) return 'Please enter a valid number'
-  if (num < 0) return 'Amount cannot be negative'
+  if (num < 1) return 'Minimum deposit is 1 ETH'
   return null
 }
 
@@ -230,7 +230,7 @@ export default function CreateVaultClient() {
     nodeOperatorManager: '',
     nodeOperatorFeePercent: '5.0',
     confirmExpiryHours: '24',
-    depositAmount: '0',
+    depositAmount: '1',
   })
 
   // Validation state
@@ -407,7 +407,7 @@ export default function CreateVaultClient() {
                   nodeOperatorManager: '',
                   nodeOperatorFeePercent: '5.0',
                   confirmExpiryHours: '24',
-                  depositAmount: '0',
+                  depositAmount: '1',
                 })
                 setTouched({})
               }}>
@@ -600,24 +600,22 @@ export default function CreateVaultClient() {
               </div>
             </FormField>
 
-            {/* Initial Deposit */}
+            {/* Connection Deposit */}
             <FormField
-              label="Initial Deposit"
+              label="Connection Deposit"
+              required
               error={touched.depositAmount ? errors.depositAmount : null}
-              hint="Optionally fund your vault during creation"
-              tooltip="You can add ETH to your vault now, or deposit later. Each validator requires 32 ETH."
+              hint="Mandatory 1 ETH minimum. This deposit remains locked while connected to VaultHub."
+              tooltip="The connection deposit serves as an anti-sybil mechanism to prevent spam vault creation. This deposit is locked for the duration of the vault's connection to VaultHub and can be reclaimed when the vault is disconnected."
             >
-              <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="text-xs">Optional</Badge>
-              </div>
-              <div className="relative w-full md:w-48 mt-2">
+              <div className="relative w-full md:w-48">
                 <Input
                   type="number"
                   name="depositAmount"
                   value={formData.depositAmount}
                   onChange={handleInputChange}
                   onBlur={() => handleBlur('depositAmount')}
-                  min="0"
+                  min="1"
                   step="0.01"
                   className={`pr-12 ${
                     touched.depositAmount && errors.depositAmount ? 'border-red-500 focus-visible:ring-red-500' : ''
@@ -626,6 +624,19 @@ export default function CreateVaultClient() {
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">ETH</span>
               </div>
             </FormField>
+
+            {/* Connection Deposit Lockup Info */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="font-medium text-blue-900 mb-2 flex items-center gap-2">
+                <Info className="w-4 h-4" />
+                About Connection Deposit
+              </h4>
+              <ul className="space-y-1 text-sm text-blue-800">
+                <li>• This 1 ETH deposit remains locked for the entire duration of your vault's connection to VaultHub</li>
+                <li>• The locked deposit cannot be used to mint stETH</li>
+                <li>• You can reclaim this deposit when you disconnect your vault from VaultHub</li>
+              </ul>
+            </div>
 
             {/* Info Card */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -697,10 +708,8 @@ export default function CreateVaultClient() {
                   <div className="font-semibold">{formData.confirmExpiryHours} hours</div>
                 </div>
                 <div>
-                  <div className="text-gray-500">Initial Deposit</div>
-                  <div className="font-semibold">
-                    {formData.depositAmount === '0' ? 'None' : `${formData.depositAmount} ETH`}
-                  </div>
+                  <div className="text-gray-500">Connection Deposit</div>
+                  <div className="font-semibold">{formData.depositAmount} ETH</div>
                 </div>
               </div>
             </div>
