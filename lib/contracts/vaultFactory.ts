@@ -9,7 +9,7 @@ export const VAULT_FACTORY_ADDRESSES: Record<number, `0x${string}`> = {
 // Chain-specific deployment blocks for event queries
 // Using these avoids querying from genesis which exceeds RPC limits
 export const VAULT_FACTORY_DEPLOYMENT_BLOCKS: Record<number, bigint> = {
-  1: 21000000n,      // Ethereum Mainnet - approximate deployment block
+  1: 21700000n,      // Ethereum Mainnet - VaultFactory deployment block (Jan 2025)
   560048: 0n,        // Hoodi Testnet
 } as const;
 

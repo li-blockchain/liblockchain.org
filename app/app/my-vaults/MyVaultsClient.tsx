@@ -64,9 +64,16 @@ export default function MyVaultsClient() {
     }
   }
 
-  // Known vaults on Hoodi testnet
+  // Known vaults by chain
   // TODO: Replace with proper vault discovery (subgraph, backend API, or user storage)
   const KNOWN_VAULTS: Record<number, VaultInfo[]> = {
+    1: [ // Ethereum Mainnet
+      {
+        vaultAddress: '0xd402937b3ff3c187f727c1146a9e846275e9f711',
+        dashboardAddress: '0x2bb82089511d3231be7bc52d3c79d06b21a2f13b',
+        blockNumber: 0n,
+      },
+    ],
     560048: [ // Hoodi Testnet
       {
         vaultAddress: '0x338edBcd4DC5F19458F4e62022475145162B7eD7',

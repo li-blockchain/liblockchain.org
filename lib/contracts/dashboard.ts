@@ -660,3 +660,7 @@ export function parseDashboardError(error: unknown): string {
 // Test vault addresses (Hoodi testnet)
 export const TEST_VAULT_ADDRESS = '0xC458f9C4f58Ac647A1C4cB3Bc0DD5478B4162560' as const
 export const TEST_DASHBOARD_ADDRESS = '0x9BecA1E65386f9e9AcDDE45666b860d63FD597a7' as const
+
+// Mainnet vault addresses (for reference/testing)
+export const MAINNET_VAULT_ADDRESS = '0xd402937b3ff3c187f727c1146a9e846275e9f711' as const
+export const MAINNET_DASHBOARD_ADDRESS = '0x2bb82089511d3231be7bc52d3c79d06b21a2f13b' as const
