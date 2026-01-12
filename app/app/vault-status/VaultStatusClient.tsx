@@ -4,8 +4,9 @@ import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt, useAccount, useBalance, useChainId, useChains, usePublicClient } from 'wagmi'
 import { parseEther, formatEther, parseAbiItem } from 'viem'
-import { DASHBOARD_ABI, basisPointsToPercent, formatEth, parseDashboardError } from '../../../lib/contracts/dashboard'
+import { DASHBOARD_ABI, basisPointsToPercent, formatEth, parseDashboardError, PDGPolicy, PDG_POLICY_LABELS, type CLIDepositData, type ContractDeposit } from '../../../lib/contracts/dashboard'
 import { STAKING_VAULT_ABI } from '../../../lib/contracts/stakingVault'
+import { transformCLIDeposits, parseCLIDepositJSON, createDepositSummary, formatPubkeyShort, type DepositSummary } from '../../../lib/utils/depositData'
 
 // shadcn components
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card'
@@ -70,7 +71,12 @@ import {
   UserPlus,
   UserMinus,
   HelpCircle,
-  Info
+  Info,
+  Upload,
+  FileJson,
+  Server,
+  ShieldCheck,
+  ShieldAlert
 } from 'lucide-react'
 
 // Health status types
@@ -1868,6 +1874,14 @@ const ROLE_CONFIG: Record<string, RoleInfo> = {
     color: 'text-amber-700',
     bgColor: 'bg-amber-100',
     canBeGrantedBy: 'admin'
+  },
+  NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE: {
+    name: 'Unguaranteed Depositor',
+    description: 'Can submit validator deposits without PDG guarantee (requires owner consent via PDG Policy).',
+    roleFunctionName: 'NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE',
+    color: 'text-rose-700',
+    bgColor: 'bg-rose-100',
+    canBeGrantedBy: 'nodeOperatorManager'
   }
 }
 
@@ -2289,6 +2303,733 @@ function RevokeRoleDialog({
   )
 }
 
+// Set PDG Policy Dialog Component
+function SetPDGPolicyDialog({
+  dashboardAddress,
+  currentPolicy,
+  isAdmin,
+  onSuccess
+}: {
+  dashboardAddress: string
+  currentPolicy: number | undefined
+  isAdmin: boolean
+  onSuccess?: () => void
+}) {
+  const [open, setOpen] = useState(false)
+  const [selectedPolicy, setSelectedPolicy] = useState<string>('')
+  const [localError, setLocalError] = useState<string | null>(null)
+
+  const chainId = useChainId()
+  const chains = useChains()
+
+  const { writeContract, data: hash, isPending, error: writeError, reset } = useWriteContract()
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
+
+  const explorerUrl = getExplorerUrl(chainId, chains)
+
+  // Track if we've already called onSuccess for this transaction
+  const hasCalledSuccess = useRef(false)
+
+  // Reset state when dialog opens/closes
+  useEffect(() => {
+    if (!open) {
+      setSelectedPolicy('')
+      setLocalError(null)
+      hasCalledSuccess.current = false
+      reset()
+    }
+  }, [open, reset])
+
+  // Handle success - only call onSuccess once per transaction
+  useEffect(() => {
+    if (isSuccess && !hasCalledSuccess.current) {
+      hasCalledSuccess.current = true
+      onSuccess?.()
+    }
+  }, [isSuccess, onSuccess])
+
+  const handleSetPolicy = async () => {
+    setLocalError(null)
+
+    if (!selectedPolicy) {
+      setLocalError('Please select a policy')
+      return
+    }
+
+    try {
+      await writeContract({
+        address: dashboardAddress as `0x${string}`,
+        abi: DASHBOARD_ABI,
+        functionName: 'setPDGPolicy',
+        args: [Number(selectedPolicy)],
+      })
+    } catch (err) {
+      setLocalError(parseErrorMessage(err))
+    }
+  }
+
+  const displayError = localError || (writeError ? parseErrorMessage(writeError) : null)
+
+  if (!isAdmin) return null
+
+  const currentPolicyLabel = currentPolicy !== undefined
+    ? PDG_POLICY_LABELS[currentPolicy as PDGPolicy] || `Unknown (${currentPolicy})`
+    : 'Loading...'
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DialogTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-amber-200 bg-amber-50 text-amber-700 hover:bg-amber-100 hover:border-amber-300"
+              >
+                <ShieldAlert className="w-4 h-4 mr-2" />
+                PDG Policy
+              </Button>
+            </DialogTrigger>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p className="text-sm">Configure Predeposit Guarantee policy</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <ShieldAlert className="w-5 h-5 text-amber-600" />
+            Set PDG Policy
+          </DialogTitle>
+          <DialogDescription>
+            Configure the Predeposit Guarantee policy to control how validator deposits are verified.
+          </DialogDescription>
+        </DialogHeader>
+
+        {isSuccess ? (
+          <div className="py-6 text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-8 h-8 text-green-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-green-800 mb-2">Policy Updated!</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              PDG Policy has been set to {PDG_POLICY_LABELS[Number(selectedPolicy) as PDGPolicy]}.
+            </p>
+            {hash && (
+              <a
+                href={`${explorerUrl}/tx/${hash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand-cyan-600 hover:underline text-sm flex items-center justify-center gap-1"
+              >
+                View transaction <ExternalLink className="w-3 h-3" />
+              </a>
+            )}
+            <Button onClick={() => setOpen(false)} className="mt-4">
+              Close
+            </Button>
+          </div>
+        ) : (
+          <>
+            <div className="space-y-4 py-4">
+              {/* Current Policy Display */}
+              <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                <p className="text-xs text-gray-600 mb-1">Current Policy</p>
+                <Badge variant="outline" className={cn(
+                  "text-sm",
+                  currentPolicy === PDGPolicy.ALLOW_DEPOSIT_AND_PROVE
+                    ? "bg-amber-100 text-amber-700 border-amber-300"
+                    : "bg-gray-100 text-gray-700 border-gray-300"
+                )}>
+                  {currentPolicyLabel}
+                </Badge>
+              </div>
+
+              {/* Policy Selection */}
+              <div className="space-y-2">
+                <Label htmlFor="policy-select">New Policy</Label>
+                <Select value={selectedPolicy} onValueChange={setSelectedPolicy} disabled={isPending || isConfirming}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a policy" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={String(PDGPolicy.NOT_SET)}>
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck className="w-4 h-4 text-green-600" />
+                        <span>Not Set (PDG Required)</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value={String(PDGPolicy.ALLOW_PROVE)}>
+                      <div className="flex items-center gap-2">
+                        <Shield className="w-4 h-4 text-blue-600" />
+                        <span>Allow Prove Only</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value={String(PDGPolicy.ALLOW_DEPOSIT_AND_PROVE)}>
+                      <div className="flex items-center gap-2">
+                        <ShieldAlert className="w-4 h-4 text-amber-600" />
+                        <span>Allow Deposit & Prove (Unguaranteed)</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Warning for ALLOW_DEPOSIT_AND_PROVE */}
+              {selectedPolicy === String(PDGPolicy.ALLOW_DEPOSIT_AND_PROVE) && (
+                <Alert className="border-amber-200 bg-amber-50">
+                  <AlertTriangle className="h-4 w-4 text-amber-600" />
+                  <AlertDescription className="text-amber-800">
+                    <strong>Warning:</strong> This policy allows bypassing Predeposit Guarantee checks.
+                    Only enable this if you trust your node operator to deposit to the correct withdrawal credentials.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Error Message */}
+              {displayError && (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>{displayError}</AlertDescription>
+                </Alert>
+              )}
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending || isConfirming}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSetPolicy}
+                disabled={isPending || isConfirming || !selectedPolicy}
+                className="bg-amber-600 hover:bg-amber-700 text-white"
+              >
+                {isPending || isConfirming ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {isPending ? 'Confirm in Wallet...' : 'Processing...'}
+                  </>
+                ) : (
+                  <>
+                    <ShieldAlert className="w-4 h-4 mr-2" />
+                    Set Policy
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// Unguaranteed Deposit Dialog Component
+function UnguaranteedDepositDialog({
+  dashboardAddress,
+  vaultAddress,
+  pdgPolicy,
+  hasRole,
+  isAdmin,
+  onSuccess
+}: {
+  dashboardAddress: string
+  vaultAddress: string
+  pdgPolicy: number | undefined
+  hasRole: boolean
+  isAdmin: boolean
+  onSuccess?: () => void
+}) {
+  const [open, setOpen] = useState(false)
+  const [depositJson, setDepositJson] = useState('')
+  const [parsedDeposits, setParsedDeposits] = useState<CLIDepositData[] | null>(null)
+  const [depositSummary, setDepositSummary] = useState<DepositSummary | null>(null)
+  const [parseError, setParseError] = useState<string | null>(null)
+  const [localError, setLocalError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const chainId = useChainId()
+  const chains = useChains()
+
+  const { writeContract, data: hash, isPending, error: writeError, reset } = useWriteContract()
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
+
+  const explorerUrl = getExplorerUrl(chainId, chains)
+
+  // Track if we've already called onSuccess for this transaction
+  const hasCalledSuccess = useRef(false)
+
+  // Reset state when dialog opens/closes
+  useEffect(() => {
+    if (!open) {
+      setDepositJson('')
+      setParsedDeposits(null)
+      setDepositSummary(null)
+      setParseError(null)
+      setLocalError(null)
+      hasCalledSuccess.current = false
+      reset()
+    }
+  }, [open, reset])
+
+  // Handle success - only call onSuccess once per transaction
+  useEffect(() => {
+    if (isSuccess && !hasCalledSuccess.current) {
+      hasCalledSuccess.current = true
+      onSuccess?.()
+    }
+  }, [isSuccess, onSuccess])
+
+  // Parse deposit JSON when input changes
+  useEffect(() => {
+    if (!depositJson.trim()) {
+      setParsedDeposits(null)
+      setDepositSummary(null)
+      setParseError(null)
+      return
+    }
+
+    try {
+      const deposits = parseCLIDepositJSON(depositJson)
+      setParsedDeposits(deposits)
+      setDepositSummary(createDepositSummary(deposits))
+      setParseError(null)
+    } catch (error) {
+      setParsedDeposits(null)
+      setDepositSummary(null)
+      setParseError(error instanceof Error ? error.message : 'Failed to parse deposit data')
+    }
+  }, [depositJson])
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const content = e.target?.result as string
+      setDepositJson(content)
+    }
+    reader.readAsText(file)
+  }
+
+  const handleSubmitDeposits = async () => {
+    setLocalError(null)
+
+    if (!parsedDeposits || parsedDeposits.length === 0) {
+      setLocalError('Please provide valid deposit data')
+      return
+    }
+
+    // Check PDG policy
+    if (pdgPolicy !== PDGPolicy.ALLOW_DEPOSIT_AND_PROVE) {
+      setLocalError('PDG Policy must be set to "Allow Deposit & Prove" before making unguaranteed deposits')
+      return
+    }
+
+    try {
+      // Transform to contract format
+      const contractDeposits = transformCLIDeposits(parsedDeposits)
+
+      await writeContract({
+        address: dashboardAddress as `0x${string}`,
+        abi: DASHBOARD_ABI,
+        functionName: 'unguaranteedDepositToBeaconChain',
+        args: [contractDeposits],
+      })
+    } catch (err) {
+      setLocalError(err instanceof Error ? err.message : 'Failed to submit deposits')
+    }
+  }
+
+  const displayError = localError || (writeError ? parseErrorMessage(writeError) : null)
+  const canPerformAction = (hasRole || isAdmin) && pdgPolicy === PDGPolicy.ALLOW_DEPOSIT_AND_PROVE
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span>
+              <DialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={!hasRole && !isAdmin}
+                  className={cn(
+                    "disabled:opacity-50 disabled:cursor-not-allowed",
+                    pdgPolicy === PDGPolicy.ALLOW_DEPOSIT_AND_PROVE
+                      ? "border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100 hover:border-rose-300"
+                      : "border-gray-200 bg-gray-50 text-gray-500"
+                  )}
+                >
+                  <Server className="w-4 h-4 mr-2" />
+                  Deposit Validators
+                </Button>
+              </DialogTrigger>
+            </span>
+          </TooltipTrigger>
+          {(!hasRole && !isAdmin) ? (
+            <TooltipContent>
+              <p className="text-sm">Requires Unguaranteed Depositor role or Admin permission</p>
+            </TooltipContent>
+          ) : pdgPolicy !== PDGPolicy.ALLOW_DEPOSIT_AND_PROVE ? (
+            <TooltipContent>
+              <p className="text-sm">PDG Policy must be set to "Allow Deposit & Prove" first</p>
+            </TooltipContent>
+          ) : null}
+        </Tooltip>
+      </TooltipProvider>
+      <DialogContent className="sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Server className="w-5 h-5 text-rose-600" />
+            Unguaranteed Validator Deposit
+          </DialogTitle>
+          <DialogDescription>
+            Submit validator deposit data to the beacon chain without Predeposit Guarantee checks.
+          </DialogDescription>
+        </DialogHeader>
+
+        {isSuccess ? (
+          <div className="py-6 text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle2 className="w-8 h-8 text-green-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-green-800 mb-2">Deposits Submitted!</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              {depositSummary?.count} validator deposit{depositSummary?.count !== 1 ? 's' : ''} ({depositSummary?.totalAmountEth} ETH) submitted successfully.
+            </p>
+            {hash && (
+              <a
+                href={`${explorerUrl}/tx/${hash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-brand-cyan-600 hover:underline text-sm flex items-center justify-center gap-1"
+              >
+                View transaction <ExternalLink className="w-3 h-3" />
+              </a>
+            )}
+            <Button onClick={() => setOpen(false)} className="mt-4">
+              Close
+            </Button>
+          </div>
+        ) : (
+          <>
+            <div className="space-y-4 py-4">
+              {/* PDG Policy Status */}
+              {pdgPolicy !== PDGPolicy.ALLOW_DEPOSIT_AND_PROVE && (
+                <Alert className="border-amber-200 bg-amber-50">
+                  <AlertTriangle className="h-4 w-4 text-amber-600" />
+                  <AlertDescription className="text-amber-800">
+                    <strong>PDG Policy Required:</strong> Set the PDG Policy to "Allow Deposit & Prove" before making unguaranteed deposits.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* File Upload */}
+              <div className="space-y-2">
+                <Label>Upload Deposit Data File</Label>
+                <div className="flex gap-2">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    accept=".json"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isPending || isConfirming}
+                    className="w-full"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    Choose deposit-data.json file
+                  </Button>
+                </div>
+              </div>
+
+              {/* JSON Input */}
+              <div className="space-y-2">
+                <Label htmlFor="deposit-json">Or Paste Deposit Data JSON</Label>
+                <textarea
+                  id="deposit-json"
+                  value={depositJson}
+                  onChange={(e) => setDepositJson(e.target.value)}
+                  placeholder='[{"pubkey": "...", "withdrawal_credentials": "...", "amount": 32000000000, ...}]'
+                  rows={6}
+                  className="w-full font-mono text-sm p-3 border rounded-md focus:ring-2 focus:ring-brand-cyan-500 focus:border-transparent resize-y"
+                  disabled={isPending || isConfirming}
+                />
+              </div>
+
+              {/* Parse Error */}
+              {parseError && (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>{parseError}</AlertDescription>
+                </Alert>
+              )}
+
+              {/* Deposit Summary */}
+              {depositSummary && (
+                <Card className="border-green-200 bg-green-50">
+                  <CardContent className="pt-4">
+                    <div className="flex items-center gap-2 mb-3">
+                      <FileJson className="w-5 h-5 text-green-600" />
+                      <h4 className="font-semibold text-green-800">Deposit Summary</h4>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <p className="text-green-600">Validators</p>
+                        <p className="font-mono font-bold text-green-800">{depositSummary.count}</p>
+                      </div>
+                      <div>
+                        <p className="text-green-600">Total Amount</p>
+                        <p className="font-mono font-bold text-green-800">{depositSummary.totalAmountEth} ETH</p>
+                      </div>
+                    </div>
+                    {depositSummary.network && (
+                      <div className="mt-2">
+                        <p className="text-green-600 text-sm">Network</p>
+                        <Badge variant="outline" className="bg-green-100 text-green-700 border-green-300">
+                          {depositSummary.network}
+                        </Badge>
+                      </div>
+                    )}
+                    {depositSummary.pubkeys.length > 0 && (
+                      <div className="mt-3">
+                        <p className="text-green-600 text-sm mb-1">Validator Pubkeys</p>
+                        <div className="space-y-1 max-h-32 overflow-y-auto">
+                          {depositSummary.pubkeys.map((pubkey, i) => (
+                            <p key={i} className="font-mono text-xs text-green-700">
+                              {i + 1}. {formatPubkeyShort(pubkey)}
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Error Message */}
+              {displayError && (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>{displayError}</AlertDescription>
+                </Alert>
+              )}
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending || isConfirming}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSubmitDeposits}
+                disabled={isPending || isConfirming || !parsedDeposits || !canPerformAction}
+                className="bg-rose-600 hover:bg-rose-700 text-white"
+              >
+                {isPending || isConfirming ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {isPending ? 'Confirm in Wallet...' : 'Processing...'}
+                  </>
+                ) : (
+                  <>
+                    <Server className="w-4 h-4 mr-2" />
+                    Submit {parsedDeposits?.length || 0} Deposit{parsedDeposits?.length !== 1 ? 's' : ''}
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </>
+        )}
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// Unguaranteed Deposit Workflow Guide Component
+function UnguaranteedDepositWorkflow({
+  dashboardAddress,
+  vaultAddress,
+  totalValue,
+  pdgPolicy,
+  hasUnguaranteedDepositRole,
+  isAdmin,
+  isNodeOperatorManager
+}: {
+  dashboardAddress: string
+  vaultAddress: string
+  totalValue: bigint | undefined
+  pdgPolicy: number | undefined
+  hasUnguaranteedDepositRole: boolean
+  isAdmin: boolean
+  isNodeOperatorManager: boolean
+}) {
+  // Define workflow steps
+  const steps = [
+    {
+      id: 'fund',
+      title: 'Fund Vault',
+      description: 'Deposit ETH into the vault to provide collateral for validators',
+      requiredRole: 'FUND_ROLE',
+      isComplete: totalValue !== undefined && totalValue > 0n,
+      canPerform: true, // Fund is always available
+    },
+    {
+      id: 'pdg-policy',
+      title: 'Set PDG Policy',
+      description: 'Owner consent to bypass Predeposit Guarantee checks',
+      requiredRole: 'DEFAULT_ADMIN_ROLE',
+      isComplete: pdgPolicy === PDGPolicy.ALLOW_DEPOSIT_AND_PROVE,
+      canPerform: isAdmin,
+    },
+    {
+      id: 'assign-role',
+      title: 'Assign Depositor Role',
+      description: 'Grant NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE to the depositor address',
+      requiredRole: 'NODE_OPERATOR_MANAGER_ROLE',
+      isComplete: hasUnguaranteedDepositRole,
+      canPerform: isAdmin || isNodeOperatorManager,
+    },
+    {
+      id: 'deposit',
+      title: 'Submit Deposits',
+      description: 'Upload deposit data and submit validators to beacon chain',
+      requiredRole: 'NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE',
+      isComplete: false, // We don't track completed deposits here
+      canPerform: hasUnguaranteedDepositRole || isAdmin,
+    },
+  ]
+
+  // Calculate current step
+  const currentStepIndex = steps.findIndex((step) => !step.isComplete)
+  const allStepsComplete = currentStepIndex === -1
+
+  return (
+    <Card className="border border-gray-200">
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <Server className="w-5 h-5 text-brand-cyan-600" />
+          <CardTitle className="text-lg">Unguaranteed Deposit Workflow</CardTitle>
+        </div>
+        <CardDescription>
+          Follow these steps to deposit validators without Predeposit Guarantee checks
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="relative">
+          {/* Progress line */}
+          <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-gray-200" />
+          <div
+            className="absolute left-4 top-4 w-0.5 bg-brand-cyan-500 transition-all duration-300"
+            style={{
+              height: allStepsComplete
+                ? 'calc(100% - 32px)'
+                : `calc(${(currentStepIndex / (steps.length - 1)) * 100}% - 8px)`,
+            }}
+          />
+
+          {/* Steps */}
+          <div className="space-y-6">
+            {steps.map((step, index) => {
+              const isComplete = step.isComplete
+              const isCurrent = index === currentStepIndex
+              const isPending = index > currentStepIndex
+
+              return (
+                <div key={step.id} className="relative flex gap-4">
+                  {/* Step indicator */}
+                  <div
+                    className={cn(
+                      'relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 text-sm font-medium transition-colors',
+                      isComplete
+                        ? 'border-brand-cyan-500 bg-brand-cyan-500 text-white'
+                        : isCurrent
+                        ? 'border-brand-cyan-500 bg-white text-brand-cyan-600'
+                        : 'border-gray-300 bg-white text-gray-400'
+                    )}
+                  >
+                    {isComplete ? (
+                      <Check className="w-4 h-4" />
+                    ) : (
+                      <span>{index + 1}</span>
+                    )}
+                  </div>
+
+                  {/* Step content */}
+                  <div className="flex-1 pb-2">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4
+                        className={cn(
+                          'font-medium',
+                          isComplete
+                            ? 'text-gray-900'
+                            : isCurrent
+                            ? 'text-brand-cyan-700'
+                            : 'text-gray-500'
+                        )}
+                      >
+                        {step.title}
+                      </h4>
+                      {isComplete && (
+                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 text-xs">
+                          Complete
+                        </Badge>
+                      )}
+                      {isCurrent && (
+                        <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200 text-xs">
+                          Current
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-500 mb-2">{step.description}</p>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-xs bg-gray-50">
+                        Requires: {ROLE_CONFIG[step.requiredRole]?.name || step.requiredRole}
+                      </Badge>
+                      {!step.canPerform && !isComplete && (
+                        <span className="text-xs text-amber-600">You don't have this role</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Workflow status summary */}
+        <div className="mt-6 pt-4 border-t border-gray-200">
+          {allStepsComplete ? (
+            <div className="flex items-center gap-2 text-green-700 bg-green-50 p-3 rounded-lg">
+              <CheckCircle2 className="w-5 h-5" />
+              <span className="font-medium">Ready to submit validator deposits!</span>
+            </div>
+          ) : pdgPolicy !== PDGPolicy.ALLOW_DEPOSIT_AND_PROVE && currentStepIndex >= 1 ? (
+            <div className="flex items-center gap-2 text-amber-700 bg-amber-50 p-3 rounded-lg">
+              <AlertTriangle className="w-5 h-5" />
+              <span>PDG Policy must be set to "Allow Deposit & Prove" to proceed</span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 text-gray-600 bg-gray-50 p-3 rounded-lg">
+              <Info className="w-5 h-5" />
+              <span>Complete step {currentStepIndex + 1} to continue</span>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 // Roles Section Component
 function RolesSection({
   dashboardAddress,
@@ -2347,6 +3088,12 @@ function RolesSection({
     functionName: 'NODE_OPERATOR_MANAGER_ROLE',
   })
 
+  const { data: nodeOperatorUnguaranteedDepositRole } = useReadContract({
+    address: dashboardAddress as `0x${string}`,
+    abi: DASHBOARD_ABI,
+    functionName: 'NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE',
+  })
+
   // Create role bytes32 map
   const roleBytes32Map: Record<string, `0x${string}` | undefined> = {
     DEFAULT_ADMIN_ROLE: defaultAdminRole,
@@ -2356,6 +3103,7 @@ function RolesSection({
     BURN_ROLE: burnRole,
     REBALANCE_ROLE: rebalanceRole,
     NODE_OPERATOR_MANAGER_ROLE: nodeOperatorManagerRole,
+    NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE: nodeOperatorUnguaranteedDepositRole,
   }
 
   // Fetch role members for each role
@@ -2812,6 +3560,48 @@ export default function VaultStatusClient() {
     query: { enabled: hasValidAddresses && !!burnRole && !!userAddress }
   })
 
+  // Fetch NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE constant
+  const { data: unguaranteedDepositRole } = useReadContract({
+    address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
+    abi: DASHBOARD_ABI,
+    functionName: 'NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE',
+    query: { enabled: hasValidAddresses }
+  })
+
+  // Check if user has unguaranteed deposit role
+  const { data: hasUserUnguaranteedDepositRole } = useReadContract({
+    address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
+    abi: DASHBOARD_ABI,
+    functionName: 'hasRole',
+    args: unguaranteedDepositRole && userAddress ? [unguaranteedDepositRole, userAddress] : undefined,
+    query: { enabled: hasValidAddresses && !!unguaranteedDepositRole && !!userAddress }
+  })
+
+  // Read current PDG Policy
+  const { data: currentPdgPolicy } = useReadContract({
+    address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
+    abi: DASHBOARD_ABI,
+    functionName: 'pdgPolicy',
+    query: { enabled: hasValidAddresses }
+  })
+
+  // Fetch NODE_OPERATOR_MANAGER_ROLE constant
+  const { data: nodeOperatorManagerRole } = useReadContract({
+    address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
+    abi: DASHBOARD_ABI,
+    functionName: 'NODE_OPERATOR_MANAGER_ROLE',
+    query: { enabled: hasValidAddresses }
+  })
+
+  // Check if user has node operator manager role
+  const { data: hasUserNodeOperatorManagerRole } = useReadContract({
+    address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
+    abi: DASHBOARD_ABI,
+    functionName: 'hasRole',
+    args: nodeOperatorManagerRole && userAddress ? [nodeOperatorManagerRole, userAddress] : undefined,
+    query: { enabled: hasValidAddresses && !!nodeOperatorManagerRole && !!userAddress }
+  })
+
   // Calculate reserve ratio percentage
   const reserveRatioBP = vaultConnection?.reserveRatioBP ? Number(vaultConnection.reserveRatioBP) : undefined
   const reserveRatioPercent = reserveRatioBP ? (reserveRatioBP / 100).toFixed(1) : '0.0'
@@ -2991,6 +3781,20 @@ export default function VaultStatusClient() {
               onSuccess={() => {}}
               hasRole={!!hasUserBurnRole}
               isAdmin={!!isUserAdmin}
+            />
+            <SetPDGPolicyDialog
+              dashboardAddress={dashboardAddress}
+              currentPolicy={currentPdgPolicy}
+              isAdmin={!!isUserAdmin}
+              onSuccess={() => {}}
+            />
+            <UnguaranteedDepositDialog
+              dashboardAddress={dashboardAddress}
+              vaultAddress={vaultAddress}
+              pdgPolicy={currentPdgPolicy}
+              hasRole={!!hasUserUnguaranteedDepositRole}
+              isAdmin={!!isUserAdmin}
+              onSuccess={() => {}}
             />
           </div>
         </div>
@@ -3212,6 +4016,19 @@ export default function VaultStatusClient() {
             />
           </section>
         )}
+
+        {/* Unguaranteed Deposit Workflow */}
+        <section>
+          <UnguaranteedDepositWorkflow
+            dashboardAddress={dashboardAddress}
+            vaultAddress={vaultAddress}
+            totalValue={totalValue}
+            pdgPolicy={currentPdgPolicy}
+            hasUnguaranteedDepositRole={!!hasUserUnguaranteedDepositRole}
+            isAdmin={!!isUserAdmin}
+            isNodeOperatorManager={!!hasUserNodeOperatorManagerRole}
+          />
+        </section>
 
         {/* Roles & Permissions */}
         <section>

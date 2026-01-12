@@ -353,6 +353,22 @@ export const DASHBOARD_ABI = [
     outputs: [{ name: '', type: 'bytes32', internalType: 'bytes32' }],
     stateMutability: 'view',
   },
+  {
+    type: 'function',
+    name: 'NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE',
+    inputs: [],
+    outputs: [{ name: '', type: 'bytes32', internalType: 'bytes32' }],
+    stateMutability: 'view',
+  },
+
+  // ============ PDG POLICY ============
+  {
+    type: 'function',
+    name: 'pdgPolicy',
+    inputs: [],
+    outputs: [{ name: '', type: 'uint8', internalType: 'enum PDGPolicy' }],
+    stateMutability: 'view',
+  },
 
   // ============ ACCESS CONTROL ============
   {
@@ -537,6 +553,38 @@ export const DASHBOARD_ABI = [
     stateMutability: 'nonpayable',
   },
 
+  // Set PDG (Predeposit Guarantee) Policy
+  // Allows vault owner to consent to bypassing PDG checks for deposits
+  {
+    type: 'function',
+    name: 'setPDGPolicy',
+    inputs: [{ name: '_pdgPolicy', type: 'uint8', internalType: 'enum PDGPolicy' }],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+
+  // Unguaranteed deposit to beacon chain (bypasses PDG)
+  // Requires NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE and PDGPolicy set to ALLOW_DEPOSIT_AND_PROVE
+  {
+    type: 'function',
+    name: 'unguaranteedDepositToBeaconChain',
+    inputs: [
+      {
+        name: '_deposits',
+        type: 'tuple[]',
+        internalType: 'struct IStakingVault.Deposit[]',
+        components: [
+          { name: 'pubkey', type: 'bytes', internalType: 'bytes' },
+          { name: 'signature', type: 'bytes', internalType: 'bytes' },
+          { name: 'amount', type: 'uint256', internalType: 'uint256' },
+          { name: 'depositDataRoot', type: 'bytes32', internalType: 'bytes32' },
+        ],
+      },
+    ],
+    outputs: [],
+    stateMutability: 'nonpayable',
+  },
+
   // Request validator exit
   {
     type: 'function',
@@ -653,6 +701,22 @@ export function parseDashboardError(error: unknown): string {
   if (errorString.includes('ConnectedToVaultHub')) {
     return 'Vault is already connected to VaultHub'
   }
+  // PDG-related errors
+  if (errorString.includes('PDGPolicyViolation') || errorString.includes('UnguaranteedDepositNotAllowed')) {
+    return 'PDG Policy does not allow unguaranteed deposits. Set policy to ALLOW_DEPOSIT_AND_PROVE first.'
+  }
+  if (errorString.includes('InvalidPubkeyLength') || errorString.includes('MalformedPubkeysArray')) {
+    return 'Invalid validator public key format'
+  }
+  if (errorString.includes('InvalidSignature')) {
+    return 'Invalid deposit signature'
+  }
+  if (errorString.includes('InvalidDepositDataRoot')) {
+    return 'Invalid deposit data root'
+  }
+  if (errorString.includes('EmptyDeposits')) {
+    return 'No deposits provided'
+  }
 
   return 'Transaction failed. Please try again.'
 }
@@ -664,3 +728,57 @@ export const TEST_DASHBOARD_ADDRESS = '0x9BecA1E65386f9e9AcDDE45666b860d63FD597a
 // Mainnet vault addresses (for reference/testing)
 export const MAINNET_VAULT_ADDRESS = '0xd402937b3ff3c187f727c1146a9e846275e9f711' as const
 export const MAINNET_DASHBOARD_ADDRESS = '0x2bb82089511d3231be7bc52d3c79d06b21a2f13b' as const
+
+// Mainnet Predeposit Guarantee proxy address
+export const MAINNET_PDG_ADDRESS = '0xF4bF42c6D6A0E38825785048124DBAD6c9eaaac3' as const
+
+// ============ PDG POLICY TYPES ============
+
+/**
+ * PDGPolicy enum values for controlling Predeposit Guarantee behavior
+ * These values match the on-chain enum in the Dashboard contract
+ */
+export enum PDGPolicy {
+  /** Default policy - PDG checks enforced */
+  NOT_SET = 0,
+  /** Allow proving only - deposits still require PDG guarantee */
+  ALLOW_PROVE = 1,
+  /** Allow both deposit and prove without PDG guarantee (owner consent) */
+  ALLOW_DEPOSIT_AND_PROVE = 2,
+}
+
+/**
+ * Human-readable labels for PDG policy values
+ */
+export const PDG_POLICY_LABELS: Record<PDGPolicy, string> = {
+  [PDGPolicy.NOT_SET]: 'Not Set (PDG Required)',
+  [PDGPolicy.ALLOW_PROVE]: 'Allow Prove Only',
+  [PDGPolicy.ALLOW_DEPOSIT_AND_PROVE]: 'Allow Deposit & Prove (Unguaranteed)',
+}
+
+/**
+ * Deposit data structure from the offline CLI tool (deposit-cli)
+ * This is the format output by the Ethereum deposit CLI
+ */
+export interface CLIDepositData {
+  pubkey: string // 96 hex chars, no 0x prefix
+  withdrawal_credentials: string // 64 hex chars, with 0x prefix
+  amount: number // in Gwei (e.g., 40000000000 = 40 ETH)
+  signature: string // 192 hex chars, no 0x prefix
+  deposit_message_root: string // 64 hex chars, no 0x prefix
+  deposit_data_root: string // 64 hex chars, no 0x prefix
+  fork_version: string // 8 hex chars
+  network_name: string // e.g., "hoodi", "mainnet"
+  deposit_cli_version: string // e.g., "11.3.0-dev"
+}
+
+/**
+ * Deposit data structure expected by the contract
+ * Matches IStakingVault.Deposit struct
+ */
+export interface ContractDeposit {
+  pubkey: `0x${string}` // bytes, with 0x prefix
+  signature: `0x${string}` // bytes, with 0x prefix
+  amount: bigint // in Wei (not Gwei!)
+  depositDataRoot: `0x${string}` // bytes32, with 0x prefix
+}
