@@ -366,7 +366,7 @@ export const DASHBOARD_ABI = [
     type: 'function',
     name: 'pdgPolicy',
     inputs: [],
-    outputs: [{ name: '', type: 'uint8', internalType: 'enum PDGPolicy' }],
+    outputs: [{ name: '', type: 'uint8', internalType: 'enum Dashboard.PDGPolicy' }],
     stateMutability: 'view',
   },
 
@@ -558,7 +558,7 @@ export const DASHBOARD_ABI = [
   {
     type: 'function',
     name: 'setPDGPolicy',
-    inputs: [{ name: '_pdgPolicy', type: 'uint8', internalType: 'enum PDGPolicy' }],
+    inputs: [{ name: '_pdgPolicy', type: 'uint8', internalType: 'enum Dashboard.PDGPolicy' }],
     outputs: [],
     stateMutability: 'nonpayable',
   },
@@ -581,7 +581,7 @@ export const DASHBOARD_ABI = [
         ],
       },
     ],
-    outputs: [],
+    outputs: [{ name: 'totalAmount', type: 'uint256', internalType: 'uint256' }],
     stateMutability: 'nonpayable',
   },
 

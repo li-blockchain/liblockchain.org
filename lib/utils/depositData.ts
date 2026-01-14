@@ -128,6 +128,8 @@ export function transformCLIDeposit(cliDeposit: CLIDepositData): ContractDeposit
   // Validate first
   validateCLIDeposit(cliDeposit)
 
+  // The CLI tool outputs amounts in Gwei (e.g., 32000000000 = 32 ETH in Gwei).
+  // Convert to Wei for the contract (Solidity uses Wei natively).
   return {
     pubkey: ensureHexPrefix(cliDeposit.pubkey),
     signature: ensureHexPrefix(cliDeposit.signature),
