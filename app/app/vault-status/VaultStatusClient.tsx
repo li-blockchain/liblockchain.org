@@ -2005,7 +2005,7 @@ function GrantRoleDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="bg-brand-cyan-600 hover:bg-brand-cyan-700 text-white">
+        <Button size="sm" className="bg-brand-cyan-600 hover:bg-brand-cyan-700 text-black">
           <UserPlus className="w-4 h-4 mr-2" />
           Grant Role
         </Button>
@@ -2281,7 +2281,7 @@ function RevokeRoleDialog({
               <Button
                 onClick={handleRevoke}
                 disabled={isPending || isConfirming}
-                className="bg-red-600 hover:bg-red-700 text-white"
+                className="bg-red-600 hover:bg-red-700 text-black"
               >
                 {isPending || isConfirming ? (
                   <>
@@ -2504,7 +2504,8 @@ function SetPDGPolicyDialog({
               <Button
                 onClick={handleSetPolicy}
                 disabled={isPending || isConfirming || !selectedPolicy}
-                className="bg-amber-600 hover:bg-amber-700 text-white"
+                variant="ghost"
+                className="bg-amber-500 hover:bg-amber-600 text-black hover:text-black"
               >
                 {isPending || isConfirming ? (
                   <>
@@ -2633,13 +2634,31 @@ function UnguaranteedDepositDialog({
       // Transform to contract format
       const contractDeposits = transformCLIDeposits(parsedDeposits)
 
-      await writeContract({
+      console.log('=== UNGUARANTEED DEPOSIT DEBUG ===')
+      console.log('Dashboard address:', dashboardAddress)
+      console.log('Parsed deposits:', parsedDeposits)
+      console.log('Contract deposits:', contractDeposits)
+      console.log('Contract deposits (stringified):', JSON.stringify(contractDeposits, (_, v) => typeof v === 'bigint' ? v.toString() : v, 2))
+
+      // Log the exact args being sent
+      console.log('Args for contract call:', [contractDeposits.map(d => ({
+        pubkey: d.pubkey,
+        signature: d.signature,
+        amount: d.amount.toString(),
+        depositDataRoot: d.depositDataRoot
+      }))])
+
+      const result = await writeContract({
         address: dashboardAddress as `0x${string}`,
         abi: DASHBOARD_ABI,
         functionName: 'unguaranteedDepositToBeaconChain',
         args: [contractDeposits],
       })
+      console.log('writeContract result:', result)
     } catch (err) {
+      console.error('=== DEPOSIT ERROR ===')
+      console.error('Full error:', err)
+      console.error('Error message:', err instanceof Error ? err.message : String(err))
       setLocalError(err instanceof Error ? err.message : 'Failed to submit deposits')
     }
   }
@@ -2833,7 +2852,7 @@ function UnguaranteedDepositDialog({
               <Button
                 onClick={handleSubmitDeposits}
                 disabled={isPending || isConfirming || !parsedDeposits || !canPerformAction}
-                className="bg-rose-600 hover:bg-rose-700 text-white"
+                className="bg-rose-600 hover:bg-rose-700 text-black"
               >
                 {isPending || isConfirming ? (
                   <>
@@ -2951,7 +2970,7 @@ function UnguaranteedDepositWorkflow({
                     className={cn(
                       'relative z-10 flex h-8 w-8 items-center justify-center rounded-full border-2 text-sm font-medium transition-colors',
                       isComplete
-                        ? 'border-brand-cyan-500 bg-brand-cyan-500 text-white'
+                        ? 'border-brand-cyan-500 bg-brand-cyan-500 text-black'
                         : isCurrent
                         ? 'border-brand-cyan-500 bg-white text-brand-cyan-600'
                         : 'border-gray-300 bg-white text-gray-400'
@@ -3782,20 +3801,6 @@ export default function VaultStatusClient() {
               hasRole={!!hasUserBurnRole}
               isAdmin={!!isUserAdmin}
             />
-            <SetPDGPolicyDialog
-              dashboardAddress={dashboardAddress}
-              currentPolicy={currentPdgPolicy}
-              isAdmin={!!isUserAdmin}
-              onSuccess={() => {}}
-            />
-            <UnguaranteedDepositDialog
-              dashboardAddress={dashboardAddress}
-              vaultAddress={vaultAddress}
-              pdgPolicy={currentPdgPolicy}
-              hasRole={!!hasUserUnguaranteedDepositRole}
-              isAdmin={!!isUserAdmin}
-              onSuccess={() => {}}
-            />
           </div>
         </div>
       </section>
@@ -4017,19 +4022,6 @@ export default function VaultStatusClient() {
           </section>
         )}
 
-        {/* Unguaranteed Deposit Workflow */}
-        <section>
-          <UnguaranteedDepositWorkflow
-            dashboardAddress={dashboardAddress}
-            vaultAddress={vaultAddress}
-            totalValue={totalValue}
-            pdgPolicy={currentPdgPolicy}
-            hasUnguaranteedDepositRole={!!hasUserUnguaranteedDepositRole}
-            isAdmin={!!isUserAdmin}
-            isNodeOperatorManager={!!hasUserNodeOperatorManagerRole}
-          />
-        </section>
-
         {/* Roles & Permissions */}
         <section>
           <RolesSection
@@ -4054,6 +4046,48 @@ export default function VaultStatusClient() {
 
           {showAdvanced && (
             <div className="mt-8 space-y-8 animate-in slide-in-from-top-2 duration-200">
+              {/* Advanced Actions */}
+              <Card className="border border-gray-200">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ShieldAlert className="w-5 h-5" />
+                    Unguaranteed Deposits
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Configure Predeposit Guarantee policy and submit validator deposits without PDG checks.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <SetPDGPolicyDialog
+                      dashboardAddress={dashboardAddress}
+                      currentPolicy={currentPdgPolicy}
+                      isAdmin={!!isUserAdmin}
+                      onSuccess={() => {}}
+                    />
+                    <UnguaranteedDepositDialog
+                      dashboardAddress={dashboardAddress}
+                      vaultAddress={vaultAddress}
+                      pdgPolicy={currentPdgPolicy}
+                      hasRole={!!hasUserUnguaranteedDepositRole}
+                      isAdmin={!!isUserAdmin}
+                      onSuccess={() => {}}
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Unguaranteed Deposit Workflow */}
+              <UnguaranteedDepositWorkflow
+                dashboardAddress={dashboardAddress}
+                vaultAddress={vaultAddress}
+                totalValue={totalValue}
+                pdgPolicy={currentPdgPolicy}
+                hasUnguaranteedDepositRole={!!hasUserUnguaranteedDepositRole}
+                isAdmin={!!isUserAdmin}
+                isNodeOperatorManager={!!hasUserNodeOperatorManagerRole}
+              />
+
               {/* Fee Configuration */}
               <Card className="border border-gray-200">
               <CardHeader>
