@@ -3182,6 +3182,14 @@ function RolesSection({
     query: { enabled: !!nodeOperatorManagerRole }
   })
 
+  const { data: unguaranteedDepositMembers, isLoading: unguaranteedDepositLoading, refetch: refetchUnguaranteedDeposit } = useReadContract({
+    address: dashboardAddress as `0x${string}`,
+    abi: DASHBOARD_ABI,
+    functionName: 'getRoleMembers',
+    args: nodeOperatorUnguaranteedDepositRole ? [nodeOperatorUnguaranteedDepositRole] : undefined,
+    query: { enabled: !!nodeOperatorUnguaranteedDepositRole }
+  })
+
   // Check if current user is admin
   const { data: isUserAdmin } = useReadContract({
     address: dashboardAddress as `0x${string}`,
@@ -3200,6 +3208,7 @@ function RolesSection({
     { key: 'BURN_ROLE', members: burnMembers || [], isLoading: burnLoading },
     { key: 'REBALANCE_ROLE', members: rebalanceMembers || [], isLoading: rebalanceLoading },
     { key: 'NODE_OPERATOR_MANAGER_ROLE', members: nodeOpMembers || [], isLoading: nodeOpLoading },
+    { key: 'NODE_OPERATOR_UNGUARANTEED_DEPOSIT_ROLE', members: unguaranteedDepositMembers || [], isLoading: unguaranteedDepositLoading },
   ]
 
   const isLoading = parentLoading || roleData.some(r => r.isLoading)
@@ -3212,6 +3221,7 @@ function RolesSection({
     refetchBurn()
     refetchRebalance()
     refetchNodeOp()
+    refetchUnguaranteedDeposit()
     setRefreshKey(k => k + 1)
   }
 
