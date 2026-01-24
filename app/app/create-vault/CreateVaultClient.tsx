@@ -222,16 +222,30 @@ export default function CreateVaultClient() {
 
   // Wizard state
   const [currentStep, setCurrentStep] = useState(0)
-  const steps = ['Operator', 'Settings', 'Review']
+  const steps = ['Roles', 'Settings', 'Review']
 
   // Form state
   const [formData, setFormData] = useState({
+    vaultOwner: '',
     nodeOperator: '',
     nodeOperatorManager: '',
     nodeOperatorFeePercent: '5.0',
     confirmExpiryHours: '24',
     depositAmount: '1',
   })
+
+  // Initialize vaultOwner with connected wallet address when first connected
+  useEffect(() => {
+    if (address) {
+      setFormData(prev => {
+        // Only set if vaultOwner is empty (initial state)
+        if (!prev.vaultOwner) {
+          return { ...prev, vaultOwner: address }
+        }
+        return prev
+      })
+    }
+  }, [address])
 
   // Validation state
   const [errors, setErrors] = useState<Record<string, string | null>>({})
@@ -245,6 +259,9 @@ export default function CreateVaultClient() {
   useEffect(() => {
     const newErrors: Record<string, string | null> = {}
 
+    if (touched.vaultOwner && formData.vaultOwner) {
+      newErrors.vaultOwner = isValidAddress(formData.vaultOwner) ? null : 'Invalid Ethereum address'
+    }
     if (touched.nodeOperator && formData.nodeOperator) {
       newErrors.nodeOperator = isValidAddress(formData.nodeOperator) ? null : 'Invalid Ethereum address'
     }
@@ -274,7 +291,7 @@ export default function CreateVaultClient() {
     setTouched(prev => ({ ...prev, [name]: true }))
   }
 
-  const fillWithMyAddress = (field: 'nodeOperator' | 'nodeOperatorManager') => {
+  const fillWithMyAddress = (field: 'vaultOwner' | 'nodeOperator' | 'nodeOperatorManager') => {
     if (address) {
       setFormData(prev => ({ ...prev, [field]: address }))
       setTouched(prev => ({ ...prev, [field]: true }))
@@ -284,6 +301,7 @@ export default function CreateVaultClient() {
   // Step validation
   const isStep1Valid = () => {
     return (
+      isValidAddress(formData.vaultOwner) &&
       isValidAddress(formData.nodeOperator) &&
       isValidAddress(formData.nodeOperatorManager) &&
       !validateOperatorFee(formData.nodeOperatorFeePercent)
@@ -308,6 +326,7 @@ export default function CreateVaultClient() {
     if (currentStep === 0) {
       setTouched(prev => ({
         ...prev,
+        vaultOwner: true,
         nodeOperator: true,
         nodeOperatorManager: true,
         nodeOperatorFeePercent: true,
@@ -352,7 +371,7 @@ export default function CreateVaultClient() {
         abi: VAULT_FACTORY_ABI,
         functionName: 'createVaultWithDashboard',
         args: [
-          address,
+          formData.vaultOwner as `0x${string}`,
           formData.nodeOperator as `0x${string}`,
           formData.nodeOperatorManager as `0x${string}`,
           nodeOperatorFeeBP,
@@ -403,6 +422,7 @@ export default function CreateVaultClient() {
               <Button variant="outline" onClick={() => {
                 setCurrentStep(0)
                 setFormData({
+                  vaultOwner: address || '',
                   nodeOperator: '',
                   nodeOperatorManager: '',
                   nodeOperatorFeePercent: '5.0',
@@ -457,20 +477,54 @@ export default function CreateVaultClient() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5 text-brand-cyan-500" />
-              <CardTitle>Node Operator Configuration</CardTitle>
+              <CardTitle>Protocol Roles</CardTitle>
             </div>
             <CardDescription>
-              Configure who will operate validators for this vault
+              Configure the three key roles that control your vault
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Operator Address */}
+            {/* Vault Owner */}
             <FormField
-              label="Operator Address"
+              label="Vault Owner"
+              required
+              error={touched.vaultOwner ? errors.vaultOwner : null}
+              hint="Has full administrative control over the vault. Can transfer ownership, withdraw funds, and manage all settings."
+              tooltip="Super user with complete control. Cannot be changed easily after deployment."
+            >
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  name="vaultOwner"
+                  value={formData.vaultOwner}
+                  onChange={handleInputChange}
+                  onBlur={() => handleBlur('vaultOwner')}
+                  placeholder="0x..."
+                  className={`font-mono text-sm flex-1 ${
+                    touched.vaultOwner && errors.vaultOwner ? 'border-red-500 focus-visible:ring-red-500' : ''
+                  }`}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fillWithMyAddress('vaultOwner')}
+                  disabled={!isConnected}
+                  className="whitespace-nowrap"
+                >
+                  <Wallet className="w-4 h-4 mr-1" />
+                  Use Mine
+                </Button>
+              </div>
+            </FormField>
+
+            {/* Node Operator Address */}
+            <FormField
+              label="Node Operator Address"
               required
               error={touched.nodeOperator ? errors.nodeOperator : null}
-              hint="The address that will run validators for this vault"
-              tooltip="This address will have permission to register validators and perform operator duties"
+              hint="The address that runs validators. This role is immutable after deployment and handles all validator operations."
+              tooltip="Cannot be changed after vault creation. Responsible for registering validators and performing deposits/exits."
             >
               <div className="flex gap-2">
                 <Input
@@ -498,13 +552,13 @@ export default function CreateVaultClient() {
               </div>
             </FormField>
 
-            {/* Manager Address */}
+            {/* Node Operator Manager */}
             <FormField
-              label="Manager Address"
+              label="Node Operator Manager"
               required
               error={touched.nodeOperatorManager ? errors.nodeOperatorManager : null}
-              hint="The address that manages operator permissions"
-              tooltip="This address can update operator settings and manage permissions"
+              hint="Can update operator settings and manage operator permissions. Acts as the supervisor for the node operator."
+              tooltip="Can modify operator parameters and permissions but cannot perform validator operations directly."
             >
               <div className="flex gap-2">
                 <Input
@@ -668,31 +722,51 @@ export default function CreateVaultClient() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Vault Owner */}
-            <div className="bg-gray-50 rounded-lg p-4">
-              <div className="text-sm text-gray-500 mb-1">Vault Owner</div>
-              <div className="font-mono text-xs break-all bg-white px-2 py-1 rounded border">{address}</div>
-            </div>
-
-            {/* Operator Config */}
-            <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+            {/* Protocol Roles */}
+            <div className="bg-gray-50 rounded-lg p-4 space-y-4">
               <div className="font-medium text-gray-900 flex items-center gap-2">
                 <Users className="w-4 h-4 text-brand-cyan-500" />
-                Operator Configuration
+                Protocol Roles
               </div>
-              <div className="space-y-3 text-sm">
+              <div className="space-y-4 text-sm">
+                {/* Vault Owner */}
                 <div>
-                  <div className="text-gray-500">Operator Address</div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="text-gray-700 font-medium">Vault Owner</div>
+                    <Badge variant="secondary" className="text-xs">Admin</Badge>
+                  </div>
+                  <div className="font-mono text-xs break-all bg-white px-2 py-1 rounded border">{formData.vaultOwner}</div>
+                  <div className="text-xs text-gray-500 mt-1">Full administrative control. Can transfer ownership and manage all settings.</div>
+                </div>
+                {/* Node Operator */}
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="text-gray-700 font-medium">Node Operator</div>
+                    <Badge variant="outline" className="text-xs">Immutable</Badge>
+                  </div>
                   <div className="font-mono text-xs break-all bg-white px-2 py-1 rounded border">{formData.nodeOperator}</div>
+                  <div className="text-xs text-gray-500 mt-1">Runs validators. Cannot be changed after deployment.</div>
                 </div>
+                {/* Node Operator Manager */}
                 <div>
-                  <div className="text-gray-500">Manager Address</div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="text-gray-700 font-medium">Node Operator Manager</div>
+                  </div>
                   <div className="font-mono text-xs break-all bg-white px-2 py-1 rounded border">{formData.nodeOperatorManager}</div>
+                  <div className="text-xs text-gray-500 mt-1">Manages operator settings and permissions.</div>
                 </div>
-                <div>
-                  <div className="text-gray-500">Operator Fee</div>
-                  <div className="font-semibold">{formData.nodeOperatorFeePercent}%</div>
-                </div>
+              </div>
+            </div>
+
+            {/* Operator Fee */}
+            <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+              <div className="font-medium text-gray-900 flex items-center gap-2">
+                <Coins className="w-4 h-4 text-brand-cyan-500" />
+                Operator Fee
+              </div>
+              <div className="text-sm">
+                <div className="font-semibold text-lg">{formData.nodeOperatorFeePercent}%</div>
+                <div className="text-xs text-gray-500">Percentage of staking rewards paid to the node operator</div>
               </div>
             </div>
 
