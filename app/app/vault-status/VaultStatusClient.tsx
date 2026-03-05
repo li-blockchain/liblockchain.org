@@ -3275,7 +3275,6 @@ export default function VaultStatusClient() {
                   label="Reserve Ratio"
                   value={reserveRatioPercent}
                   unit="%"
-                  subValue={reserveRatioBP && reserveRatioBP >= 2000 ? 'Well Collateralized' : 'Monitor Closely'}
                   isLoading={connectionLoading}
                   icon={Shield}
                   accentColor="text-green-600"
