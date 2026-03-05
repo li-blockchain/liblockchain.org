@@ -113,7 +113,11 @@ export default function MyVaultsClient() {
 
   const { data: roleConstantsData, isLoading: roleConstantsLoading } = useReadContracts({
     contracts: roleConstantContracts,
-    query: { enabled: !!firstDashboard && isConnected },
+    // Scope cache key to chain to invalidate when chain changes
+    scopeKey: `roleConstants-${chainId}`,
+    query: {
+      enabled: !!firstDashboard && isConnected,
+    },
   })
 
   // Transform role constants to a map
@@ -146,8 +150,13 @@ export default function MyVaultsClient() {
 
   const { data: roleCheckData, isLoading: roleCheckLoading } = useReadContracts({
     contracts: roleCheckContracts,
+    // Critical: Scope cache key to address and chain to invalidate when either changes
+    scopeKey: `roleCheck-${address}-${chainId}`,
     query: {
       enabled: roleCheckContracts.length > 0,
+      // Ensure fresh data on mount for WalletConnect connections
+      staleTime: 0,
+      refetchOnMount: 'always',
     },
   })
 
@@ -178,6 +187,23 @@ export default function MyVaultsClient() {
 
     return { filteredVaults: filtered, vaultRoles: roles }
   }, [roleCheckData, knownVaults])
+
+  // Debug logging for vault access issues
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development' || true) { // Enable for now
+      console.log('=== Vault Access Debug ===')
+      console.log('Address:', address)
+      console.log('ChainId:', chainId)
+      console.log('isConnected:', isConnected)
+      console.log('Role Constants Loaded:', !!roleConstants)
+      console.log('Role Check Contracts:', roleCheckContracts.length)
+      console.log('Role Check Data:', roleCheckData?.map((r, i) => ({
+        role: ROLE_FUNCTION_NAMES[i % ROLE_FUNCTION_NAMES.length],
+        result: r?.status === 'success' ? r.result : r?.status
+      })))
+      console.log('Filtered Vaults:', filteredVaults.length)
+    }
+  }, [address, chainId, isConnected, roleConstants, roleCheckContracts, roleCheckData, filteredVaults])
 
   // Combined loading state
   const isLoading = (roleConstantsLoading || roleCheckLoading) && isConnected && isSupportedNetwork
