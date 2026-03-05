@@ -3152,12 +3152,6 @@ export default function VaultStatusClient() {
             </Card>
           </section>
 
-          {/* Health & APR Skeleton */}
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <Skeleton className="h-24 w-full rounded-xl" />
-            <Skeleton className="h-24 w-full rounded-xl" />
-          </section>
-
           {/* Minting Capacity Skeleton */}
           <section>
             <Card className="border border-gray-200">
@@ -3289,15 +3283,6 @@ export default function VaultStatusClient() {
               </div>
             </CardContent>
           </Card>
-        </section>
-
-        {/* Health & APR Row */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <HealthIndicator
-            reserveRatioBP={reserveRatioBP}
-            isLoading={connectionLoading}
-          />
-          <APRDisplay isLoading={reportLoading} />
         </section>
 
         {/* Minting Capacity */}
