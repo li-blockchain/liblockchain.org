@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useReadContract, useWriteContract, useWaitForTransactionReceipt, useAccount, useBalance, useChainId, useChains, usePublicClient } from 'wagmi'
 import { parseEther, formatEther, parseAbiItem } from 'viem'
-import { DASHBOARD_ABI, basisPointsToPercent, formatEth, parseDashboardError, PDGPolicy, PDG_POLICY_LABELS, type CLIDepositData, type ContractDeposit } from '../../../lib/contracts/dashboard'
+import { DASHBOARD_ABI, STETH_ABI, basisPointsToPercent, formatEth, parseDashboardError, PDGPolicy, PDG_POLICY_LABELS, type CLIDepositData, type ContractDeposit } from '../../../lib/contracts/dashboard'
 import { STAKING_VAULT_ABI } from '../../../lib/contracts/stakingVault'
 import { transformCLIDeposits, parseCLIDepositJSON, createDepositSummary, formatPubkeyShort, type DepositSummary } from '../../../lib/utils/depositData'
 import ValidatorList from './ValidatorList'
@@ -489,15 +489,15 @@ function FundVaultDialog({
 // Mint stETH Dialog Component
 function MintStETHDialog({
   dashboardAddress,
-  remainingMintingCapacity,
-  liabilityShares,
+  remainingMintingCapacitySteth,
+  liabilitySteth,
   onSuccess,
   hasRole = true,
   isAdmin = false
 }: {
   dashboardAddress: string
-  remainingMintingCapacity: bigint | undefined
-  liabilityShares: bigint | undefined
+  remainingMintingCapacitySteth: bigint | undefined
+  liabilitySteth: bigint | undefined
   onSuccess?: () => void
   hasRole?: boolean
   isAdmin?: boolean
@@ -547,7 +547,7 @@ function MintStETHDialog({
     }
 
     const mintAmount = parseEther(amount)
-    if (remainingMintingCapacity && mintAmount > remainingMintingCapacity) {
+    if (remainingMintingCapacitySteth && mintAmount > remainingMintingCapacitySteth) {
       setLocalError('Amount exceeds remaining minting capacity')
       return
     }
@@ -568,7 +568,7 @@ function MintStETHDialog({
 
   // Calculate new liability after minting
   const mintAmountBigInt = amount ? parseEther(amount) : 0n
-  const newLiability = (liabilityShares || 0n) + mintAmountBigInt
+  const newLiability = (liabilitySteth || 0n) + mintAmountBigInt
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -637,7 +637,7 @@ function MintStETHDialog({
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-green-700">Available to Mint</span>
                   <span className="font-mono font-medium text-green-900">
-                    {remainingMintingCapacity ? formatEth(remainingMintingCapacity) : '0.0000'} stETH
+                    {remainingMintingCapacitySteth ? formatEth(remainingMintingCapacitySteth) : '0.0000'} stETH
                   </span>
                 </div>
               </div>
@@ -661,13 +661,13 @@ function MintStETHDialog({
                     stETH
                   </span>
                 </div>
-                {remainingMintingCapacity && remainingMintingCapacity > 0n && (
+                {remainingMintingCapacitySteth && remainingMintingCapacitySteth > 0n && (
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
                     className="text-xs text-green-600"
-                    onClick={() => setAmount(formatEther(remainingMintingCapacity))}
+                    onClick={() => setAmount(formatEther(remainingMintingCapacitySteth))}
                     disabled={isPending || isConfirming}
                   >
                     Use Max
@@ -687,7 +687,7 @@ function MintStETHDialog({
               )}
 
               {/* Warning */}
-              {remainingMintingCapacity === 0n && (
+              {remainingMintingCapacitySteth === 0n && (
                 <Alert>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
@@ -711,7 +711,7 @@ function MintStETHDialog({
               </Button>
               <Button
                 onClick={handleMint}
-                disabled={!isConnected || isPending || isConfirming || !amount || remainingMintingCapacity === 0n}
+                disabled={!isConnected || isPending || isConfirming || !amount || remainingMintingCapacitySteth === 0n}
                 className="bg-green-600 hover:bg-green-700"
               >
                 {isPending || isConfirming ? (
@@ -737,7 +737,7 @@ function MintStETHDialog({
 // Burn stETH Dialog Component
 function BurnStETHDialog({
   dashboardAddress,
-  liabilityShares,
+  liabilitySteth,
   reserveRatioBP,
   totalValue,
   onSuccess,
@@ -745,7 +745,7 @@ function BurnStETHDialog({
   isAdmin = false
 }: {
   dashboardAddress: string
-  liabilityShares: bigint | undefined
+  liabilitySteth: bigint | undefined
   reserveRatioBP: number | undefined
   totalValue: bigint | undefined
   onSuccess?: () => void
@@ -792,7 +792,7 @@ function BurnStETHDialog({
     }
 
     const burnAmount = parseEther(amount)
-    if (liabilityShares && burnAmount > liabilityShares) {
+    if (liabilitySteth && burnAmount > liabilitySteth) {
       setLocalError('Amount exceeds current liability')
       return
     }
@@ -813,16 +813,16 @@ function BurnStETHDialog({
 
   // Calculate new liability after burning
   const burnAmountBigInt = amount ? parseEther(amount) : 0n
-  const newLiability = (liabilityShares || 0n) > burnAmountBigInt
-    ? (liabilityShares || 0n) - burnAmountBigInt
+  const newLiability = (liabilitySteth || 0n) > burnAmountBigInt
+    ? (liabilitySteth || 0n) - burnAmountBigInt
     : 0n
 
   // Estimate new reserve ratio (simplified calculation)
   // Reserve ratio improves when liability decreases relative to total value
   const estimateNewReserveRatio = () => {
-    if (!totalValue || !liabilityShares || !amount) return undefined
+    if (!totalValue || !liabilitySteth || !amount) return undefined
     const burnAmount = parseEther(amount)
-    const newLiab = liabilityShares > burnAmount ? liabilityShares - burnAmount : 0n
+    const newLiab = liabilitySteth > burnAmount ? liabilitySteth - burnAmount : 0n
     if (newLiab === 0n) return 10000 // 100% if no liability
     // Simplified: ratio = (totalValue - newLiability) / totalValue * 10000
     const newRatio = Number(((totalValue - newLiab) * 10000n) / totalValue)
@@ -898,7 +898,7 @@ function BurnStETHDialog({
                 <div className="flex justify-between items-center">
                   <span className="text-sm text-red-700">Current Liability</span>
                   <span className="font-mono font-medium text-red-900">
-                    {liabilityShares ? formatEth(liabilityShares) : '0.0000'} stETH
+                    {liabilitySteth ? formatEth(liabilitySteth) : '0.0000'} stETH
                   </span>
                 </div>
               </div>
@@ -922,13 +922,13 @@ function BurnStETHDialog({
                     stETH
                   </span>
                 </div>
-                {liabilityShares && liabilityShares > 0n && (
+                {liabilitySteth && liabilitySteth > 0n && (
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
                     className="text-xs text-red-600"
-                    onClick={() => setAmount(formatEther(liabilityShares))}
+                    onClick={() => setAmount(formatEther(liabilitySteth))}
                     disabled={isPending || isConfirming}
                   >
                     Burn All
@@ -960,7 +960,7 @@ function BurnStETHDialog({
               )}
 
               {/* Warning */}
-              {(!liabilityShares || liabilityShares === 0n) && (
+              {(!liabilitySteth || liabilitySteth === 0n) && (
                 <Alert>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
@@ -992,7 +992,7 @@ function BurnStETHDialog({
               </Button>
               <Button
                 onClick={handleBurn}
-                disabled={!isConnected || isPending || isConfirming || !amount || !liabilityShares || liabilityShares === 0n}
+                disabled={!isConnected || isPending || isConfirming || !amount || !liabilitySteth || liabilitySteth === 0n}
                 className="bg-red-600 hover:bg-red-700"
               >
                 {isPending || isConfirming ? (
@@ -2896,6 +2896,42 @@ export default function VaultStatusClient() {
     query: { enabled: hasValidAddresses }
   })
 
+  // Fetch stETH contract address from dashboard to convert shares to stETH
+  const { data: stethAddress } = useReadContract({
+    address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
+    abi: DASHBOARD_ABI,
+    functionName: 'STETH',
+    query: { enabled: hasValidAddresses }
+  })
+
+  // Convert liabilityShares to actual stETH amount
+  // stETH is a rebasing token, so shares != stETH (ratio is ~1.229 currently)
+  const { data: liabilitySteth, isLoading: liabilityStethLoading } = useReadContract({
+    address: stethAddress as `0x${string}` | undefined,
+    abi: STETH_ABI,
+    functionName: 'getPooledEthByShares',
+    args: liabilityShares !== undefined ? [liabilityShares] : undefined,
+    query: { enabled: !!stethAddress && liabilityShares !== undefined }
+  })
+
+  // Convert totalMintingCapacityShares to stETH
+  const { data: totalMintingCapacitySteth, isLoading: totalMintCapStethLoading } = useReadContract({
+    address: stethAddress as `0x${string}` | undefined,
+    abi: STETH_ABI,
+    functionName: 'getPooledEthByShares',
+    args: totalMintingCapacity !== undefined ? [totalMintingCapacity] : undefined,
+    query: { enabled: !!stethAddress && totalMintingCapacity !== undefined }
+  })
+
+  // Convert remainingMintingCapacityShares to stETH
+  const { data: remainingMintingCapacitySteth, isLoading: remainingCapStethLoading } = useReadContract({
+    address: stethAddress as `0x${string}` | undefined,
+    abi: STETH_ABI,
+    functionName: 'getPooledEthByShares',
+    args: remainingMintingCapacity !== undefined ? [remainingMintingCapacity] : undefined,
+    query: { enabled: !!stethAddress && remainingMintingCapacity !== undefined }
+  })
+
   const { data: minimalReserve, isLoading: minimalReserveLoading } = useReadContract({
     address: hasValidAddresses ? dashboardAddress as `0x${string}` : undefined,
     abi: DASHBOARD_ABI,
@@ -3230,15 +3266,15 @@ export default function VaultStatusClient() {
             />
             <MintStETHDialog
               dashboardAddress={dashboardAddress}
-              remainingMintingCapacity={remainingMintingCapacity}
-              liabilityShares={liabilityShares}
+              remainingMintingCapacitySteth={remainingMintingCapacitySteth}
+              liabilitySteth={liabilitySteth}
               onSuccess={() => {}}
               hasRole={!!hasUserMintRole}
               isAdmin={!!isUserAdmin}
             />
             <BurnStETHDialog
               dashboardAddress={dashboardAddress}
-              liabilityShares={liabilityShares}
+              liabilitySteth={liabilitySteth}
               reserveRatioBP={reserveRatioBP}
               totalValue={totalValue}
               onSuccess={() => {}}
@@ -3265,9 +3301,9 @@ export default function VaultStatusClient() {
                 />
                 <HeroMetric
                   label="stETH Minted"
-                  value={liabilityShares ? formatEth(liabilityShares) : undefined}
+                  value={liabilitySteth ? formatEth(liabilitySteth) : undefined}
                   unit="stETH"
-                  isLoading={liabilityLoading}
+                  isLoading={liabilityLoading || liabilityStethLoading}
                   icon={Coins}
                   accentColor="text-brand-purple-600"
                 />
@@ -3322,16 +3358,16 @@ export default function VaultStatusClient() {
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Used</span>
                     <span className="font-medium">
-                      {totalMintingCapacity && remainingMintingCapacity
-                        ? formatEth(totalMintingCapacity - remainingMintingCapacity)
+                      {totalMintingCapacitySteth && remainingMintingCapacitySteth
+                        ? formatEth(totalMintingCapacitySteth - remainingMintingCapacitySteth)
                         : '0.0000'
-                      } / {totalMintingCapacity ? formatEth(totalMintingCapacity) : '0.0000'} stETH
+                      } / {totalMintingCapacitySteth ? formatEth(totalMintingCapacitySteth) : '0.0000'} stETH
                     </span>
                   </div>
                   <Progress value={capacityUsedPercent} className="h-3" />
                   <div className="flex justify-between text-sm">
                     <span className="text-green-600 font-medium">
-                      {remainingMintingCapacity ? formatEth(remainingMintingCapacity) : '0.0000'} stETH available to mint
+                      {remainingMintingCapacitySteth ? formatEth(remainingMintingCapacitySteth) : '0.0000'} stETH available to mint
                     </span>
                     <span className="text-muted-foreground">
                       {capacityUsedPercent.toFixed(1)}% used
@@ -3390,17 +3426,17 @@ export default function VaultStatusClient() {
 
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Current stETH Minted</span>
-                          <span className="font-mono">{liabilityShares ? formatEth(liabilityShares) : '0.0000'} stETH</span>
+                          <span className="font-mono">{liabilitySteth ? formatEth(liabilitySteth) : '0.0000'} stETH</span>
                         </div>
 
                         <div className="flex justify-between">
                           <span className="text-muted-foreground">Total Minting Capacity</span>
-                          <span className="font-mono">{totalMintingCapacity ? formatEth(totalMintingCapacity) : '0.0000'} stETH</span>
+                          <span className="font-mono">{totalMintingCapacitySteth ? formatEth(totalMintingCapacitySteth) : '0.0000'} stETH</span>
                         </div>
 
                         <div className="flex justify-between font-medium text-green-600">
                           <span>Remaining Capacity</span>
-                          <span className="font-mono">{remainingMintingCapacity ? formatEth(remainingMintingCapacity) : '0.0000'} stETH</span>
+                          <span className="font-mono">{remainingMintingCapacitySteth ? formatEth(remainingMintingCapacitySteth) : '0.0000'} stETH</span>
                         </div>
                       </div>
 

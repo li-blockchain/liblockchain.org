@@ -1,6 +1,18 @@
 // Dashboard contract configuration and ABI
 // Based on mainnet implementation: 0x294825c2764c7D412dc32d87E2242c4f1D989AF3
 
+// stETH ABI for share-to-stETH conversion
+// Used to convert liabilityShares (internal accounting) to actual stETH amounts
+export const STETH_ABI = [
+  {
+    type: 'function',
+    name: 'getPooledEthByShares',
+    inputs: [{ name: '_sharesAmount', type: 'uint256', internalType: 'uint256' }],
+    outputs: [{ name: '', type: 'uint256', internalType: 'uint256' }],
+    stateMutability: 'view',
+  },
+] as const
+
 export const DASHBOARD_ABI = [
   // ============ ERRORS ============
   { inputs: [], name: 'AbnormallyHighFee', type: 'error' },
