@@ -128,11 +128,9 @@ export default function VaultSidebar({ className = '' }: VaultSidebarProps) {
                     Visit our{' '}
                     <a
                       href="/insights"
-                      target="_blank"
-                      rel="noopener noreferrer"
                       className="text-brand-cyan-600 hover:text-brand-cyan-700 font-medium"
                     >
-                      documentation
+                      Insights
                     </a>
                   </p>
                 </div>

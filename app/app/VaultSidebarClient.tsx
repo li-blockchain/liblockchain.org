@@ -82,11 +82,9 @@ export default function VaultSidebarClient() {
                 Visit our{' '}
                 <a
                   href="/insights"
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="font-medium text-brand-cyan-600 hover:text-brand-cyan-700 hover:underline"
                 >
-                  documentation
+                  Insights
                 </a>
               </p>
             </div>
