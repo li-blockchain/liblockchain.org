@@ -121,9 +121,10 @@ async function handler(req, res) {
   const diagnostics = { discord, notion };
 
   // The lead is captured as long as it reached at least one destination.
+  // Failure details are logged server-side only, never returned to the client.
   if (!discord.ok && !notion.ok) {
     console.error('Lead capture failed on all destinations:', diagnostics);
-    return res.status(502).json({ error: 'Failed to save contact submission', diagnostics });
+    return res.status(502).json({ error: 'Failed to save contact submission' });
   }
 
   if (!discord.ok || !notion.ok) {
@@ -131,6 +132,6 @@ async function handler(req, res) {
     console.warn('Lead captured with a degraded destination:', diagnostics);
   }
 
-  res.status(200).json({ status: 'success', diagnostics });
+  res.status(200).json({ status: 'success' });
 }
 export default handler;
