@@ -5,9 +5,15 @@ export const config = {
   },
 };
 
+// Each integration returns { ok, detail } instead of throwing, so a failure in
+// one destination never prevents the other from running or short-circuits the
+// whole submission. `detail` is a short, non-sensitive reason for logs/diagnostics.
 async function postToDiscord(message) {
   const webhookUrl = process.env.DISCORD_LEAD_CHANNEL;
-  
+  if (!webhookUrl) {
+    return { ok: false, detail: 'DISCORD_LEAD_CHANNEL not configured' };
+  }
+
   try {
     const response = await fetch(webhookUrl, {
       method: 'POST',
@@ -20,19 +26,28 @@ async function postToDiscord(message) {
     });
 
     if (!response.ok) {
-      throw new Error(`Discord API error: ${response.status}`);
+      const body = await response.text().catch(() => '');
+      console.error('Discord webhook error:', response.status, body);
+      return { ok: false, detail: `Discord HTTP ${response.status}` };
     }
 
-    return true;
+    return { ok: true };
   } catch (error) {
     console.error('Error posting to Discord:', error);
-    return false;
+    return { ok: false, detail: `Discord request failed: ${error.message}` };
   }
 }
 
 async function postToNotion(data) {
   const NOTION_API_KEY = process.env.NOTION_API_KEY;
   const NOTION_DATABASE_ID = process.env.NOTION_DATABASE_ID;
+  if (!NOTION_API_KEY || !NOTION_DATABASE_ID) {
+    return { ok: false, detail: 'NOTION_API_KEY / NOTION_DATABASE_ID not configured' };
+  }
+
+  const email = data.properties?.Email?.email || '';
+  const services = data.properties?.['Services interested in']?.multi_select || [];
+  const servicesText = services.map(s => s.name).join(', ');
 
   try {
     const response = await fetch(`https://api.notion.com/v1/pages`, {
@@ -50,14 +65,14 @@ async function postToNotion(data) {
         properties: {
           "Email": {
             type: "email",
-            email: data.properties.Email.email
+            email
           },
           "Project description": {
             type: "rich_text",
             rich_text: [{
               type: "text",
               text: {
-                content: data.properties["Services interested in"].multi_select[0].name
+                content: servicesText
               }
             }]
           }
@@ -66,15 +81,15 @@ async function postToNotion(data) {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Notion API error details:', errorData);
-      throw new Error(`Notion API error: ${response.status}`);
+      const errorData = await response.json().catch(() => ({}));
+      console.error('Notion API error details:', response.status, errorData);
+      return { ok: false, detail: `Notion HTTP ${response.status}: ${errorData.message || 'unknown'}` };
     }
 
-    return true;
+    return { ok: true };
   } catch (error) {
     console.error('Error posting to Notion:', error);
-    return false;
+    return { ok: false, detail: `Notion request failed: ${error.message}` };
   }
 }
 
@@ -84,36 +99,38 @@ async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  try {
-    const { data } = req.body;
-    const { properties } = data;
-    
-    // Format the properties into a readable message
-    const email = properties.Email?.email || 'No email provided';
-    const services = properties['Services interested in']?.multi_select || [];
-    const servicesText = services.length > 0 
-      ? services.map(s => s.name).join(', ')
-      : 'No services selected';
-
-    const message = `🚨 New Contact Form Submission 🚨 \nEmail: ${email}\nServices Interested In: ${servicesText}`;
-    
-    const discordSuccess = await postToDiscord(message);
-    const notionSuccess = await postToNotion(data);
-
-    if (!discordSuccess || !notionSuccess) {
-      console.error('Failed to post to services:', {
-        discord: discordSuccess,
-        notion: notionSuccess
-      });
-      return res.status(500).json({ 
-        error: 'Failed to save contact submission'
-      });
-    }
-
-    res.status(200).json({ status: 'success' });
-  } catch (error) {
-    console.error('Error processing request:', error);
-    res.status(500).json({ error: 'Failed to process request' });
+  const properties = req.body?.data?.properties;
+  const email = properties?.Email?.email;
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
   }
+
+  const services = properties['Services interested in']?.multi_select || [];
+  const servicesText = services.length > 0
+    ? services.map(s => s.name).join(', ')
+    : 'No services selected';
+
+  const message = `🚨 New Contact Form Submission 🚨 \nEmail: ${email}\nServices Interested In: ${servicesText}`;
+
+  // Run both destinations independently — a failure in one must not block the other.
+  const [discord, notion] = await Promise.all([
+    postToDiscord(message),
+    postToNotion(req.body.data),
+  ]);
+
+  const diagnostics = { discord, notion };
+
+  // The lead is captured as long as it reached at least one destination.
+  if (!discord.ok && !notion.ok) {
+    console.error('Lead capture failed on all destinations:', diagnostics);
+    return res.status(502).json({ error: 'Failed to save contact submission', diagnostics });
+  }
+
+  if (!discord.ok || !notion.ok) {
+    // Partial success — lead is safe, but flag the degraded destination in logs.
+    console.warn('Lead captured with a degraded destination:', diagnostics);
+  }
+
+  res.status(200).json({ status: 'success', diagnostics });
 }
 export default handler;
