@@ -123,12 +123,9 @@ export default function NavigationClient({ showConnectWallet = true }: Navigatio
                         <Link href="/#about" className="px-4 py-2 text-brand-slate-600 hover:text-brand-cyan-600 font-medium transition-colors">
                             About
                         </Link>
-                        <a href="https://mirror.xyz/0x372051ff945eD07b8073872C7B77C9E84e000e06" target="_blank" rel="noopener noreferrer" className="px-4 py-2 text-brand-slate-600 hover:text-brand-purple-600 font-medium transition-colors">
-                            Blog
-                        </a>
-                        <a href="https://www.youtube.com/c/LongIslandBlockchain" target="_blank" rel="noopener noreferrer" className="px-4 py-2 text-brand-slate-600 hover:text-brand-purple-600 font-medium transition-colors">
-                            Learn
-                        </a>
+                        <Link href="/insights" className="px-4 py-2 text-brand-slate-600 hover:text-brand-purple-600 font-medium transition-colors">
+                            Insights
+                        </Link>
                     </div>
 
                     {/* CTA Button */}
@@ -191,12 +188,9 @@ export default function NavigationClient({ showConnectWallet = true }: Navigatio
                         <Link href="/#about" className="block px-4 py-3 text-brand-slate-600 hover:text-brand-cyan-600 hover:bg-brand-slate-50 rounded-lg transition-colors">
                             About
                         </Link>
-                        <a href="https://mirror.xyz/0x372051ff945eD07b8073872C7B77C9E84e000e06" target="_blank" rel="noopener noreferrer" className="block px-4 py-3 text-brand-slate-600 hover:text-brand-purple-600 hover:bg-brand-slate-50 rounded-lg transition-colors">
-                            Blog
-                        </a>
-                        <a href="https://www.youtube.com/c/LongIslandBlockchain" target="_blank" rel="noopener noreferrer" className="block px-4 py-3 text-brand-slate-600 hover:text-brand-purple-600 hover:bg-brand-slate-50 rounded-lg transition-colors">
-                            Learn
-                        </a>
+                        <Link href="/insights" className="block px-4 py-3 text-brand-slate-600 hover:text-brand-purple-600 hover:bg-brand-slate-50 rounded-lg transition-colors">
+                            Insights
+                        </Link>
                         <div className="pt-4">
                             {showConnectWallet ? (
                                 <div className="flex justify-center connect-wallet-custom">

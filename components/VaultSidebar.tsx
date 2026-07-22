@@ -127,7 +127,7 @@ export default function VaultSidebar({ className = '' }: VaultSidebarProps) {
                   <p className="text-xs text-brand-slate-600">
                     Visit our{' '}
                     <a
-                      href="https://mirror.xyz/0x372051ff945eD07b8073872C7B77C9E84e000e06"
+                      href="/insights"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-brand-cyan-600 hover:text-brand-cyan-700 font-medium"

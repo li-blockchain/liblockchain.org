@@ -292,7 +292,7 @@ export default function InsightsIndex({ entries }: InsightsIndexProps) {
             Have Questions About Staking?
           </h2>
           <p className="text-xl text-white/90 mb-8 leading-relaxed">
-            Our team has been operating Ethereum validators since 2016. Let&apos;s talk about your
+            Our team has been operating Ethereum validators since 2020. Let&apos;s talk about your
             staking strategy.
           </p>
           <Link

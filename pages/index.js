@@ -302,8 +302,8 @@ export default function Home() {
             <div>
               <h4 className="text-brand-slate-900 font-semibold mb-4">Resources</h4>
               <ul className="space-y-2">
-                <li><a href="https://mirror.xyz/0x372051ff945eD07b8073872C7B77C9E84e000e06" target="_blank" rel="noopener noreferrer" className="text-brand-slate-600 hover:text-brand-cyan-600 transition-colors">Blog</a></li>
-                <li><a href="https://www.youtube.com/c/LongIslandBlockchain" target="_blank" rel="noopener noreferrer" className="text-brand-slate-600 hover:text-brand-purple-600 transition-colors">Learn</a></li>
+                <li><a href="/insights" className="text-brand-slate-600 hover:text-brand-cyan-600 transition-colors">Insights</a></li>
+                <li><a href="https://www.youtube.com/c/LongIslandBlockchain" target="_blank" rel="noopener noreferrer" className="text-brand-slate-600 hover:text-brand-purple-600 transition-colors">YouTube</a></li>
                 <li><a href="/privacy" className="text-brand-slate-600 hover:text-brand-cyan-600 transition-colors">Privacy Policy</a></li>
               </ul>
             </div>
