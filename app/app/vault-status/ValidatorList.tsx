@@ -11,7 +11,7 @@ import {
   getStatusLabel,
   canTopUp,
   type ValidatorInfo,
-} from '../../../lib/utils/beaconchain'
+} from '../../../lib/utils/validators'
 import { PDG_ABI, getPDGAddress, parsePDGError, ValidatorStage, VALIDATOR_STAGE_LABELS } from '../../../lib/contracts/pdg'
 
 // shadcn components
@@ -155,7 +155,7 @@ function TopUpValidatorDialog({
   }
 
   const displayError = localError || (writeError ? parsePDGError(writeError) : null)
-  const currentBalanceEth = Number(validator.effectiveBalance) / 1e9
+  const currentBalanceEth = Number(validator.effectiveBalance ?? validator.balance) / 1e9
   const newBalanceEth = amount ? currentBalanceEth + parseFloat(amount) : currentBalanceEth
 
   // Get explorer URL for transaction
@@ -361,10 +361,10 @@ function ValidatorRow({
   // Get explorer URL for validator
   const getValidatorUrl = () => {
     if (chainId === 1) {
-      return `https://beaconcha.in/validator/${validator.index}`
+      return `https://beaconscan.com/validator/${validator.index}`
     }
     if (chainId === 560048) {
-      return `https://hoodi.beaconcha.in/validator/${validator.index}`
+      return `https://dora.hoodi.ethpandaops.io/validator/${validator.index}`
     }
     return null
   }
@@ -433,9 +433,11 @@ function ValidatorRow({
             <TooltipTrigger asChild>
               <div className="text-right min-w-[90px]">
                 <p className="text-sm font-medium text-gray-900">
-                  {gweiToEthString(validator.effectiveBalance)} ETH
+                  {gweiToEthString(validator.effectiveBalance ?? validator.balance)} ETH
                 </p>
-                <p className="text-xs text-gray-500">Effective</p>
+                <p className="text-xs text-gray-500">
+                  {validator.effectiveBalance != null ? 'Effective' : 'Balance'}
+                </p>
               </div>
             </TooltipTrigger>
             <TooltipContent>
@@ -505,7 +507,7 @@ export default function ValidatorList({ vaultAddress, dashboardAddress, isLoadin
     try {
       const result = await fetchVaultValidators(vaultAddress, chainId)
       if (result === null) {
-        setError(`Beacon chain API not configured for chain ID ${chainId}`)
+        setError(`Validator data is not available for chain ID ${chainId}`)
       } else {
         setValidators(result)
       }

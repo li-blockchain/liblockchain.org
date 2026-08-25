@@ -1,31 +1,19 @@
 /**
- * Beacon Chain API Utilities
+ * Validator Utilities
  *
- * Fetches validator data from beacon chain explorers/nodes based on withdrawal credentials.
- * Supports mainnet (via beaconcha.in) and Hoodi testnet (via configurable endpoint).
+ * Fetches validator data for a staking vault via the server-side proxy at
+ * /api/beacon/validators, which sources discovery from Lido's stVaults Keys API and
+ * hydrates effective balance from a beacon node.
  */
 
-// Beacon chain API configuration per network
-function getBeaconApiConfig(chainId: number): { baseUrl: string; type: 'beaconchain' | 'beacon_node' } | null {
-  switch (chainId) {
-    case 1:
-      // Mainnet - beaconcha.in
-      return {
-        baseUrl: 'https://beaconcha.in',
-        type: 'beaconchain',
-      }
-    case 560048:
-      // Hoodi testnet
-      return {
-        baseUrl: process.env.NEXT_PUBLIC_HOODI_BEACON_API_URL || 'https://hoodi.beaconcha.in',
-        type: 'beaconchain',
-      }
-    default:
-      return null
-  }
+// Networks with a Lido stVaults Keys API deployment
+const SUPPORTED_CHAIN_IDS = [1, 560048]
+
+export function isSupportedChain(chainId: number): boolean {
+  return SUPPORTED_CHAIN_IDS.includes(chainId)
 }
 
-// Validator status as returned by beacon chain
+// Validator status as returned by the consensus layer
 export type ValidatorStatus =
   | 'pending_initialized'
   | 'pending_queued'
@@ -46,7 +34,7 @@ export interface ValidatorInfo {
   index: number
   status: ValidatorStatus
   displayStatus: ValidatorDisplayStatus
-  effectiveBalance: bigint // in Gwei
+  effectiveBalance: bigint | null // in Gwei; null when hydration was unavailable
   balance: bigint // in Gwei
   activationEpoch: number | null
   exitEpoch: number | null
@@ -54,24 +42,26 @@ export interface ValidatorInfo {
   slashed: boolean
 }
 
-// Response from beaconcha.in API
-interface BeaconchainValidatorResponse {
-  status: string
-  data: BeaconchainValidator | BeaconchainValidator[]
+// Response from our /api/beacon/validators proxy
+interface ValidatorsApiResponse {
+  data: ApiValidator[]
 }
 
-interface BeaconchainValidator {
-  pubkey?: string
-  publickey?: string // API sometimes returns this instead of pubkey
-  validatorindex: number
-  status?: string
-  effectivebalance?: number
-  balance?: number
-  activationepoch?: number
-  exitepoch?: number
-  withdrawableepoch?: number
-  slashed?: boolean
+interface ApiValidator {
+  index: number
+  pubkey: string
+  status: string
+  balance: string
+  effectiveBalance: string | null
+  activationEpoch: string | null
+  exitEpoch: string | null
+  withdrawableEpoch: string | null
+  slashed: boolean
 }
+
+// The consensus layer uses this to mean "never" for exit/withdrawable epochs.
+// It exceeds Number.MAX_SAFE_INTEGER, so it must be compared as a string or BigInt.
+const FAR_FUTURE_EPOCH = '18446744073709551615'
 
 /**
  * Maps raw validator status to a simplified display status
@@ -158,80 +148,63 @@ export function formatPubkeyDisplay(pubkey: string): string {
 }
 
 /**
- * Fetches validators associated with a vault address from the beacon chain
+ * Parses an epoch that may carry the far-future sentinel meaning "never"
+ */
+function parseEpoch(epoch: string | null): number | null {
+  if (!epoch || epoch === FAR_FUTURE_EPOCH) return null
+  const parsed = Number(epoch)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null
+}
+
+/**
+ * Fetches validators associated with a vault address
  * Uses a server-side API proxy to avoid CORS issues
  * @param vaultAddress The staking vault address
  * @param chainId The chain ID (1 for mainnet, 560048 for hoodi)
- * @returns Array of validator info or null if fetch fails
+ * @returns Array of validator info, or null if the chain is unsupported
  */
 export async function fetchVaultValidators(
   vaultAddress: string,
   chainId: number
 ): Promise<ValidatorInfo[] | null> {
-  console.log(`[BeaconChain] Fetching validators for vault ${vaultAddress} on chain ${chainId}`)
-
-  // Validate chain is supported
-  const config = getBeaconApiConfig(chainId)
-  if (!config) {
-    console.warn(`[BeaconChain] No beacon API configured for chain ${chainId}`)
+  if (!isSupportedChain(chainId)) {
+    console.warn(`[Validators] No validator API configured for chain ${chainId}`)
     return null
   }
 
-  const withdrawalCredentials = vaultAddressToWithdrawalCredentials(vaultAddress)
-  console.log(`[BeaconChain] Withdrawal credentials: ${withdrawalCredentials}`)
+  const proxyUrl = `/api/beacon/validators?chainId=${chainId}&vaultAddress=${encodeURIComponent(vaultAddress)}`
+  const response = await fetch(proxyUrl)
 
-  try {
-    // Use our API proxy to avoid CORS issues
-    const proxyUrl = `/api/beacon/validators?chainId=${chainId}&withdrawalCredentials=${encodeURIComponent(withdrawalCredentials)}`
-    console.log(`[BeaconChain] Calling proxy: ${proxyUrl}`)
-
-    const response = await fetch(proxyUrl)
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}))
-      throw new Error(errorData.error || `API error: ${response.status}`)
-    }
-
-    const data: BeaconchainValidatorResponse = await response.json()
-    return parseBeaconchainResponse(data)
-  } catch (error) {
-    console.error('[BeaconChain] Failed to fetch validators:', error)
-    throw error
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}))
+    throw new Error(errorData.error || `API error: ${response.status}`)
   }
+
+  const data: ValidatorsApiResponse = await response.json()
+  return parseValidatorsResponse(data)
 }
 
 /**
- * Parses the beaconcha.in API response into ValidatorInfo array
+ * Parses the proxy response into a ValidatorInfo array
  */
-function parseBeaconchainResponse(data: BeaconchainValidatorResponse): ValidatorInfo[] {
-  console.log('[BeaconChain] Parsing response:', JSON.stringify(data, null, 2))
+function parseValidatorsResponse(data: ValidatorsApiResponse): ValidatorInfo[] {
+  if (!data || !Array.isArray(data.data)) return []
 
-  if (!data || data.status !== 'OK' || !data.data) {
-    console.log('[BeaconChain] No valid data in response')
-    return []
-  }
-
-  // API returns single object or array
-  const validators = Array.isArray(data.data) ? data.data : [data.data]
-  console.log(`[BeaconChain] Found ${validators.length} validators`)
-
-  return validators
-    .filter((v) => v && (v.pubkey || v.publickey)) // Filter out invalid entries
+  return data.data
+    .filter((v) => v && v.pubkey)
     .map((v) => {
       const status = (v.status || 'pending_initialized') as ValidatorStatus
-      // Handle both 'pubkey' and 'publickey' field names
-      const pubkeyRaw = v.pubkey || v.publickey || ''
-      const pubkey = pubkeyRaw.startsWith('0x') ? pubkeyRaw : `0x${pubkeyRaw}`
+      const pubkey = v.pubkey.startsWith('0x') ? v.pubkey : `0x${v.pubkey}`
       return {
         pubkey,
-        index: v.validatorindex || 0,
+        index: v.index ?? 0,
         status,
         displayStatus: mapToDisplayStatus(status),
-        effectiveBalance: BigInt(v.effectivebalance || 0),
+        effectiveBalance: v.effectiveBalance != null ? BigInt(v.effectiveBalance) : null,
         balance: BigInt(v.balance || 0),
-        activationEpoch: v.activationepoch && v.activationepoch > 0 ? v.activationepoch : null,
-        exitEpoch: v.exitepoch && v.exitepoch < 18446744073709551615 ? v.exitepoch : null,
-        withdrawableEpoch: v.withdrawableepoch && v.withdrawableepoch < 18446744073709551615 ? v.withdrawableepoch : null,
+        activationEpoch: parseEpoch(v.activationEpoch),
+        exitEpoch: parseEpoch(v.exitEpoch),
+        withdrawableEpoch: parseEpoch(v.withdrawableEpoch),
         slashed: v.slashed || false,
       }
     })
