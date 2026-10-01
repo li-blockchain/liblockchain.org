@@ -1,8 +1,12 @@
 import PageMeta from '../components/PageMeta'
+import { serviceJsonLd } from '../lib/site'
 import { useState } from 'react'
 import Navigation from '../components/Navigation'
 import ContactForm from '../components/ContactForm'
 import Link from 'next/link'
+
+const description =
+  'Enterprise Ethereum validator infrastructure for institutions. Custom branded staking solutions with SOC-2 compliance and top 5% performance.'
 
 export default function InstitutionalStaking() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
@@ -11,8 +15,14 @@ export default function InstitutionalStaking() {
     <>
       <PageMeta
         title="Whitelabel Validators & Institutional Staking - Long Island Blockchain"
-        description="Enterprise Ethereum validator infrastructure for institutions. Custom branded staking solutions with SOC-2 compliance and top 5% performance."
+        description={description}
         path="/institutional-staking"
+        jsonLd={serviceJsonLd({
+          name: 'Whitelabel Validators & Institutional Staking',
+          description,
+          path: '/institutional-staking',
+          serviceType: 'Ethereum staking',
+        })}
       />
 
       <Navigation onContactClick={() => setIsContactModalOpen(true)} />

@@ -1,4 +1,5 @@
 import PageMeta from '../components/PageMeta'
+import { serviceJsonLd } from '../lib/site'
 import Hamburger from 'hamburger-react'
 import styles from '../styles/Home.module.css'
 import ContractForm from '../components/ContactForm'
@@ -6,6 +7,9 @@ import Link from 'next/link'
 import { useState } from 'react'
 import StakingFeature from '../components/StakingFeature'
 import Navigation from '../components/Navigation'
+
+const description =
+  'Ethereum Staking and Rocketpool node operator services.'
 
 export default function Home() {
   // Mobile menu state.
@@ -15,8 +19,14 @@ export default function Home() {
     <>
       <PageMeta
         title="Long Island Blockchain - Non-Custodial Ethereum Staking Services"
-        description="Ethereum Staking and Rocketpool node operator services."
+        description={description}
         path="/eth-staking"
+        jsonLd={serviceJsonLd({
+          name: 'Non-Custodial Ethereum Staking',
+          description,
+          path: '/eth-staking',
+          serviceType: 'Ethereum staking',
+        })}
       />
 
       <Navigation></Navigation>

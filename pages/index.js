@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import PageMeta from '../components/PageMeta'
-import { SITE_URL, SITE_NAME } from '../lib/site'
+import { organizationJsonLd } from '../lib/site'
 import { useState } from 'react'
 import styles from '../styles/Home.module.css'
 import ContractForm from '../components/ContactForm'
@@ -9,21 +9,6 @@ import Navigation from '../components/Navigation'
 import StatsSection from '../components/StatsSection'
 import NetworksGrid from '../components/NetworksGrid'
 import TrustIndicators from '../components/TrustIndicators'
-
-const organizationJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: SITE_NAME,
-  alternateName: 'LIBC',
-  url: SITE_URL,
-  logo: `${SITE_URL}/libc-logo.png`,
-  foundingDate: '2016',
-  sameAs: [
-    'https://www.youtube.com/c/LongIslandBlockchain',
-    'https://x.com/0xlibc',
-    'https://github.com/li-blockchain',
-  ],
-}
 
 export default function Home() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
@@ -34,12 +19,9 @@ export default function Home() {
         title="Long Island Blockchain - White Label Ethereum Validators"
         description="Enterprise Ethereum validator infrastructure for institutions. $100M+ staked, top 5% performance. Supporting Lido, Rocketpool, and native staking from our SOC-2 datacenter since 2016."
         path="/"
+        jsonLd={organizationJsonLd}
       />
       <Head>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
-        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />

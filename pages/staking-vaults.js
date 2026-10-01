@@ -1,8 +1,12 @@
 import PageMeta from '../components/PageMeta'
+import { serviceJsonLd } from '../lib/site'
 import { useState } from 'react'
 import Navigation from '../components/Navigation'
 import ContactForm from '../components/ContactForm'
 import Link from 'next/link'
+
+const description =
+  'Expert deployment and operation of Lido v3 stVault infrastructure. Unlock liquidity while staking with institutional-grade vault management and top 5% validator performance.'
 
 export default function StakingVaults() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
@@ -11,8 +15,14 @@ export default function StakingVaults() {
     <>
       <PageMeta
         title="Liquidity-Enabled Staking Vaults - Long Island Blockchain"
-        description="Expert deployment and operation of Lido v3 stVault infrastructure. Unlock liquidity while staking with institutional-grade vault management and top 5% validator performance."
+        description={description}
         path="/staking-vaults"
+        jsonLd={serviceJsonLd({
+          name: 'Liquidity-Enabled Staking Vaults (Lido v3 stVaults)',
+          description,
+          path: '/staking-vaults',
+          serviceType: 'Ethereum staking',
+        })}
       />
 
       <Navigation onContactClick={() => setIsContactModalOpen(true)} />

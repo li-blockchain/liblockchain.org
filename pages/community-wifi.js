@@ -1,14 +1,24 @@
 import PageMeta from '../components/PageMeta'
+import { serviceJsonLd } from '../lib/site'
 import Navigation from '../components/Navigation'
 import EmbeddedContactForm from '../components/EmbeddedContactForm'
+
+const description =
+  "Join Long Island's community-driven WiFi network. Monetize your WiFi and provide better connectivity to your customers."
 
 export default function CommunityWifi() {
   return (
     <>
       <PageMeta
         title="Community WiFi Network - Long Island Blockchain"
-        description="Join Long Island's community-driven WiFi network. Monetize your WiFi and provide better connectivity to your customers."
+        description={description}
         path="/community-wifi"
+        jsonLd={serviceJsonLd({
+          name: 'Community WiFi Network',
+          description,
+          path: '/community-wifi',
+          serviceType: 'Wireless network services',
+        })}
       />
 
       <Navigation></Navigation>
