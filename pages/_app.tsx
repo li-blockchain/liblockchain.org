@@ -7,6 +7,7 @@ import { RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { WagmiProvider } from 'wagmi'
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query'
 import { config } from '../lib/wagmi'
+import { SITE_URL, SITE_NAME } from '../lib/site'
 
 const queryClient = new QueryClient()
 
@@ -26,8 +27,13 @@ export default function App({ Component, pageProps }: AppProps) {
         `}
     </Script>
     <Head>
-        <title>Welcome!</title>
+        <title>{SITE_NAME}</title>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
+        <meta property="og:site_name" content={SITE_NAME} />
+        <meta property="og:type" content="website" key="og:type" />
+        <meta property="og:image" content={`${SITE_URL}/libc-logo.png`} key="og:image" />
+        <meta name="twitter:card" content="summary" key="twitter:card" />
+        <meta name="twitter:site" content="@0xlibc" />
     </Head>
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>

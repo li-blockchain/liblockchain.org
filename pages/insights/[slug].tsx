@@ -34,12 +34,12 @@ export default function ArticlePage({ post }: ArticlePageProps) {
     <>
       <Head>
         <title>{`${post.title} - Long Island Blockchain`}</title>
-        <meta name="description" content={post.description} />
+        <meta name="description" content={post.description} key="description" />
         <link rel="canonical" href={postUrl} key="canonical" />
-        <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.description} />
-        <meta property="og:type" content="article" />
-        <meta property="og:url" content={postUrl} />
+        <meta property="og:title" content={post.title} key="og:title" />
+        <meta property="og:description" content={post.description} key="og:description" />
+        <meta property="og:type" content="article" key="og:type" />
+        <meta property="og:url" content={postUrl} key="og:url" />
         <meta property="article:published_time" content={post.date} />
         <script
           type="application/ld+json"

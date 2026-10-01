@@ -1,19 +1,15 @@
-import Head from 'next/head'
+import PageMeta from '../components/PageMeta'
 import Navigation from '../components/Navigation'
 import EmbeddedContactForm from '../components/EmbeddedContactForm'
 
 export default function CommunityWifi() {
   return (
     <>
-      <Head>
-        <title>Community WiFi Network - Long Island Blockchain</title>
-        <meta name="description" content="Join Long Island's community-driven WiFi network. Monetize your WiFi and provide better connectivity to your customers." />
-        <link
-          rel="canonical"
-          href="https://liblockchain.xyz/community-wifi"
-          key="canonical"
-        />
-      </Head>
+      <PageMeta
+        title="Community WiFi Network - Long Island Blockchain"
+        description="Join Long Island's community-driven WiFi network. Monetize your WiFi and provide better connectivity to your customers."
+        path="/community-wifi"
+      />
 
       <Navigation></Navigation>
 
@@ -160,9 +156,7 @@ export default function CommunityWifi() {
 
       <footer className="flex items-center justify-center p-8 bg-white border-t">
         <a
-          href="https://liblockchain.xyz"
-          target="_blank"
-          rel="noopener noreferrer"
+          href="/"
           className="flex items-center"
         >
           <img className="w-40" alt="Long Island Blockchain Logo" src="/libc-logo.png"/>

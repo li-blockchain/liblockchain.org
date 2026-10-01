@@ -1,5 +1,5 @@
-//robots.txt
-
-# Allow all crawlers
 User-agent: *
 Allow: /
+Disallow: /api/
+
+Sitemap: https://libc.fi/sitemap.xml

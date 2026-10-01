@@ -7,6 +7,8 @@ export const metadata: Metadata = {
     default: 'Vault Manager | Long Island Blockchain',
   },
   description: 'Manage your private Ethereum staking vaults',
+  // Wallet-gated app screens: keep them out of search results
+  robots: { index: false, follow: false },
 }
 
 export default function VaultLayout({

@@ -3,7 +3,7 @@ import path from 'path'
 import matter from 'gray-matter'
 import { marked } from 'marked'
 
-export const SITE_URL = 'https://libc.fi'
+export { SITE_URL } from './site'
 
 const CONTENT_DIR = path.join(process.cwd(), 'content', 'insights')
 

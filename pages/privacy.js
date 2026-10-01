@@ -1,19 +1,15 @@
-import Head from 'next/head'
+import PageMeta from '../components/PageMeta'
 import styles from '../styles/Home.module.css'
 import Navigation from '../components/Navigation'
 
 export default function Privacy() {
   return (
     <>
-      <Head>
-        <title>Privacy Policy - Long Island Blockchain</title>
-        <meta name="description" content="Privacy Policy for LI Blockchain LLC mobile application and wallet services." />
-        <link
-          rel="canonical"
-          href="https://liblockchain.xyz/privacy"
-          key="canonical"
-        />
-      </Head>
+      <PageMeta
+        title="Privacy Policy - Long Island Blockchain"
+        description="Privacy Policy for LI Blockchain LLC mobile application and wallet services."
+        path="/privacy"
+      />
 
       <Navigation></Navigation>
 
@@ -74,9 +70,7 @@ export default function Privacy() {
 
       <footer className={styles.footer}>
         <a
-          href="https://liblockchain.xyz"
-          target="_blank"
-          rel="noopener noreferrer"
+          href="/"
         >
           <span className={styles.logo}>
             <img className="w-40" alt="Long Island Blockchain Logo" src="/libc-logo.png" />

@@ -1,4 +1,4 @@
-import Head from 'next/head'
+import PageMeta from '../components/PageMeta'
 import { useState } from 'react'
 import Navigation from '../components/Navigation'
 import ContactForm from '../components/ContactForm'
@@ -9,15 +9,11 @@ export default function InstitutionalStaking() {
 
   return (
     <>
-      <Head>
-        <title>Whitelabel Validators & Institutional Staking - Long Island Blockchain</title>
-        <meta name="description" content="Enterprise Ethereum validator infrastructure for institutions. Custom branded staking solutions with SOC-2 compliance and top 5% performance." />
-        <link
-          rel="canonical"
-          href="https://liblockchain.xyz/institutional-staking"
-          key="canonical"
-        />
-      </Head>
+      <PageMeta
+        title="Whitelabel Validators & Institutional Staking - Long Island Blockchain"
+        description="Enterprise Ethereum validator infrastructure for institutions. Custom branded staking solutions with SOC-2 compliance and top 5% performance."
+        path="/institutional-staking"
+      />
 
       <Navigation onContactClick={() => setIsContactModalOpen(true)} />
 

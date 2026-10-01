@@ -1,4 +1,4 @@
-import Head from 'next/head'
+import PageMeta from '../components/PageMeta'
 import Hamburger from 'hamburger-react'
 import styles from '../styles/Home.module.css'
 import ContractForm from '../components/ContactForm'
@@ -13,15 +13,11 @@ export default function Home() {
 
   return (
     <>
-      <Head>
-        <title>Long Island Blockchain - Non-Custodial Ethereum Staking Services</title>
-        <meta name="description" content="Ethereum Staking and Rocketpool node operator services." />
-        <link
-          rel="canonical"
-          href="https://liblockchain.xyz/eth-staking"
-          key="canonical"
-        />
-      </Head>
+      <PageMeta
+        title="Long Island Blockchain - Non-Custodial Ethereum Staking Services"
+        description="Ethereum Staking and Rocketpool node operator services."
+        path="/eth-staking"
+      />
 
       <Navigation></Navigation>
 
@@ -57,9 +53,7 @@ export default function Home() {
      
       <footer className={styles.footer}>
         <a
-          href="https://liblockchain.xyz"
-          target="_blank"
-          rel="noopener noreferrer"
+          href="/"
         >
           <span className={styles.logo}>
             <img className="w-40" alt="Long Island Blockchain Logo" src="/libc-logo.png"/>

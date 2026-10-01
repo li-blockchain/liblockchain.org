@@ -196,15 +196,17 @@ export default function InsightsIndex({ entries }: InsightsIndexProps) {
         <meta
           name="description"
           content="Articles and videos on Ethereum staking, Lido v3 stVaults, validator operations, and crypto custody from the Long Island Blockchain team."
+          key="description"
         />
         <link rel="canonical" href={`${SITE_URL}/insights`} key="canonical" />
-        <meta property="og:title" content="Insights - Long Island Blockchain" />
+        <meta property="og:title" content="Insights - Long Island Blockchain" key="og:title" />
         <meta
           property="og:description"
           content="Articles and videos on Ethereum staking, Lido v3 stVaults, validator operations, and crypto custody."
+          key="og:description"
         />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content={`${SITE_URL}/insights`} />
+        <meta property="og:type" content="website" key="og:type" />
+        <meta property="og:url" content={`${SITE_URL}/insights`} key="og:url" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(videoJsonLd) }}

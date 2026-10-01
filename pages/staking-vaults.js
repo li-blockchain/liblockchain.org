@@ -1,4 +1,4 @@
-import Head from 'next/head'
+import PageMeta from '../components/PageMeta'
 import { useState } from 'react'
 import Navigation from '../components/Navigation'
 import ContactForm from '../components/ContactForm'
@@ -9,15 +9,11 @@ export default function StakingVaults() {
 
   return (
     <>
-      <Head>
-        <title>Liquidity-Enabled Staking Vaults - Long Island Blockchain</title>
-        <meta name="description" content="Expert deployment and operation of Lido v3 stVault infrastructure. Unlock liquidity while staking with institutional-grade vault management and top 5% validator performance." />
-        <link
-          rel="canonical"
-          href="https://liblockchain.xyz/staking-vaults"
-          key="canonical"
-        />
-      </Head>
+      <PageMeta
+        title="Liquidity-Enabled Staking Vaults - Long Island Blockchain"
+        description="Expert deployment and operation of Lido v3 stVault infrastructure. Unlock liquidity while staking with institutional-grade vault management and top 5% validator performance."
+        path="/staking-vaults"
+      />
 
       <Navigation onContactClick={() => setIsContactModalOpen(true)} />
 
