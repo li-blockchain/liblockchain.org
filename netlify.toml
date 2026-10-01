@@ -1,0 +1,27 @@
+# Build settings stay in the Netlify UI; this file only carries redirects.
+
+# Legacy domains -> canonical libc.fi. These are domain aliases on the libcfi
+# site; without these rules they serve duplicate copies of the site.
+[[redirects]]
+  from = "https://liblockchain.xyz/*"
+  to = "https://libc.fi/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.liblockchain.xyz/*"
+  to = "https://libc.fi/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://liblockchain.org/*"
+  to = "https://libc.fi/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://www.liblockchain.org/*"
+  to = "https://libc.fi/:splat"
+  status = 301
+  force = true
