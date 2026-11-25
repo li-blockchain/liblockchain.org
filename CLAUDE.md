@@ -18,7 +18,7 @@ Note: This project uses pnpm as the package manager.
 This is a Next.js-based website for Long Island Blockchain (liblockchain.org) with the following structure:
 
 ### Tech Stack
-- **Framework**: Next.js 14 with React 18 and TypeScript
+- **Framework**: Next.js 15 with React 18 and TypeScript (Node 20.18.1, see `.nvmrc`)
 - **Styling**: Tailwind CSS with custom brand colors (cyan, purple, slate)
 - **Web3**: Wagmi v2, Viem, RainbowKit for wallet connections
 - **Data Fetching**: TanStack React Query for async state management
@@ -45,7 +45,13 @@ This is a Next.js-based website for Long Island Blockchain (liblockchain.org) wi
     - `my-vaults/` - View all user's private staking vaults (`/app/my-vaults`)
     - `create-vault/` - Create new private staking vault (`/app/create-vault`)
     - `vault-status/` - View individual vault details (`/app/vault-status`)
+    - Each route is `page.tsx` → `*Loader.tsx` → `*Client.tsx`. The Loader is a Client Component that loads the Client with `ssr: false` (RainbowKit/wagmi need browser APIs); Next 15 only allows `ssr: false` inside a Client Component. Loading skeletons live in the Loader.
+  - `api/vault-report/` - Returns a vault's leaf and Merkle proof from the Lido oracle report (see Oracle Report Flow)
+  - `api/beacon/` - Validator data for the vault status page
+- `hooks/` - React hooks
+  - `use-fresh-report.ts` - Checks and applies the latest oracle report before a vault operation
 - `components/` - Reusable React components
+  - `vault/ReportFreshness.tsx` - Oracle report status banner and in-dialog step notice
   - `Navigation.tsx` - Main navigation with mobile hamburger menu and RainbowKit wallet connection
   - `VaultSidebar.tsx` - Legacy sidebar (pages router version)
   - `ContactForm.jsx` - Contact form component using Formik
@@ -59,9 +65,15 @@ This is a Next.js-based website for Long Island Blockchain (liblockchain.org) wi
   - **`chains.ts`** - Custom blockchain network configurations (Hoodi testnet, local Anvil)
   - **`wagmi.ts`** - Wagmi/RainbowKit configuration
   - **`utils.ts`** - Utility functions (cn for className merging)
+  - **`site.ts`** - `SITE_URL` and site constants; never hardcode a domain in a page
+  - **`insights.ts`** - Loads the markdown Insights posts from `content/insights/`
+  - **`vaultReport.ts`** - Parses the Lido oracle report and builds a vault's Merkle proof
   - **`contracts/`** - Smart contract ABIs and addresses
     - `vaultFactory.ts` - Vault factory contract configuration
     - `dashboard.ts` - Dashboard contract configuration
+    - `stakingVault.ts` - Staking vault contract configuration
+    - `pdg.ts` - PredepositGuarantee, used for validator top-ups
+    - `lazyOracle.ts` - LazyOracle ABI and addresses (mainnet, Hoodi) for report submission
 - `public/` - Static assets (images, logos, etc.)
 
 ### Key Features
@@ -126,6 +138,24 @@ The site includes a private Ethereum staking vault management application that a
   - Events are queried to discover user's vaults
 - **Vault**: Individual staking vault contract
 - **Dashboard**: Vault management and monitoring interface
+
+### Oracle Report Flow
+
+Lido publishes one oracle report for all vaults, but it only takes effect for a vault once someone submits that vault's leaf to LazyOracle (`updateVaultData`, permissionless). Until then some operations revert with `VaultReportStale` and every Dashboard figure comes from the previous report.
+
+- Every operation dialog calls `useFreshReport(dashboardAddress)` and awaits `report.ensureFresh()` at the top of its submit handler. If the report is stale this sends the update transaction first, so the operation becomes transaction 2 of 2.
+- `ensureFresh()` blocks the operation if the update fails. Used where a stale report reverts: mint stETH, withdraw, unguaranteed deposit.
+- `ensureFresh({ required: false })` attempts the update but lets the operation continue. Used where a stale report does not revert: fund, burn stETH, validator top-up.
+- A new operation dialog must pick one of the two. Amounts shown as "max" must be read after the update, because applying a report changes withdrawable value and mint capacity.
+- `/api/vault-report` fetches the report from public IPFS gateways server-side. Its answer is not trusted: the client re-verifies the proof against the on-chain root, and a response is only cached when the report's root matches the requested root.
+
+## Deployment
+
+- Netlify site `libcfi` publishes the **`redesign`** branch to libc.fi. `main` is the default branch and deploys nothing. Keep the two level: after shipping, fast-forward `main` to `redesign`.
+- `bundlePagesRouterDependencies: true` in `next.config.js` must stay. Without it the build passes and local runs work, but every Pages Router page returns 500 on Netlify (`EMFILE`, from loading viem's chain files one by one).
+- Framework or wallet-library updates (next, wagmi, viem, RainbowKit) go through a PR against `redesign` and are checked on the Netlify deploy preview. A passing local build is not evidence.
+- `next.config.js` sends `frame-ancestors 'self'` and `X-Frame-Options: SAMEORIGIN` on every path, so the app cannot be embedded in another site.
+- The favicon set in `public/` is generated from `public/libc-logo.png` by `scripts/favicon.sh` (needs ImageMagick 7).
 
 ### Known Issues
 
