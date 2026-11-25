@@ -2,6 +2,24 @@
 const nextConfig = {
   reactStrictMode: true,
   productionBrowserSourceMaps: false,
+  poweredByHeader: false,
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          // The app prompts wallet transactions, so it must never render inside
+          // another site's frame (clickjacking). Relax frame-ancestors only if
+          // the app is deliberately listed as a Safe App.
+          { key: 'Content-Security-Policy', value: "frame-ancestors 'self'" },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [
       { source: '/blog', destination: '/insights', permanent: true },
@@ -26,6 +44,19 @@ const nextConfig = {
     if (!dev) {
       config.devtool = false;
     }
+
+    // @coinbase/cdp-sdk (pulled in by wagmi's Base Account connector) imports its
+    // optional x402 payment peers unconditionally. They are not installed and the
+    // payment path is unused here, so resolve them to empty modules.
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@x402/core': false,
+      '@x402/evm': false,
+      '@x402/svm': false,
+      '@x402/extensions': false,
+      '@x402/express': false,
+      '@x402/fetch': false,
+    };
 
     // Handle optional React Native dependency for MetaMask SDK
     if (!isServer) {
