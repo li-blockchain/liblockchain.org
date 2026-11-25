@@ -3,6 +3,11 @@ const nextConfig = {
   reactStrictMode: true,
   productionBrowserSourceMaps: false,
   poweredByHeader: false,
+  // Bundle Pages Router dependencies into the server build, as the App Router
+  // already does. Left external, _app's wagmi/viem imports make Node open
+  // viem's ~700 chain definition files at once, which exceeds the file
+  // descriptor limit on Netlify's functions (EMFILE -> 500 on every page).
+  bundlePagesRouterDependencies: true,
   async headers() {
     return [
       {
