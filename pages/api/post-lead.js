@@ -21,9 +21,7 @@ async function postToDiscord(message) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        content: message,
-        // Submitted text is untrusted: never let it ping @everyone, roles or users.
-        allowed_mentions: { parse: [] }
+        content: message
       })
     });
 
@@ -96,47 +94,18 @@ async function postToNotion(data) {
 }
 
 
-// The endpoint is public and unauthenticated, and whatever it accepts is posted
-// into the partners' Discord channel and Notion database. Bound and normalise
-// every field so it cannot be used to inject arbitrary content there.
-const EMAIL_RE = /^[^\s@<>()\[\]\\,;:"]+@[^\s@<>()\[\]\\,;:"]+\.[^\s@<>()\[\]\\,;:"]{2,}$/;
-const MAX_EMAIL_LENGTH = 254;
-const MAX_SERVICES = 10;
-const MAX_SERVICE_LENGTH = 100;
-
-function cleanEmail(value) {
-  if (typeof value !== 'string') return null;
-  const email = value.trim();
-  if (email.length === 0 || email.length > MAX_EMAIL_LENGTH) return null;
-  return EMAIL_RE.test(email) ? email : null;
-}
-
-function cleanServices(value) {
-  if (!Array.isArray(value)) return [];
-  return value
-    .slice(0, MAX_SERVICES)
-    .map((s) => (typeof s?.name === 'string' ? s.name : ''))
-    // Drop control characters and anything that renders as markup or a link.
-    .map((name) => name.replace(/[\u0000-\u001f\u007f<>@`*_~|\[\]()\\]/g, '').replace(/\w+:\/\//g, '').trim().slice(0, MAX_SERVICE_LENGTH))
-    .filter(Boolean)
-    .map((name) => ({ name }));
-}
-
 async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const properties = req.body?.data?.properties;
-  if (!properties?.Email?.email) {
+  const email = properties?.Email?.email;
+  if (!email) {
     return res.status(400).json({ error: 'Email is required' });
   }
-  const email = cleanEmail(properties.Email.email);
-  if (!email) {
-    return res.status(400).json({ error: 'A valid email is required' });
-  }
 
-  const services = cleanServices(properties['Services interested in']?.multi_select);
+  const services = properties['Services interested in']?.multi_select || [];
   const servicesText = services.length > 0
     ? services.map(s => s.name).join(', ')
     : 'No services selected';
@@ -146,12 +115,7 @@ async function handler(req, res) {
   // Run both destinations independently — a failure in one must not block the other.
   const [discord, notion] = await Promise.all([
     postToDiscord(message),
-    postToNotion({
-      properties: {
-        Email: { email },
-        'Services interested in': { multi_select: services },
-      },
-    }),
+    postToNotion(req.body.data),
   ]);
 
   const diagnostics = { discord, notion };

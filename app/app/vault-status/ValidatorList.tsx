@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react'
 import { useChainId, useWriteContract, useWaitForTransactionReceipt, useAccount, useReadContract } from 'wagmi'
 import { parseEther, formatEther } from 'viem'
-import { useFreshReport } from '@/hooks/use-fresh-report'
-import { ReportStepNotice } from '@/components/vault/ReportFreshness'
 import {
   fetchVaultValidators,
   formatPubkeyDisplay,
@@ -67,12 +65,10 @@ interface ValidatorListProps {
 function TopUpValidatorDialog({
   validator,
   chainId,
-  dashboardAddress,
   onSuccess,
 }: {
   validator: ValidatorInfo
   chainId: number
-  dashboardAddress: string
   onSuccess?: () => void
 }) {
   const [open, setOpen] = useState(false)
@@ -94,11 +90,6 @@ function TopUpValidatorDialog({
   const { writeContract, data: hash, isPending, error: writeError, reset } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
 
-  // Whether PDG top-ups need a fresh report is not established, so refresh when
-  // possible but never block on it.
-  const report = useFreshReport(dashboardAddress)
-  const resetReport = report.reset
-
   // Parse PDG validator status
   const pdgStage = pdgValidatorStatus ? Number((pdgValidatorStatus as { stage: number }).stage) : null
   const pdgStageName = pdgStage !== null ? VALIDATOR_STAGE_LABELS[pdgStage as ValidatorStage] : null
@@ -110,9 +101,8 @@ function TopUpValidatorDialog({
       setAmount('')
       setLocalError(null)
       reset()
-      resetReport()
     }
-  }, [open, reset, resetReport])
+  }, [open, reset])
 
   // Handle success
   useEffect(() => {
@@ -121,7 +111,7 @@ function TopUpValidatorDialog({
     }
   }, [isSuccess, onSuccess])
 
-  const handleTopUp = async () => {
+  const handleTopUp = () => {
     setLocalError(null)
 
     if (!pdgAddress) {
@@ -153,9 +143,6 @@ function TopUpValidatorDialog({
       setLocalError('Maximum top-up amount is 2048 ETH')
       return
     }
-
-    // Transaction 1 of 2 when the vault's oracle report is stale.
-    if (!(await report.ensureFresh({ required: false }))) return
 
     // Call topUpExistingValidators with the validator pubkey and amount
     // Funds are pulled from the staking vault, not PDG balance
@@ -282,7 +269,7 @@ function TopUpValidatorDialog({
                   placeholder="Enter amount (1-2048 ETH)"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  disabled={isPending || isConfirming || report.isUpdating}
+                  disabled={isPending || isConfirming}
                 />
                 <p className="text-xs text-muted-foreground">
                   Min: 1 ETH, Max: 2048 ETH (Pectra limit)
@@ -312,8 +299,6 @@ function TopUpValidatorDialog({
                 </Alert>
               )}
 
-              <ReportStepNotice report={report} />
-
               {/* Error Display */}
               {displayError && (
                 <Alert variant="destructive">
@@ -327,16 +312,16 @@ function TopUpValidatorDialog({
               <Button
                 variant="outline"
                 onClick={() => setOpen(false)}
-                disabled={isPending || isConfirming || report.isUpdating}
+                disabled={isPending || isConfirming}
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleTopUp}
-                disabled={isPending || isConfirming || report.isUpdating || !amount || parseFloat(amount) <= 0 || !isActivatedInPdg || isLoadingPdgStatus}
+                disabled={isPending || isConfirming || !amount || parseFloat(amount) <= 0 || !isActivatedInPdg || isLoadingPdgStatus}
                 className="bg-brand-cyan-600 hover:bg-brand-cyan-700"
               >
-                {isPending || isConfirming || report.isUpdating ? (
+                {isPending || isConfirming ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     {isPending ? 'Confirm in Wallet...' : 'Processing...'}
@@ -359,12 +344,10 @@ function TopUpValidatorDialog({
 function ValidatorRow({
   validator,
   chainId,
-  dashboardAddress,
   onTopUpSuccess,
 }: {
   validator: ValidatorInfo
   chainId: number
-  dashboardAddress: string
   onTopUpSuccess?: () => void
 }) {
   const [copied, setCopied] = useState(false)
@@ -470,7 +453,6 @@ function ValidatorRow({
           <TopUpValidatorDialog
             validator={validator}
             chainId={chainId}
-            dashboardAddress={dashboardAddress}
             onSuccess={onTopUpSuccess}
           />
         ) : (
@@ -659,7 +641,6 @@ export default function ValidatorList({ vaultAddress, dashboardAddress, isLoadin
                   key={validator.pubkey}
                   validator={validator}
                   chainId={chainId}
-                  dashboardAddress={dashboardAddress}
                   onTopUpSuccess={handleTopUpSuccess}
                 />
               ))}

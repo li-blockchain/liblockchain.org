@@ -8,8 +8,6 @@ import { DASHBOARD_ABI, STETH_ABI, basisPointsToPercent, formatEth, parseDashboa
 import { STAKING_VAULT_ABI } from '../../../lib/contracts/stakingVault'
 import { transformCLIDeposits, parseCLIDepositJSON, createDepositSummary, formatPubkeyShort, type DepositSummary } from '../../../lib/utils/depositData'
 import ValidatorList from './ValidatorList'
-import { useFreshReport } from '@/hooks/use-fresh-report'
-import { ReportStatusBanner, ReportStepNotice } from '@/components/vault/ReportFreshness'
 
 // shadcn components
 import { Card, CardHeader, CardContent, CardTitle, CardDescription } from '@/components/ui/card'
@@ -301,11 +299,6 @@ function FundVaultDialog({
   const { writeContract, data: hash, isPending, error: writeError, reset } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
 
-  // Not required on-chain for this operation, but refreshed when possible so the
-  // figures it is validated against are current.
-  const report = useFreshReport(dashboardAddress)
-  const resetReport = report.reset
-
   const explorerUrl = getExplorerUrl(chainId, chains)
 
   // Reset state when dialog opens/closes
@@ -314,9 +307,8 @@ function FundVaultDialog({
       setAmount('')
       setLocalError(null)
       reset()
-      resetReport()
     }
-  }, [open, reset, resetReport])
+  }, [open, reset])
 
   // Handle success
   useEffect(() => {
@@ -337,9 +329,6 @@ function FundVaultDialog({
       setLocalError('Insufficient wallet balance')
       return
     }
-
-    // Transaction 1 of 2 when the vault's oracle report is stale.
-    if (!(await report.ensureFresh({ required: false }))) return
 
     try {
       await writeContract({
@@ -439,7 +428,7 @@ function FundVaultDialog({
                     min="0"
                     step="0.01"
                     className="pr-16"
-                    disabled={isPending || isConfirming || report.isUpdating}
+                    disabled={isPending || isConfirming}
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                     ETH
@@ -452,14 +441,12 @@ function FundVaultDialog({
                     size="sm"
                     className="text-xs text-brand-cyan-600"
                     onClick={() => setAmount(formatEther(walletBalance.value))}
-                    disabled={isPending || isConfirming || report.isUpdating}
+                    disabled={isPending || isConfirming}
                   >
                     Use Max
                   </Button>
                 )}
               </div>
-
-              <ReportStepNotice report={report} />
 
               {/* Error Message */}
               {displayError && (
@@ -471,15 +458,15 @@ function FundVaultDialog({
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending || isConfirming || report.isUpdating}>
+              <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending || isConfirming}>
                 Cancel
               </Button>
               <Button
                 onClick={handleFund}
-                disabled={!isConnected || isPending || isConfirming || report.isUpdating || !amount}
+                disabled={!isConnected || isPending || isConfirming || !amount}
                 className="bg-brand-cyan-500 hover:bg-brand-cyan-600"
               >
-                {isPending || isConfirming || report.isUpdating ? (
+                {isPending || isConfirming ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     {isPending ? 'Confirm in Wallet...' : 'Processing...'}
@@ -528,9 +515,6 @@ function MintStETHDialog({
   const { writeContract, data: hash, isPending, error: writeError, reset } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
 
-  const report = useFreshReport(dashboardAddress)
-  const resetReport = report.reset
-
   const explorerUrl = getExplorerUrl(chainId, chains)
 
   // Reset state when dialog opens/closes
@@ -539,9 +523,8 @@ function MintStETHDialog({
       setAmount('')
       setLocalError(null)
       reset()
-      resetReport()
     }
-  }, [open, reset, resetReport])
+  }, [open, reset])
 
   // Handle success
   useEffect(() => {
@@ -568,9 +551,6 @@ function MintStETHDialog({
       setLocalError('Amount exceeds remaining minting capacity')
       return
     }
-
-    // Transaction 1 of 2 when the vault's oracle report is stale.
-    if (!(await report.ensureFresh())) return
 
     try {
       await writeContract({
@@ -675,7 +655,7 @@ function MintStETHDialog({
                     min="0"
                     step="0.01"
                     className="pr-16"
-                    disabled={isPending || isConfirming || report.isUpdating}
+                    disabled={isPending || isConfirming}
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                     stETH
@@ -688,7 +668,7 @@ function MintStETHDialog({
                     size="sm"
                     className="text-xs text-green-600"
                     onClick={() => setAmount(formatEther(remainingMintingCapacitySteth))}
-                    disabled={isPending || isConfirming || report.isUpdating}
+                    disabled={isPending || isConfirming}
                   >
                     Use Max
                   </Button>
@@ -716,8 +696,6 @@ function MintStETHDialog({
                 </Alert>
               )}
 
-              <ReportStepNotice report={report} />
-
               {/* Error Message */}
               {displayError && (
                 <Alert variant="destructive">
@@ -728,15 +706,15 @@ function MintStETHDialog({
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending || isConfirming || report.isUpdating}>
+              <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending || isConfirming}>
                 Cancel
               </Button>
               <Button
                 onClick={handleMint}
-                disabled={!isConnected || isPending || isConfirming || report.isUpdating || !amount || remainingMintingCapacitySteth === 0n}
+                disabled={!isConnected || isPending || isConfirming || !amount || remainingMintingCapacitySteth === 0n}
                 className="bg-green-600 hover:bg-green-700"
               >
-                {isPending || isConfirming || report.isUpdating ? (
+                {isPending || isConfirming ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     {isPending ? 'Confirm in Wallet...' : 'Processing...'}
@@ -787,11 +765,6 @@ function BurnStETHDialog({
   const { writeContract, data: hash, isPending, error: writeError, reset } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
 
-  // Not required on-chain for this operation, but refreshed when possible so the
-  // figures it is validated against are current.
-  const report = useFreshReport(dashboardAddress)
-  const resetReport = report.reset
-
   const explorerUrl = getExplorerUrl(chainId, chains)
 
   // Reset state when dialog opens/closes
@@ -800,9 +773,8 @@ function BurnStETHDialog({
       setAmount('')
       setLocalError(null)
       reset()
-      resetReport()
     }
-  }, [open, reset, resetReport])
+  }, [open, reset])
 
   // Handle success
   useEffect(() => {
@@ -824,9 +796,6 @@ function BurnStETHDialog({
       setLocalError('Amount exceeds current liability')
       return
     }
-
-    // Transaction 1 of 2 when the vault's oracle report is stale.
-    if (!(await report.ensureFresh({ required: false }))) return
 
     try {
       await writeContract({
@@ -947,7 +916,7 @@ function BurnStETHDialog({
                     min="0"
                     step="0.01"
                     className="pr-16"
-                    disabled={isPending || isConfirming || report.isUpdating}
+                    disabled={isPending || isConfirming}
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                     stETH
@@ -960,7 +929,7 @@ function BurnStETHDialog({
                     size="sm"
                     className="text-xs text-red-600"
                     onClick={() => setAmount(formatEther(liabilitySteth))}
-                    disabled={isPending || isConfirming || report.isUpdating}
+                    disabled={isPending || isConfirming}
                   >
                     Burn All
                   </Button>
@@ -1008,8 +977,6 @@ function BurnStETHDialog({
                 </AlertDescription>
               </Alert>
 
-              <ReportStepNotice report={report} />
-
               {/* Error Message */}
               {displayError && (
                 <Alert variant="destructive">
@@ -1020,15 +987,15 @@ function BurnStETHDialog({
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending || isConfirming || report.isUpdating}>
+              <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending || isConfirming}>
                 Cancel
               </Button>
               <Button
                 onClick={handleBurn}
-                disabled={!isConnected || isPending || isConfirming || report.isUpdating || !amount || !liabilitySteth || liabilitySteth === 0n}
+                disabled={!isConnected || isPending || isConfirming || !amount || !liabilitySteth || liabilitySteth === 0n}
                 className="bg-red-600 hover:bg-red-700"
               >
-                {isPending || isConfirming || report.isUpdating ? (
+                {isPending || isConfirming ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     {isPending ? 'Confirm in Wallet...' : 'Processing...'}
@@ -1075,9 +1042,6 @@ function WithdrawDialog({
   const { writeContract, data: hash, isPending, error: writeError, reset } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
 
-  const report = useFreshReport(dashboardAddress)
-  const resetReport = report.reset
-
   const explorerUrl = getExplorerUrl(chainId, chains)
 
   // Reset state when dialog opens/closes
@@ -1086,9 +1050,8 @@ function WithdrawDialog({
       setAmount('')
       setLocalError(null)
       reset()
-      resetReport()
     }
-  }, [open, reset, resetReport])
+  }, [open, reset])
 
   // Handle success
   useEffect(() => {
@@ -1115,9 +1078,6 @@ function WithdrawDialog({
       setLocalError('Amount exceeds withdrawable balance')
       return
     }
-
-    // Transaction 1 of 2 when the vault's oracle report is stale.
-    if (!(await report.ensureFresh())) return
 
     try {
       await writeContract({
@@ -1218,7 +1178,7 @@ function WithdrawDialog({
                     min="0"
                     step="0.01"
                     className="pr-16"
-                    disabled={isPending || isConfirming || report.isUpdating}
+                    disabled={isPending || isConfirming}
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                     ETH
@@ -1231,7 +1191,7 @@ function WithdrawDialog({
                     size="sm"
                     className="text-xs text-brand-purple-600"
                     onClick={() => setAmount(formatEther(withdrawableValue))}
-                    disabled={isPending || isConfirming || report.isUpdating}
+                    disabled={isPending || isConfirming}
                   >
                     Use Max
                   </Button>
@@ -1248,8 +1208,6 @@ function WithdrawDialog({
                 </Alert>
               )}
 
-              <ReportStepNotice report={report} />
-
               {/* Error Message */}
               {displayError && (
                 <Alert variant="destructive">
@@ -1260,15 +1218,15 @@ function WithdrawDialog({
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending || isConfirming || report.isUpdating}>
+              <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending || isConfirming}>
                 Cancel
               </Button>
               <Button
                 onClick={handleWithdraw}
-                disabled={!isConnected || isPending || isConfirming || report.isUpdating || !amount || withdrawableValue === 0n}
+                disabled={!isConnected || isPending || isConfirming || !amount || withdrawableValue === 0n}
                 className="bg-brand-purple-500 hover:bg-brand-purple-600"
               >
-                {isPending || isConfirming || report.isUpdating ? (
+                {isPending || isConfirming ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     {isPending ? 'Confirm in Wallet...' : 'Processing...'}
@@ -2039,9 +1997,6 @@ function UnguaranteedDepositDialog({
   const { writeContract, data: hash, isPending, error: writeError, reset } = useWriteContract()
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
 
-  const report = useFreshReport(dashboardAddress)
-  const resetReport = report.reset
-
   const explorerUrl = getExplorerUrl(chainId, chains)
 
   // Track if we've already called onSuccess for this transaction
@@ -2057,9 +2012,8 @@ function UnguaranteedDepositDialog({
       setLocalError(null)
       hasCalledSuccess.current = false
       reset()
-      resetReport()
     }
-  }, [open, reset, resetReport])
+  }, [open, reset])
 
   // Handle success - only call onSuccess once per transaction
   useEffect(() => {
@@ -2115,9 +2069,6 @@ function UnguaranteedDepositDialog({
       setLocalError('PDG Policy must be set to "Allow Deposit & Prove" before making unguaranteed deposits')
       return
     }
-
-    // Transaction 1 of 2 when the vault's oracle report is stale.
-    if (!(await report.ensureFresh())) return
 
     try {
       // Transform to contract format
@@ -2252,7 +2203,7 @@ function UnguaranteedDepositDialog({
                     type="button"
                     variant="outline"
                     onClick={() => fileInputRef.current?.click()}
-                    disabled={isPending || isConfirming || report.isUpdating}
+                    disabled={isPending || isConfirming}
                     className="w-full"
                   >
                     <Upload className="w-4 h-4 mr-2" />
@@ -2271,7 +2222,7 @@ function UnguaranteedDepositDialog({
                   placeholder='[{"pubkey": "...", "withdrawal_credentials": "...", "amount": 32000000000, ...}]'
                   rows={6}
                   className="w-full font-mono text-sm p-3 border rounded-md focus:ring-2 focus:ring-brand-cyan-500 focus:border-transparent resize-y"
-                  disabled={isPending || isConfirming || report.isUpdating}
+                  disabled={isPending || isConfirming}
                 />
               </div>
 
@@ -2325,8 +2276,6 @@ function UnguaranteedDepositDialog({
                 </Card>
               )}
 
-              <ReportStepNotice report={report} />
-
               {/* Error Message */}
               {displayError && (
                 <Alert variant="destructive">
@@ -2337,15 +2286,15 @@ function UnguaranteedDepositDialog({
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending || isConfirming || report.isUpdating}>
+              <Button variant="outline" onClick={() => setOpen(false)} disabled={isPending || isConfirming}>
                 Cancel
               </Button>
               <Button
                 onClick={handleSubmitDeposits}
-                disabled={isPending || isConfirming || report.isUpdating || !parsedDeposits || !canPerformAction}
+                disabled={isPending || isConfirming || !parsedDeposits || !canPerformAction}
                 className="bg-rose-600 hover:bg-rose-700 text-black"
               >
-                {isPending || isConfirming || report.isUpdating ? (
+                {isPending || isConfirming ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     {isPending ? 'Confirm in Wallet...' : 'Processing...'}
@@ -3337,9 +3286,6 @@ export default function VaultStatusClient() {
       </section>
 
       <div className="space-y-12">
-        {/* Oracle report freshness — only renders while the vault's report is stale */}
-        {hasValidAddresses && <ReportStatusBanner dashboardAddress={dashboardAddress} />}
-
         {/* Key Metrics */}
         <section>
           <Card className="border border-gray-200">
