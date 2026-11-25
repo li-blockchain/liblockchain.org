@@ -10,6 +10,14 @@ export const metadata: Metadata = {
     template: '%s | Long Island Blockchain',
   },
   description: 'Long Island Blockchain - Web3 Development, Education, and Blockchain Services since 2016',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '48x48' },
+      { url: '/favicon-32.png', type: 'image/png', sizes: '32x32' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/site.webmanifest',
 }
 
 export const viewport: Viewport = {

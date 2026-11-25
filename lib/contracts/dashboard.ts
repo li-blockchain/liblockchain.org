@@ -27,6 +27,8 @@ export const DASHBOARD_ABI = [
   },
   { inputs: [], name: 'AlreadyInitialized', type: 'error' },
   { inputs: [], name: 'ConnectedToVaultHub', type: 'error' },
+  // Raised by VaultHub (through the Dashboard) when the vault's oracle report is stale.
+  { inputs: [{ internalType: 'address', name: 'vault', type: 'address' }], name: 'VaultReportStale', type: 'error' },
   { inputs: [], name: 'DashboardNotAllowed', type: 'error' },
   {
     inputs: [
@@ -709,6 +711,9 @@ export function parseDashboardError(error: unknown): string {
   }
   if (errorString.includes('ZeroAddress')) {
     return 'Invalid recipient address'
+  }
+  if (errorString.includes('VaultReportStale')) {
+    return 'The vault\'s oracle report is out of date. Update the report, then try again.'
   }
   if (errorString.includes('ConnectedToVaultHub')) {
     return 'Vault is already connected to VaultHub'
